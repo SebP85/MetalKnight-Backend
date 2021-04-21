@@ -4,7 +4,7 @@
 
  const { body, validationResult } = require('express-validator');
 
-exports.register = function (req, res) {
+exports.register = function (req, res, next) {
     // username must be an email
     body('username').isEmail(),
     // password must be at least 5 chars long
