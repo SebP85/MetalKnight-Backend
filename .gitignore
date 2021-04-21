@@ -1,0 +1,35 @@
+.DS_Store
+node_modules
+/dist
+
+# local certificate files
+certificate
+
+# local images
+images
+
+# requêtes
+request.rest
+
+# local env files
+.env.local
+.env.*.local
+config/.env
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+log/combined.log
+log/error.log
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+node_modules
