@@ -9,6 +9,8 @@ const cookieParser = require('cookie-parser');
 const winston = require('./log/winston');//enregistre les logs dans un fichier
 winston.info('API MetalKnight Lancée');
 
+const mongoSanitize = require('express-mongo-sanitize');//contre les attaque noSQL
+
 const auth = require('./middleware/auth');
 const userRoutes = require('./routes/user');
 const userTest = require('./routes/test');
@@ -40,6 +42,8 @@ const app = express();
 app.use(helmet());
 app.use(morgan('dev'));
 
+app.use(mongoSanitize());
+
 var optionsCors = {
   origin: 'http://localhost:8080',
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -62,7 +66,7 @@ app.use(cors(optionsCors));
 var parseForm = express.urlencoded({
   extended: true
 });*/
-app.use(cookieParser('cookie'));
+app.use(cookieParser('cookie'));//paramètres ?
 
 app.use(express.json());
 app.use(express.urlencoded({
