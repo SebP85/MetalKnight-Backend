@@ -9,7 +9,7 @@ const cookieParser = require('cookie-parser');
 const winston = require('./log/winston');//enregistre les logs dans un fichier
 winston.info('API MetalKnight Lancée');
 
-const mongoSanitize = require('express-mongo-sanitize');//contre les attaque noSQL
+const mongoSanitize = require('express-mongo-sanitize');//contre les attaques noSQL pour mongodb
 
 const auth = require('./middleware/auth');
 const userRoutes = require('./routes/user');
