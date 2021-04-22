@@ -4,6 +4,7 @@ const testCtrl = require('../controllers/test');
 const auth = require('../middleware/auth');
 const mail = require("../controllers/mail");
 const xssFilter = require("../controllers/xssFilter");
+const checkBody = require("../controllers/checkBody");
 
 const csrf = require("csurf");
 var csrfProtection = csrf({ cookie: true });
@@ -12,7 +13,7 @@ var parseForm = express.urlencoded({
 });
 const csrfProtectionCtrl = require('../controllers/csrf');
 
-router.get('/', xssFilter.filterRegister);
+router.get('/', checkBody.reqValidation);
 router.get('/login', csrfProtection, csrfProtectionCtrl.getToken, testCtrl.login);
 router.get('/getTest', parseForm, csrfProtection, csrfProtectionCtrl.checkToken, testCtrl.typeGet);//test route GET
 
