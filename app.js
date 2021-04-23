@@ -48,7 +48,7 @@ var optionsCors = {
 
 app.use(cors(optionsCors));
 
-app.use(cookieParser('cookie'));//paramètres ?
+app.use(cookieParser(process.env.COOKIE_PARSER_SECRET));
 
 app.use(express.json());
 app.use(express.urlencoded({
