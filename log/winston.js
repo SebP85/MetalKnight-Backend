@@ -45,4 +45,5 @@ module.exports = {
     if(process.env.DEVELOP === DEVELOP)
       logger.error(msg);
   },
+  logger: logger,
 }

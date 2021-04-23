@@ -1,6 +1,25 @@
+/**
+ * Listing
+ * 
+ * 1-Valider CSRF
+ * 2-Valider données d'entrée (noSQL, SQL, pas de script, regex, redos attack, ...)
+ * 3-filtrer xss
+ * 4-filtrer xml (si besoin)
+ * 5-décryptage données d'entrée (cookie+JWT+API key+formulaire envoyé) et authentification
+ * 6-objectif de la route
+ */
+
 const express = require('express');
 const router = express.Router();
-const userCtrl = require('../controllers/user');
+
+const auth = require('../middleware/auth');
+const mail = require("../controllers/mail");
+const xssFilter = require("../controllers/xssFilter");
+const checkBody = require("../controllers/checkBody");
+
+//exemple
+//const userCtrl = require('../controllers/user');
+//const testCtrl = require('../controllers/test');
 
 const csrf = require("csurf");
 var csrfProtection = csrf({ cookie: true });
@@ -9,12 +28,14 @@ var parseForm = express.urlencoded({
 });
 const csrfProtectionCtrl = require('../controllers/csrf');
 
+//Routes connexion
+router.get('/login', /*parseForm,*/ csrfProtection, csrfProtectionCtrl.getToken, checkBody.reqValidation, xssFilter.filterRegister, /*xml,*/ auth/*, objectifRoute*/);
+router.get('/register', csrfProtection, csrfProtectionCtrl.getToken, );
+router.get('/verify/:token/:refreshToken', );
 
-router.post('/signup', userCtrl.signup);
-router.post('/login', csrfProtection, csrfProtectionCtrl.getToken, userCtrl.login);//get ?
-router.post('/login/codeVerification', userCtrl.codeVerification);//vérification de l'utilisateur par un code envoyé par email
-router.get('/verify/:token/:refreshToken', userCtrl.verify);//Vérification que l'email existe
+//Routes principales
+router.get('/', );
+
+router.get('/getProfile', parseForm, csrfProtection, csrfProtectionCtrl.checkToken, );
 
 module.exports = router;
-
-//manque logout => refresh JWT

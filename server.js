@@ -4,6 +4,7 @@ const app = require('./app');
 const fs = require('fs');
 const path = require('path');
 
+//Pour générer https => ssl
 const key = fs.readFileSync(path.join(__dirname, 'certificate', 'server.key'));
 const cert = fs.readFileSync(path.join(__dirname, 'certificate', 'server.cert'));
 const options = { key, cert };
