@@ -1,10 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const config = require('./config/config');
 const helmet = require('helmet');//Protège l'en-tête
 const morgan = require('morgan');//affiche les log en console
 const cors = require('cors');//Configure l'en-tête
 const cookieParser = require('cookie-parser');
+const config = require('./config/config');
 const winston = require('./log/winston');//enregistre les logs dans un fichier
 const { logger } = require('./log/winston');
 if(process.env.DEVELOP === "false") logger.info('API '+process.env.NOM_APP+' Lancée');
@@ -24,10 +24,9 @@ mongoose.connect(config.db.database,
     if(process.env.DEVELOP === "true") console.log('Connexion à MongoDB réussie !');
     if(process.env.DEVELOP === "false") logger.info('BDD OK');
   })
-  .catch(() => { if(process.env.DEVELOP === "true") {
-    console.log('Connexion à MongoDB échouée !');
-    logger.error('BDD NOK');
-  }
+  .catch(() => {
+    if(process.env.DEVELOP === "true") console.log('Connexion à MongoDB échouée !');
+    if(process.env.DEVELOP === "false") logger.error('BDD NOK');
   });
 
 const app = express();
@@ -65,7 +64,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use('/apiMetalKnight', userRoutes);
+app.use('/api'+config.email.NOM_APP, userRoutes);
 
 app.use(function (req, res, next) {
   if(process.env.DEVELOP === "true") console.log('---------------------------------------------------------   Requête traitée   ------------------------------------------------------------------');

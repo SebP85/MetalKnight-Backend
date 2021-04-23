@@ -21,6 +21,7 @@ const checkBody = require("../controllers/checkBody");
 //const userCtrl = require('../controllers/user');
 //const testCtrl = require('../controllers/test');
 
+//Protection contre CSRF
 const csrf = require("csurf");
 var csrfProtection = csrf({ cookie: true });
 var parseForm = express.urlencoded({
@@ -29,9 +30,9 @@ var parseForm = express.urlencoded({
 const csrfProtectionCtrl = require('../controllers/csrf');
 
 //Routes connexion
+router.get('/register', csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, /*xml,*/ /*objectifRoute*/);
+router.get('/verify/:token/:refreshToken', csrfProtection, checkBody.reqValidation, xssFilter.filterRegister, /*xml,*/ /*objectifRoute*/);
 router.get('/login', /*parseForm,*/ csrfProtection, csrfProtectionCtrl.getToken, checkBody.reqValidation, xssFilter.filterRegister, /*xml,*/ auth/*, objectifRoute*/);
-router.get('/register', csrfProtection, csrfProtectionCtrl.getToken, );
-router.get('/verify/:token/:refreshToken', );
 
 //Routes principales
 router.get('/', );

@@ -4,6 +4,7 @@ const db = require('./database');
 const token = require('./token');
 const googleAPI = require('./google_api');
 const email = require('./mail');
+const cookie = require('./cookie');
 
 const {resolve} = require('path');
 
@@ -20,4 +21,5 @@ module.exports = {
   token: token(env),
   googleAPI: googleAPI(env),
   email: email(env),
+  cookie: cookie(env),
 };
