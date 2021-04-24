@@ -16,8 +16,8 @@ function isEmail(val){
         .some.equal('.')
         .test(val);
 
-    //console.log("v1 ", v);
-    if(!V && process.env.DEVELOP === "false") logger.error("Email =>", val);
+    //console.log("email", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("Email =>", val);
 
     return v;
 }
@@ -31,13 +31,79 @@ function isStrongPassword(val){
         .some.lowercase()
         .some.uppercase()
         .some.numeric()
-        .pattern(/.*[-+!*$@%_^|~#'"`.:;,?<>ø£€ùµ°=()éèê]/)//doit avoir un des caractères acceptés entre [], ne peut pas être /[]
+        .pattern(/[-+!*$@%_^|~#'"`.:;,?<>ø£€ùµ°=()éèê]/)//doit avoir un des caractères acceptés entre [], ne peut pas être /[]
         .not.includes('&')//caractère spéciaux interdits
         .not.includes('{')
         .test(val);
 
-    //console.log("v2 ", v);
-    if(!V && process.env.DEVELOP === "false") logger.error("Password =>", val);
+    //console.log("password", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("Password =>", val);
+
+    return v;
+}
+
+function isIndividu(val){
+    var v = v8n()
+        .string()
+        .passesAnyOf(v8n().exact("un particulier"), v8n().exact("un professionnel"))
+        .test(val);
+
+    //console.log("individu", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("Individu =>", val);
+
+    return v;
+}
+
+function isFirstName(val){
+    var v = v8n()
+        .string()
+        .minLength(2)
+        .pattern(/^[a-zA-Zéêèàù'ùëäâ]+$/)//autorisé
+        .pattern(/^[^0-9.;,?:!§%*µ$£ø^¨"~&{()}|_`@=+-<>]+$/)//interdit
+        .test(val);
+
+    //console.log("firstName", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("firstName =>", val);
+
+    return v;
+}
+
+function isLastName(val){
+    var v = v8n()
+        .string()
+        .minLength(2)
+        .pattern(/^[a-zA-Zéêèàù'ùëäâ]+$/)//autorisé
+        .pattern(/^[^0-9.;,?:!§%*µ$£ø^¨"~&{()}|_`@=+-<>]+$/)//interdit
+        .test(val);
+
+    //console.log("lastName", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("lastName =>", val);
+
+    return v;
+}
+
+function isDate(val){//type => mm/jj/aaaa
+    var v = v8n()
+        .pattern(/^[0-9\/]+$/)//autorisé
+        //.pattern(/^\d{2}\/\d{2}\/\d{4}$/)
+        .pattern(/^((((0[13578])|([13578])|(1[02]))[\/](([1-9])|([0-2][0-9])|(3[01])))|(((0[469])|([469])|(11))[\/](([1-9])|([0-2][0-9])|(30)))|((2|02)[\/](([1-9])|([0-2][0-9]))))[\/]\d{4}$|^\d{4}$/)
+        //.length(10)
+        .test(val);
+
+    //console.log("date", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("date =>", val);
+
+    return v;
+}
+
+function isCivilite(val){
+    var v = v8n()
+        .string()
+        .passesAnyOf(v8n().exact("monsieur"), v8n().exact("madame"))
+        .test(val);
+
+    //console.log("civilite", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("civilite =>", val);
 
     return v;
 }
@@ -47,7 +113,9 @@ exports.validParamRegister = function (req, res, next){
     if(process.env.DEVELOP === "false") logger.info("Vérification des données d'entrées");
 
     //v8n
-    if(isEmail(req.body.email) && isStrongPassword(req.body.password)){
+    if(isEmail(req.body.email) && isStrongPassword(req.body.password) && isIndividu(req.body.individu) &&
+        isFirstName(req.body.firstName) && isLastName(req.body.lastName) && isDate(req.body.birthday) &&
+            isCivilite(req.body.civilite)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
         if(process.env.DEVELOP === "false") logger.error("Données d'entrées ok");
         next();
@@ -55,8 +123,6 @@ exports.validParamRegister = function (req, res, next){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées nok");
         if(process.env.DEVELOP === "false") logger.error("Données d'entrées nok");
     }
-
-    
 };
 
 exports.reqValidation = function (req, res, next) {
