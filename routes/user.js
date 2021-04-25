@@ -7,19 +7,19 @@
  * 4-filtrer xml (si besoin)
  * 5-décryptage données d'entrée (cookie+JWT+API key+formulaire envoyé) et authentification
  * 6-objectif de la route
+ * 
+ * attaque ddos = beaucoup de requêtes pour down le serveur
+ * brute force pour passer le mot de passe (bloquer l'adresse IP après x tentative + MDP avec 8 carac/symbole/majuscule + captcha=image + double identification)
  */
 
 const express = require('express');
 const router = express.Router();
 
 const auth = require('../middleware/auth');
-const mail = require("../controllers/mail");
+//const mail = require("../controllers/mail");
 const xssFilter = require("../controllers/xssFilter");
 const checkBody = require("../controllers/checkBody");
-
-//exemple
-//const userCtrl = require('../controllers/user');
-//const testCtrl = require('../controllers/test');
+const userCtrl = require("../controllers/user");
 
 //Protection contre CSRF
 const csrf = require("csurf");
@@ -30,13 +30,13 @@ var parseForm = express.urlencoded({
 const csrfProtectionCtrl = require('../controllers/csrf');
 
 //Routes connexion
-router.get('/register', csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, /*xml,*/ /*objectifRoute*/);
+//exemple: router.get('/register', /*parseForm,*/ csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, /*xml,*/ /*objectifRoute*/);
+router.get('/register', csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, userCtrl.signup);
 router.get('/verify/:token/:refreshToken', csrfProtection, checkBody.reqValidation, xssFilter.filterRegister, /*xml,*/ /*objectifRoute*/);
 router.get('/login', /*parseForm,*/ csrfProtection, csrfProtectionCtrl.getToken, checkBody.reqValidation, xssFilter.filterRegister, /*xml,*/ auth/*, objectifRoute*/);
 
 //Routes principales
 router.get('/', );
-
 router.get('/getProfile', parseForm, csrfProtection, csrfProtectionCtrl.checkToken, );
 
 module.exports = router;

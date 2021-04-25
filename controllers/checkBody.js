@@ -22,7 +22,7 @@ function isEmail(val){
     return v;
 }
 
-function isStrongPassword(val){
+function isStrongPassword(val){//Caractère spéciaux => %@_$|#?!
     var v = v8n()
         .string()
         .not.null()
@@ -31,7 +31,7 @@ function isStrongPassword(val){
         .some.lowercase()
         .some.uppercase()
         .some.numeric()
-        .pattern(/[-+!*$@%_^|~#'"`.:;,?<>ø£€ùµ°=()éèê]/)//doit avoir un des caractères acceptés entre [], ne peut pas être /[]
+        .pattern(/[%@_$|#?!]/)//doit avoir un des caractères acceptés entre [], ne peut pas être /[]
         .not.includes('&')//caractère spéciaux interdits
         .not.includes('{')
         .test(val);
@@ -125,6 +125,7 @@ exports.validParamRegister = function (req, res, next){
     }
 };
 
+//exemple
 exports.reqValidation = function (req, res, next) {
     // username must be an email
     body('username').isEmail(),
@@ -166,6 +167,3 @@ exports.reqValidation = function (req, res, next) {
         .then(result => console.log("v8n ok"))
         .catch(result => console.log("v8n nok"));
 };
-
-
-//////faire les autres

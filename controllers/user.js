@@ -136,7 +136,7 @@ exports.verify = (req, res, next) => {//vérification que l'email existe
 exports.signup = (req, res, next) => {
   if(process.env.DEVELOP === "true") console.log('Requete signup');
 
-  /*
+  //*
   console.log('pwd => '+req.body.data);
   console.log('username => '+req.body.userName);
   console.log('email => '+req.body.email);
@@ -144,7 +144,7 @@ exports.signup = (req, res, next) => {
 
   bcrypt.hash(req.body.password, 10)
     .then(hash => {
-      //console.log('Hash du pwd');
+      console.log('Hash du pwd');
 
       const userObject = req.body;
       delete userObject._id;
