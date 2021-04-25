@@ -8,6 +8,8 @@
  * 5-décryptage données d'entrée (cookie+JWT+API key+formulaire envoyé) et authentification
  * 6-objectif de la route
  * 
+ * 7-installer sqreen pour se protéger des attaques
+ * 
  * attaque ddos = beaucoup de requêtes pour down le serveur
  * brute force pour passer le mot de passe (bloquer l'adresse IP après x tentative + MDP avec 8 carac/symbole/majuscule + captcha=image + double identification)
  */
@@ -16,7 +18,7 @@ const express = require('express');
 const router = express.Router();
 
 const auth = require('../middleware/auth');
-//const mail = require("../controllers/mail");
+const mail = require("../controllers/mail");
 const xssFilter = require("../controllers/xssFilter");
 const checkBody = require("../controllers/checkBody");
 const userCtrl = require("../controllers/user");
@@ -31,7 +33,7 @@ const csrfProtectionCtrl = require('../controllers/csrf');
 
 //Routes connexion
 //exemple: router.get('/register', /*parseForm,*/ csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, /*xml,*/ /*objectifRoute*/);
-router.get('/register', csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, userCtrl.signup);
+router.get('/register', csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, mail.checkEmail, userCtrl.signup);
 router.get('/verify/:token/:refreshToken', csrfProtection, checkBody.reqValidation, xssFilter.filterRegister, /*xml,*/ /*objectifRoute*/);
 router.get('/login', /*parseForm,*/ csrfProtection, csrfProtectionCtrl.getToken, checkBody.reqValidation, xssFilter.filterRegister, /*xml,*/ auth/*, objectifRoute*/);
 

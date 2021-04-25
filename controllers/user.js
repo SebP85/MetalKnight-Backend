@@ -5,94 +5,8 @@ const User = require('../models/User');
 
 const config = require('../config/config');
 const crypto = require('crypto');
-var nodemailer = require('nodemailer');
-
-//const nodemailer = require('nodemailer');
-//const mailgun = require('nodemailer-mailgun-transport');
-
-/*function sendEmail(email, token, tokenRefresh){
-  if(process.env.DEVELOP === "true") console.log("fonction sendEmail !");
-
-  const auth = {
-    auth: {
-      api_key: '716603a41030b10142a4f656f7cba2fe-1553bd45-a0a51f6a',
-      domain: 'sandbox3f4a9798481c4496bd179b97739b6581.mailgun.org',
-    }
-  };
-
-  if(process.env.DEVELOP === "true") console.log("Create Transport !");
-  let transporter = nodemailer.createTransport( mailgun(auth) );
-
-  if(process.env.DEVELOP === "true") console.log("mailOptions !");
-  const mailOptions = {
-    from: 'MetalKnight <sebdistribution@gmail.com>',
-    to: email,
-    subject: "[MetalKnight] Confirmation d'E-mail",
-    html: `<p><a href=https://localhost:4000/apiMetalKnight/auth/verify/${token}/${tokenRefresh}>Cliquez ici</a> pour vérifier votre adresse. Merci</p>`,
-  };
-
-  if(process.env.DEVELOP === "true") console.log("envoie du mail !");
-  transporter.sendMail(mailOptions, (err, data) => {
-    if(err){
-      if(process.env.DEVELOP === "true") console.log('Error: ', err);
-      else console.log(process.env.MSG_ERROR_PRODUCTION);
-    } else {
-      if(process.env.DEVELOP === "true") console.log('Message sent !');
-    }
-
-    return true;
-  });
-
-
-  /*
-  Si besoin
-
-  var smtpTransport = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, //secure : true for 465, secure: false for port 587 
-    auth: {
-        user: '{{email}}',
-        pass: '{{app_password}}'
-    }
-  });
-  
-
-}*/
-
-/*function sendEmailConfirmation(email) {
-  if(process.env.DEVELOP === "true") console.log("fonction sendEmailConfirmation !");
-
-  const auth = {
-    auth: {
-      api_key: '716603a41030b10142a4f656f7cba2fe-1553bd45-a0a51f6a',
-      domain: 'sandbox3f4a9798481c4496bd179b97739b6581.mailgun.org',
-    }
-  };
-
-  if(process.env.DEVELOP === "true") console.log("Create Transport !");
-  let transporter = nodemailer.createTransport( mailgun(auth) );
-
-  if(process.env.DEVELOP === "true") console.log("mailOptions !");
-  const mailOptions = {
-    from: 'MetalKnight <sebdistribution@gmail.com>',
-    to: email,
-    subject: "[MetalKnight] E-mail validé",
-    html: `<p>Votre email : ${email} est validé. Merci</p>`,
-  };
-
-  if(process.env.DEVELOP === "true") console.log("envoie du mail !");
-  transporter.sendMail(mailOptions, (err, data) => {
-    if(err){
-      if(process.env.DEVELOP === "true") console.log('Error: ', err)
-      else console.log(process.env.MSG_ERROR_PRODUCTION)
-    } else {
-      if(process.env.DEVELOP === "true") console.log('Message sent !');
-    }
-
-    return true;
-  });
-}*/
+const mail = require("../controllers/mail");
+const { logger } = require('../log/winston');
 
 exports.verify = (req, res, next) => {//vérification que l'email existe
   if(process.env.DEVELOP === "true") console.log("fonction verify !");
@@ -135,16 +49,17 @@ exports.verify = (req, res, next) => {//vérification que l'email existe
 
 exports.signup = (req, res, next) => {
   if(process.env.DEVELOP === "true") console.log('Requete signup');
+  else logger.info("Requête signup lancée !");
 
-  //*
-  console.log('pwd => '+req.body.data);
-  console.log('username => '+req.body.userName);
-  console.log('email => '+req.body.email);
-  //*/
+  if(process.env.DEVELOP === "true") {
+    console.log('pwd => '+req.body.password);
+    console.log('username => '+req.body.firstName);
+    console.log('email => '+req.body.email);
+  }
 
   bcrypt.hash(req.body.password, 10)
     .then(hash => {
-      console.log('Hash du pwd');
+      if(process.env.DEVELOP === "true") console.log('Hash du pwd');
 
       const userObject = req.body;
       delete userObject._id;
@@ -155,7 +70,7 @@ exports.signup = (req, res, next) => {
         lastName: req.body.lastName,
         password: hash,
         individu: req.body.individu,
-        birthday: req.body.birthday,
+        birthday: new Date(req.body.birthday),
         civilite: req.body.civilite,
         token: crypto.randomBytes(128).toString('hex'),
         refreshToken: crypto.randomBytes(128).toString('hex'),
@@ -163,17 +78,25 @@ exports.signup = (req, res, next) => {
       });
 
       //Envoie l'email
-      //sendEmail(req.body.email, user.token, user.refreshToken);
+      req.body.token = user.token;
+      req.body.refreshToken = user.refreshToken;
+      mail.sendVerifyEmail;
 
 
-      let data = user.save()
+      user.save()
         .then(() => {
           if(process.env.DEVELOP === "true") res.status(201).json({ message: 'Utilisateur créé !' })
-          else res.status(201).json({ message: process.env.MSG_OK_PRODUCTION })
+          else {
+            res.status(201).json({ message: process.env.MSG_OK_PRODUCTION });
+            logger.info("Enregistrement du nouvelle utilisateur", user.email);
+          }
         })
         .catch(error => {
           if(process.env.DEVELOP === "true") res.status(400).json({ error })
-          else console.log(process.env.MSG_ERROR_PRODUCTION)
+          else {
+            console.log(process.env.MSG_ERROR_PRODUCTION);
+            logger.error("Erreur 400 d'enregistrement du nouvelle utilisateur", error.message);
+          }
         });
 
       
@@ -181,7 +104,10 @@ exports.signup = (req, res, next) => {
     .catch(error => {
       if(process.env.DEVELOP === "true") console.log('erreur 500');
       if(process.env.DEVELOP === "true") res.status(500).json({ error })
-      else res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION })
+      else {
+        res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
+        logger.error("Erreur 500 d'enregistrement du nouvelle utilisateur", error.message);
+      }
     });
 };
 
