@@ -48,7 +48,7 @@ async function sendMail(email, subject, text, html) {
     }
 }
 
-exports.sendVerifyEmail = (email, token, refreshToken) => {
+exports.sendVerifyEmail = (email, token, refreshToken, callback) => {
     if(process.env.DEVELOP === "true") console.log("Préparation de l'email");
     console.log("email", email);
     console.log("token", token);
@@ -56,7 +56,7 @@ exports.sendVerifyEmail = (email, token, refreshToken) => {
 
     var text = 'Mail de vérification';
     var html =  '<h1>Bienvenue sur '+config.email.NOM_APP+'</h1>'+
-                '<p>Vous venez de vous vous inscrire sur notre site et nous vous en remercions.<br />'+
+                '<p>Vous venez de vous inscrire sur notre site et nous vous en remercions.<br />'+
                 '<a href=https://localhost:4000/apiMetalKnight/auth/verify/${token}/${tokenRefresh}>Cliquez ici</a> pour finaliser la vérification de votre compte.</p>'+
                 '<p>Merci</p>';
     var subject = "Confirmation d'E-mail";
@@ -65,18 +65,20 @@ exports.sendVerifyEmail = (email, token, refreshToken) => {
 
     sendMail(email, subject, text, html)
         .then(r=> {
+            console.log("then sendveryfyemail");
             if(process.env.DEVELOP === "true") console.log('Email sent ...', r);
             else logger.info("email de vérification envoyé !");
 
-            return true;
+            callback(true);
         })
         .catch(err => {
+            console.log("catch sendveryfyemail");
             if(process.env.DEVELOP === "true"){
                 console.log(err.message);
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
             } else logger.error("Problème pour envoyer l'email de vérification !", err.message);
 
-            return false;
+            callback(false);
         });
 }
 
@@ -89,12 +91,13 @@ exports.sendConfirmationEmail = (req, res, next) => {
     var subject = "Mail validé";
 
     sendMail(req.body.email, subject, text, html)
-        .then(r=> {
+        .then(r=> {//communication avec le serveur ok
             if(process.env.DEVELOP === "true") console.log('Email sent ...', r);
             else logger.info("Email pour validation du compte envoyé !");
             next();
+            
         })
-        .catch(err => {
+        .catch(err => {//erreur avec la communication du serveur
             if(process.env.DEVELOP === "true"){
                 console.log(err.message);
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');

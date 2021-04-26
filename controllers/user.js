@@ -79,33 +79,50 @@ exports.signup = (req, res, next) => {
 
       //Envoie l'email
       if(process.env.DEVELOP === "true") console.log("Envoie de l'email");
-      if(mail.sendVerifyEmail(user.email, user.token, user.refreshToken))
-        user.save()
-          .then(() => {
-            if(process.env.DEVELOP === "true") res.status(201).json({ message: 'Utilisateur créé !' })
-            else {
-              res.status(201).json({ message: process.env.MSG_OK_PRODUCTION });
-              logger.info("Enregistrement du nouvelle utilisateur", user.email);
-            }
-          })
-          .catch(error => {
-            if(process.env.DEVELOP === "true") res.status(400).json({ error })
-            else {
-              console.log(process.env.MSG_ERROR_PRODUCTION);
-              logger.error("Erreur 400 d'enregistrement du nouvelle utilisateur", error.message);
-            }
-          });
+      mail.sendVerifyEmail(user.email, user.token, user.refreshToken, (result) => {
+        if(result)
+          user.save()
+            .then(() => {
+              if(process.env.DEVELOP === "true") {
+                console.log("then user");
+                res.status(201).json({ message: 'Utilisateur créé !' });
+              } else {
+                res.status(201).json({ message: process.env.MSG_OK_PRODUCTION });
+                logger.info("Enregistrement du nouvelle utilisateur", user.email);
+              }
 
+              next();
+            })
+            .catch(error => {
+              if(process.env.DEVELOP === "true") {
+                console.log("catch user");
+                res.status(400).json({ error });
+              } else {
+                console.log(process.env.MSG_ERROR_PRODUCTION);
+                logger.error("Erreur 400 d'enregistrement du nouvelle utilisateur", error.message);
+              }
+            });
+        else {
+          if(process.env.DEVELOP === "true") res.status(500).json({ message: "error 500, pb mail" })
+          else {
+            res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
+            logger.error("Erreur 500 problème avec l'envoie du mail", error.message);
+          }
+        }
+      });
       
     })
     .catch(error => {
-      if(process.env.DEVELOP === "true") console.log('erreur 500');
-      if(process.env.DEVELOP === "true") res.status(500).json({ error })
-      else {
+      if(process.env.DEVELOP === "true") {
+        console.log('erreur 500');
+        res.status(500).json({ error });
+      } else {
         res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
         logger.error("Erreur 500 d'enregistrement du nouvelle utilisateur", error.message);
       }
     });
+
+    console.log("fin fonction signup");
 };
 
 exports.login = (req, res, next) => { //  ===> ajouter refreshToken
