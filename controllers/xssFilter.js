@@ -30,3 +30,16 @@ exports.filterVerify = function (req, res, next) {//on transforme les données s
     //console.log(req);
     next();
 };
+
+exports.filterLogin = function (req, res, next) {//on transforme les données si danger
+    if(process.env.DEVELOP === "true") console.log("fonction xss");
+    if(process.env.DEVELOP === "false") logger.info('Traitement contre XSS attack');
+
+    req.body.email = xss(req.body.email);
+    req.body.password = xss(req.body.password);
+
+    //req.body.csrf à faire ?
+    
+    //console.log(req);
+    next();
+};

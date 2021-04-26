@@ -7,6 +7,38 @@ const config = require('../config/config');
 const crypto = require('crypto');
 const mail = require("../controllers/mail");
 const { logger } = require('../log/winston');
+const { log } = require('util');
+
+////////////////////////////////////////////////////////////////////////////   Fonction    /////////////////////////////////////////////////////////////////////////
+
+function nbreTentative(user) {//Vérifie le nombre de tentative lors de la connexion (limité à 5)
+  if(process.env.DEVELOP === "true") console.log('Fonction nbreTentative');
+  else logger.info("Fonction nbreTentative lancée !");
+
+  console.log(user.tentativesConnexion);
+  //console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+  
+};
+
+function initNbreTentativeConnexion(user) {//réinitialisation à 0
+  if(process.env.DEVELOP === "true") console.log('Fonction initNbreTentativeConnexion');
+  else logger.info("Fonction initNbreTentativeConnexion lancée !");
+
+  console.log(user.tentativesConnexion);
+  //console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+  
+};
+
+function compteSuspendu(user) {//réinitialisation à 0
+  if(process.env.DEVELOP === "true") console.log('Fonction compteSuspendu');
+  else logger.info("Fonction compteSuspendu lancée !");
+
+  console.log(user.suspendu);
+  //console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+  
+};
+
+/////////////////////////////////////////////////////////////////////////////   Exports    //////////////////////////////////////////////////////////////////////////
 
 exports.verify = (req, res, next) => {//vérification que l'email existe et validation de l'utilisateur
   if(process.env.DEVELOP === "true") console.log("fonction verify !");
@@ -167,7 +199,7 @@ exports.signup = (req, res, next) => {//Enregistrement du nouvel utilisateur
     console.log("fin fonction signup");
 };
 
-/*exports.login = (req, res, next) => { //  ===> ajouter refreshToken
+exports.login = (req, res, next) => { //  ===> ajouter refreshToken
   if(process.env.DEVELOP === "true") console.log('Requete login');
   /*
   console.log("user_serv => "+req.body.userName);
@@ -175,15 +207,49 @@ exports.signup = (req, res, next) => {//Enregistrement du nouvel utilisateur
   console.log("email_serv => "+req.body.email);
   /**/
 
-  /*User.findOne({ email: req.body.email })
+  User.findOne({ email: req.body.email })
     .then(user => {
       if (!user) {
-        if(process.env.DEVELOP === "true") return res.status(401).json({ error: 'Utilisateur non trouvé !' });
-        else return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
-      }/* else {
-        console.log("email trouvé");
-      }*/
-      /*bcrypt.compare(req.body.password, user.password)
+        if(process.env.DEVELOP === "true") {
+          console.log("Utilisateur non trouvé !");
+          console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+          return res.status(401).json({ error: 'Utilisateur non trouvé !' });
+        } else {
+          logger.error("Utilisateur non trouvé !");
+          return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        }
+      } else {
+        //On vérifie si le compte est suspendu
+        if(process.env.DEVELOP === "true") console.log("check si compte suspendu");
+        else logger.info("check si compte suspendu");
+        if(compteSuspendu(user)) {
+          if(process.env.DEVELOP === "true") {
+            console.log("Compte suspendu");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+            return res.status(401).json({ error: 'Compte suspendu' });
+          }
+          else {
+            logger.error("Compte suspendu");
+            return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+          }
+        }
+
+        //On vérifie le nombre de tentative de connexion
+        if(process.env.DEVELOP === "true") console.log("check nombre de tentatives de connexion");
+        else logger.info("check nombre de tentatives de connexion");
+        if(nbreTentative(user) >= config.login.MAX_CONNEXION){
+          if(process.env.DEVELOP === "true") {
+            console.log("nombre de tentatives de connexion max atteint");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+            return res.status(401).json({ error: 'nombre de tentatives de connexion max atteint' });
+          } else {
+            logger.error("nombre de tentatives de connexion max atteint");
+            return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+          }
+        }
+      }
+
+      bcrypt.compare(req.body.password, user.password)
         .then(valid => {
           if(process.env.DEVELOP === "true") console.log('envoie token');
           if (!valid) {
@@ -191,8 +257,10 @@ exports.signup = (req, res, next) => {//Enregistrement du nouvel utilisateur
             else return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
           }
 
+          initNbreTentativeConnexion(user);
+
           /* 7. On créer le refresh token et on le stocke en BDD */
-          /*const refreshToken = crypto.randomBytes(128).toString('base64');
+          const refreshToken = crypto.randomBytes(128).toString('base64');
       
           /*await RefreshToken.create({
             userId: user.id,
@@ -200,7 +268,7 @@ exports.signup = (req, res, next) => {//Enregistrement du nouvel utilisateur
             expiresAt: Date.now() + config.refreshToken.expiresIn
           });*/
 
-          /*if(process.env.DEVELOP === "true") console.log('refreshToken => '+refreshToken);
+          if(process.env.DEVELOP === "true") console.log('refreshToken => '+refreshToken);
 
           res.cookie('test', refreshToken, {
             maxAge: config.token.refreshToken.expiresIn,
@@ -247,21 +315,4 @@ exports.signup = (req, res, next) => {//Enregistrement du nouvel utilisateur
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
       } else res.status(500).json({ error: process.env.MSG_ERROR_PRODUCTION });
     });
-};*/
-
-/*exports.codeVerification = (req, res, next) => {//vérification par email de l'utilisateur
-  if(process.env.DEVELOP === "true") console.log('Requete codeVerification');
-  else logger.info("Requête codeVerification lancée !");
-
-  //console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-
-};*/
-
-exports.nbreTentative = (req, res, next) => {//Vérifie le nombre de tentative lors de la connexion (limité à 5)
-  if(process.env.DEVELOP === "true") console.log('Requete nbreTentative');
-  else logger.info("Requête nbreTentative lancée !");
-
-  //console.log(req);
-  //console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-  
 };

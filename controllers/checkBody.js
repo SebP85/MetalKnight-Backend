@@ -2,7 +2,7 @@
  * Vérifie les données d'entrées de la requête
  */
 
-const { body, validationResult, oneOf } = require('express-validator');//valide les paramètres avec des fonctions préprogrammées
+//const { body, validationResult, oneOf } = require('express-validator');//valide les paramètres avec des fonctions préprogrammées
 const v8n = require('v8n');//valide les paramètres d'entrées et peutajouter des fonctions chainés
 //voir https://imbrn.github.io/v8n/#what-s-v8n et https://github.com/imbrn/v8n/tree/master/src et https://imbrn.github.io/v8n/api/#testasync
 
@@ -131,7 +131,7 @@ exports.validParamRegister = function (req, res, next){
         isFirstName(req.body.firstName) && isLastName(req.body.lastName) && isDate(req.body.birthday) &&
             isCivilite(req.body.civilite)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
-        else logger.error("Données d'entrées ok");
+        else logger.info("Données d'entrées ok");
         next();
     } else {
         if(process.env.DEVELOP === "true") {
@@ -149,7 +149,7 @@ exports.validParamLogin = function (req, res, next){
     //v8n
     if(isEmail(req.body.email) && isStrongPassword(req.body.password)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
-        else logger.error("Données d'entrées ok");
+        else logger.info("Données d'entrées ok");
         next();
     } else {
         if(process.env.DEVELOP === "true") {
@@ -174,7 +174,7 @@ exports.validParamVerify = function (req, res, next){
     //v8n
     if(isToken(token) && isToken(refreshToken)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
-        else logger.error("Données d'entrées ok");
+        else logger.info("Données d'entrées ok");
         next();
     } else {
         if(process.env.DEVELOP === "true") {
@@ -184,6 +184,26 @@ exports.validParamVerify = function (req, res, next){
         
     }
 };
+
+exports.validParamLogin = function (req, res, next){
+    if(process.env.DEVELOP === "true") console.log("checkBody");
+    else logger.info("Vérification des données d'entrées");
+
+    //valid param req.body.csrf ?
+
+    //v8n
+    if(isEmail(req.body.email) && isStrongPassword(req.body.password)){
+        if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
+        else logger.info("Données d'entrées ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données d'entrées nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données d'entrées nok");
+        
+    }
+}
 
 //exemple
 /*exports.reqValidation = function (req, res, next) {
