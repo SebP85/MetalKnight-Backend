@@ -78,26 +78,23 @@ exports.signup = (req, res, next) => {
       });
 
       //Envoie l'email
-      req.body.token = user.token;
-      req.body.refreshToken = user.refreshToken;
-      mail.sendVerifyEmail;
-
-
-      user.save()
-        .then(() => {
-          if(process.env.DEVELOP === "true") res.status(201).json({ message: 'Utilisateur créé !' })
-          else {
-            res.status(201).json({ message: process.env.MSG_OK_PRODUCTION });
-            logger.info("Enregistrement du nouvelle utilisateur", user.email);
-          }
-        })
-        .catch(error => {
-          if(process.env.DEVELOP === "true") res.status(400).json({ error })
-          else {
-            console.log(process.env.MSG_ERROR_PRODUCTION);
-            logger.error("Erreur 400 d'enregistrement du nouvelle utilisateur", error.message);
-          }
-        });
+      if(process.env.DEVELOP === "true") console.log("Envoie de l'email");
+      if(mail.sendVerifyEmail(user.email, user.token, user.refreshToken))
+        user.save()
+          .then(() => {
+            if(process.env.DEVELOP === "true") res.status(201).json({ message: 'Utilisateur créé !' })
+            else {
+              res.status(201).json({ message: process.env.MSG_OK_PRODUCTION });
+              logger.info("Enregistrement du nouvelle utilisateur", user.email);
+            }
+          })
+          .catch(error => {
+            if(process.env.DEVELOP === "true") res.status(400).json({ error })
+            else {
+              console.log(process.env.MSG_ERROR_PRODUCTION);
+              logger.error("Erreur 400 d'enregistrement du nouvelle utilisateur", error.message);
+            }
+          });
 
       
     })

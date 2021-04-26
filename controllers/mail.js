@@ -7,13 +7,15 @@ const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
 const { logger } = require('../log/winston');
 
-const oAuth2Client = new google.auth.OAuth2(config.googleAPI.CLIENT_ID, config.googleAPI.CLIENT_SECRET, config.googleAPI.REDIRECT_URI);
-oAuth2Client.setCredentials({ refresh_token: config.googleAPI.REFRESH_TOKEN });
-
 async function sendMail(email, subject, text, html) {
     try{
-        const accessToken = await oAuth2Client.getAccessToken();
+        const oAuth2Client = new google.auth.OAuth2(config.googleAPI.CLIENT_ID, config.googleAPI.CLIENT_SECRET, config.googleAPI.REDIRECT_URI);
+        oAuth2Client.setCredentials({ refresh_token: config.googleAPI.REFRESH_TOKEN });
 
+        if(process.env.DEVELOP === "true") console.log("fonction sendEmail");
+        const accessToken = await oAuth2Client.getAccessToken();//erreur
+
+        if(process.env.DEVELOP === "true") console.log("fonction createTransport");
         const transport = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -27,6 +29,7 @@ async function sendMail(email, subject, text, html) {
             }
         });
 
+        if(process.env.DEVELOP === "true") console.log("Objet mailOptions");
         const mailOptions = {
             from: config.email.NOM_APP+' <'+config.email.ADRESSE_MAIL+'>',
             to: email,
@@ -35,6 +38,7 @@ async function sendMail(email, subject, text, html) {
             html: html,
         };
 
+        if(process.env.DEVELOP === "true") console.log("sendEmail => Nodemailer");
         const result = transport.sendMail(mailOptions);
 
         return result;
@@ -44,7 +48,12 @@ async function sendMail(email, subject, text, html) {
     }
 }
 
-exports.sendVerifyEmail = (req, res, next) => {
+exports.sendVerifyEmail = (email, token, refreshToken) => {
+    if(process.env.DEVELOP === "true") console.log("Préparation de l'email");
+    console.log("email", email);
+    console.log("token", token);
+    console.log("refreshToken", refreshToken);
+
     var text = 'Mail de vérification';
     var html =  '<h1>Bienvenue sur '+config.email.NOM_APP+'</h1>'+
                 '<p>Vous venez de vous vous inscrire sur notre site et nous vous en remercions.<br />'+
@@ -52,17 +61,22 @@ exports.sendVerifyEmail = (req, res, next) => {
                 '<p>Merci</p>';
     var subject = "Confirmation d'E-mail";
 
-    sendMail(req.body.email, subject, text, html)
+    console.log("Préparation de l'email ok");
+
+    sendMail(email, subject, text, html)
         .then(r=> {
             if(process.env.DEVELOP === "true") console.log('Email sent ...', r);
             else logger.info("email de vérification envoyé !");
-            next();
+
+            return true;
         })
         .catch(err => {
             if(process.env.DEVELOP === "true"){
                 console.log(err.message);
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
             } else logger.error("Problème pour envoyer l'email de vérification !", err.message);
+
+            return false;
         });
 }
 
