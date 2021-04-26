@@ -33,12 +33,12 @@ const csrfProtectionCtrl = require('../controllers/csrf');
 
 //Routes connexion
 //exemple: router.get('/register', /*parseForm,*/ csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, /*xml,*/ /*objectifRoute*/);
-router.get('/register', csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, mail.checkEmail, userCtrl.signup);
-router.get('/verify/:token/:refreshToken', csrfProtection, checkBody.reqValidation, xssFilter.filterRegister, /*xml,*/ /*objectifRoute*/);
-router.get('/login', /*parseForm,*/ csrfProtection, csrfProtectionCtrl.getToken, checkBody.reqValidation, xssFilter.filterRegister, /*xml,*/ auth/*, objectifRoute*/);
+router.get('/register', csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, mail.checkEmail, userCtrl.signup);//=>post
+router.get('/verify/:token/:refreshToken', csrfProtection, checkBody.validParamVerify, xssFilter.filterVerify, userCtrl.verify);
+//router.get('/login', /*parseForm,*/ csrfProtection, csrfProtectionCtrl.getToken, checkBody.reqValidation, xssFilter.filterRegister, userCtrl.nbreTentative, /*xml,*/ auth/*, objectifRoute*/);
 
 //Routes principales
 router.get('/', );
-router.get('/getProfile', parseForm, csrfProtection, csrfProtectionCtrl.checkToken, );
+router.get('/getProfile', parseForm, csrfProtection, csrfProtectionCtrl.checkToken, /*checkBody.validParamVerify,*/ /*xssFilter.filterRegister,*/ /*xml,*/ auth/*(vérification du rôle), objectifRoute*/);
 
 module.exports = router;

@@ -19,3 +19,14 @@ exports.filterRegister = function (req, res, next) {//on transforme les données
     //console.log(req);
     next();
 };
+
+exports.filterVerify = function (req, res, next) {//on transforme les données si danger
+    if(process.env.DEVELOP === "true") console.log("fonction xss");
+    if(process.env.DEVELOP === "false") logger.info('Traitement contre XSS attack');
+
+    req.params.token = xss(req.params.token);
+    req.params.refreshToken = xss(req.params.refreshToken);
+    
+    //console.log(req);
+    next();
+};

@@ -108,25 +108,85 @@ function isCivilite(val){
     return v;
 }
 
+function isToken(val){
+    var v = v8n()
+        .string()
+        .not.null()
+        .length(257)
+        .pattern(/^[a-f0-9:]+$/)//autorisé
+        .test(val);
+
+    //console.log("token/refreshToken", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("token/refreshToken =>", val);
+
+    return v;
+}
+
 exports.validParamRegister = function (req, res, next){
     if(process.env.DEVELOP === "true") console.log("checkBody");
-    if(process.env.DEVELOP === "false") logger.info("Vérification des données d'entrées");
+    else logger.info("Vérification des données d'entrées");
 
     //v8n
     if(isEmail(req.body.email) && isStrongPassword(req.body.password) && isIndividu(req.body.individu) &&
         isFirstName(req.body.firstName) && isLastName(req.body.lastName) && isDate(req.body.birthday) &&
             isCivilite(req.body.civilite)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
-        if(process.env.DEVELOP === "false") logger.error("Données d'entrées ok");
+        else logger.error("Données d'entrées ok");
         next();
     } else {
-        if(process.env.DEVELOP === "true") console.log("Données d'entrées nok");
-        if(process.env.DEVELOP === "false") logger.error("Données d'entrées nok");
+        if(process.env.DEVELOP === "true") {
+            console.log("Données d'entrées nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données d'entrées nok");
+        
+    }
+};
+
+exports.validParamLogin = function (req, res, next){
+    if(process.env.DEVELOP === "true") console.log("checkBody");
+    else logger.info("Vérification des données d'entrées");
+
+    //v8n
+    if(isEmail(req.body.email) && isStrongPassword(req.body.password)){
+        if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
+        else logger.error("Données d'entrées ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données d'entrées nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données d'entrées nok");
+        
+    }
+};
+
+exports.validParamVerify = function (req, res, next){
+    if(process.env.DEVELOP === "true") console.log("checkBody");
+    else logger.info("Vérification des données d'entrées");
+
+    const { token } = req.params;
+    const { refreshToken } = req.params;
+
+    /*console.log(token);
+    console.log(token.length);
+    console.log(refreshToken.length);*/
+
+    //v8n
+    if(isToken(token) && isToken(refreshToken)){
+        if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
+        else logger.error("Données d'entrées ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données d'entrées nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données d'entrées nok");
+        
     }
 };
 
 //exemple
-exports.reqValidation = function (req, res, next) {
+/*exports.reqValidation = function (req, res, next) {
     // username must be an email
     body('username').isEmail(),
     // password must be at least 5 chars long
@@ -162,8 +222,8 @@ exports.reqValidation = function (req, res, next) {
         .not.includes('*')
         .not.includes('/')
         .not.includes('$')*/
-        .not.includes("<")
+        /*.not.includes("<")
         .testAsync(req.body.username)
         .then(result => console.log("v8n ok"))
         .catch(result => console.log("v8n nok"));
-};
+};*/

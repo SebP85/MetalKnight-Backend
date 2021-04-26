@@ -49,10 +49,12 @@ async function sendMail(email, subject, text, html) {
 }
 
 exports.sendVerifyEmail = (email, token, refreshToken, callback) => {
-    if(process.env.DEVELOP === "true") console.log("Préparation de l'email");
-    console.log("email", email);
-    console.log("token", token);
-    console.log("refreshToken", refreshToken);
+    if(process.env.DEVELOP === "true") {
+        console.log("Préparation de l'email");
+        console.log("email", email);
+        console.log("token", token);
+        console.log("refreshToken", refreshToken);
+    }
 
     var text = 'Mail de vérification';
     var html =  '<h1>Bienvenue sur '+config.email.NOM_APP+'</h1>'+
@@ -61,18 +63,18 @@ exports.sendVerifyEmail = (email, token, refreshToken, callback) => {
                 '<p>Merci</p>';
     var subject = "Confirmation d'E-mail";
 
-    console.log("Préparation de l'email ok");
+    if(process.env.DEVELOP === "true") console.log("Préparation de l'email ok");
 
     sendMail(email, subject, text, html)
         .then(r=> {
-            console.log("then sendveryfyemail");
+            //console.log("then sendveryfyemail");
             if(process.env.DEVELOP === "true") console.log('Email sent ...', r);
             else logger.info("email de vérification envoyé !");
 
             callback(true);
         })
         .catch(err => {
-            console.log("catch sendveryfyemail");
+            //console.log("catch sendveryfyemail");
             if(process.env.DEVELOP === "true"){
                 console.log(err.message);
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
@@ -82,7 +84,7 @@ exports.sendVerifyEmail = (email, token, refreshToken, callback) => {
         });
 }
 
-exports.sendConfirmationEmail = (req, res, next) => {
+exports.sendConfirmationEmail = (email, callback) => {//Envoie le confirmation que le compte et l'email sont validé
     var text = 'Bienvenue sur '+config.email.NOM_APP+'\rNous vous informons que votre compte est validé !\rMerci de votre inscription';
 
     var html =  '<h1>Bienvenue sur '+config.email.NOM_APP+'</h1>'+
@@ -90,18 +92,20 @@ exports.sendConfirmationEmail = (req, res, next) => {
                 'Merci de votre inscription</p>';
     var subject = "Mail validé";
 
-    sendMail(req.body.email, subject, text, html)
+    sendMail(email, subject, text, html)
         .then(r=> {//communication avec le serveur ok
             if(process.env.DEVELOP === "true") console.log('Email sent ...', r);
             else logger.info("Email pour validation du compte envoyé !");
-            next();
-            
+
+            callback(true);
         })
         .catch(err => {//erreur avec la communication du serveur
             if(process.env.DEVELOP === "true"){
                 console.log(err.message);
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
             } else logger.error("Problème pour envoyer l'email de validation du compte !", err.message);
+
+            callback(false);
         });
 }
 
