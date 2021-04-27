@@ -85,21 +85,27 @@ exports.verify = (req, res, next) => {//vérification que l'email existe et vali
   const { refreshToken } = req.params;
 
   if(process.env.DEVELOP === "true") {
-    //console.log("token => "+token);
-    //console.log("refreshToken => "+refreshToken);
+    console.log("token => "+token);
+    console.log("refreshToken => "+refreshToken);
   }
 
   const user = User.findOne({ token: token.substr(1, token.length), refreshToken: refreshToken.substr(1, refreshToken.length) })
     .then(user => {
       if (!user) {//si utilisateur non trouvé
-        logger.error("Email vérifié et non validé");
-        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        if(process.env.DEVELOP === "true") {
+          console.log("Utilisateur non trouvé");
+          console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Email vérifié et non validé");
+        
         return res.status(401).redirect("http://localhost:8080/login");
       }
 
       if(user.userConfirmed) {
-        logger.error("Email déjà vérifié");
-        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        if(process.env.DEVELOP === "true") {
+          console.log("Email déjà vérifié");
+          console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Email déjà vérifié");
+
         return res.status(401).redirect("http://localhost:8080/login");//Si déjà confirmé
       }
 
@@ -109,7 +115,11 @@ exports.verify = (req, res, next) => {//vérification que l'email existe et vali
 
       user.save()
         .then(() => {
-          logger.info("Email vérifié et validé");
+          if(process.env.DEVELOP === "true") {
+            console.log("Email vérifié et validé");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+          } else logger.info("Email vérifié et validé");
+          
           res.status(200).redirect("http://localhost:8080/login");
 
           //Envoyer email de confirmation
