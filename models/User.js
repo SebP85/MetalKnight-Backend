@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
+const moment = require('moment');
 
 const userSchema = mongoose.Schema({
     email: { type: String, required: true, unique: true },
@@ -10,7 +11,7 @@ const userSchema = mongoose.Schema({
     birthday: { type: Date, required: true },//> à 18 ans
     civilite: { type: String, required: true },//madame ou monsieur
     role: { type: String, default: "free" },//free, expert, ...
-    suspendu: { type: Date, default: Date.now },//date:heure:minute:seconde de fin de suspension
+    suspendu: { type: Date, default: moment() },//date:heure:minute:seconde de fin de suspension
     tentativesConnexion: { type: Number, default: 0 },
     userConfirmed: { type: Boolean, default: false },
     token: { type: String, required: true },
