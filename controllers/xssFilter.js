@@ -43,3 +43,15 @@ exports.filterLogin = function (req, res, next) {//on transforme les données si
     //console.log(req);
     next();
 };
+
+exports.filterLogout = function (req, res, next) {//on transforme les données si danger
+    if(process.env.DEVELOP === "true") console.log("fonction xss");
+    if(process.env.DEVELOP === "false") logger.info('Traitement contre XSS attack');
+
+    req.body.xsrfToken = xss(req.body.xsrfToken);
+
+    //req.body.csrf à faire ?
+    
+    //console.log(req);
+    next();
+}

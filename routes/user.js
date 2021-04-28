@@ -5,7 +5,7 @@
  * 2-Valider données d'entrée (noSQL, SQL, pas de script, regex, redos attack, ...)
  * 3-filtrer xss
  * 4-filtrer xml (si besoin)
- * 5-décryptage données d'entrée (cookie+JWT+API key+formulaire envoyé) et authentification
+ * 5-décryptage données d'entrée (cookie+JWT+API key+formulaire envoyé) et authentification et role
  * 6-objectif de la route
  * 
  * 7-installer sqreen pour se protéger des attaques
@@ -32,13 +32,14 @@ var parseForm = express.urlencoded({
 const csrfProtectionCtrl = require('../controllers/csrf');
 
 //Routes connexion
-//exemple: router.get('/register', /*parseForm,*/ csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, /*xml,*/ /*objectifRoute*/);
+//exemple: router.get('/register', /*parseForm,*/ csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, xml, objectifRoute);
 router.get('/register', csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, mail.checkEmail, userCtrl.signup);//=>post
 router.get('/verify/:token/:refreshToken', csrfProtection, checkBody.validParamVerify, xssFilter.filterVerify, userCtrl.verify);
 router.get('/login', csrfProtection, csrfProtectionCtrl.getToken, checkBody.validParamLogin, xssFilter.filterLogin, userCtrl.login);
+router.get('/logout', parseForm, csrfProtection, checkBody.validParamLogout, xssFilter.filterLogout, auth, userCtrl.logout);
 
 //Routes principales
-router.get('/', );
-router.get('/getProfile', parseForm, csrfProtection, /*checkBody.validParamVerify,*/ /*xssFilter.filterRegister,*/ /*xml,*/ auth/*(vérification du rôle), objectifRoute*/);
+//exemple: router.get('/register', /*parseForm,*/ csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, xml, auth, role, objectifRoute);
+router.get('/getProfile', parseForm, csrfProtection, /*checkBody.validParamLogout, xssFilter.filterProfil, auth, role, objectifRoute*/);
 
 module.exports = router;

@@ -122,6 +122,20 @@ function isToken(val){
     return v;
 }
 
+function isXSRFToken(val){
+    var v = v8n()
+        .string()
+        .not.null()
+        .length(256)
+        .pattern(/^[a-zA-Z0-9]+$/)//autorisé
+        .test(val);
+
+    console.log("xsrfToken", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("xsrfToken =>", val);
+
+    return v;
+}
+
 exports.validParamRegister = function (req, res, next){
     if(process.env.DEVELOP === "true") console.log("checkBody");
     else logger.info("Vérification des données d'entrées");
@@ -130,24 +144,6 @@ exports.validParamRegister = function (req, res, next){
     if(isEmail(req.body.email) && isStrongPassword(req.body.password) && isIndividu(req.body.individu) &&
         isFirstName(req.body.firstName) && isLastName(req.body.lastName) && isDate(req.body.birthday) &&
             isCivilite(req.body.civilite)){
-        if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
-        else logger.info("Données d'entrées ok");
-        next();
-    } else {
-        if(process.env.DEVELOP === "true") {
-            console.log("Données d'entrées nok");
-            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-        } else logger.error("Données d'entrées nok");
-        
-    }
-};
-
-exports.validParamLogin = function (req, res, next){
-    if(process.env.DEVELOP === "true") console.log("checkBody");
-    else logger.info("Vérification des données d'entrées");
-
-    //v8n
-    if(isEmail(req.body.email) && isStrongPassword(req.body.password)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
         else logger.info("Données d'entrées ok");
         next();
@@ -193,6 +189,26 @@ exports.validParamLogin = function (req, res, next){
 
     //v8n
     if(isEmail(req.body.email) && isStrongPassword(req.body.password)){
+        if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
+        else logger.info("Données d'entrées ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données d'entrées nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données d'entrées nok");
+        
+    }
+}
+
+exports.validParamLogout = function (req, res, next){
+    if(process.env.DEVELOP === "true") console.log("checkBody");
+    else logger.info("Vérification des données d'entrées");
+
+    //valid param req.body.csrf ?
+
+    //v8n
+    if(isXSRFToken(req.body.xsrfToken)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
         else logger.info("Données d'entrées ok");
         next();

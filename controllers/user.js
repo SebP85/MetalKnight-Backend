@@ -547,5 +547,10 @@ exports.login = (req, res, next) => {//connexion
 };
 
 exports.logout = (req, res, next) => {//Déconnexion
+  if(process.env.DEVELOP === "true") console.log('Requete login');
+  else logger.info("requête login");
 
+  //Dans la BDD refreshToken on modifie la date expiresAt à Date.now
+
+  //côté client, on supprime xsrfToken et les cookies
 };
