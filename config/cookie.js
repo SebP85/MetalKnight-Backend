@@ -9,4 +9,7 @@
  */
  module.exports = env => ({
     pathCookie: env.PATH_COOKIE,
+    refreshToken: {
+      pathCookie: env.PATH_COOKIE_REFRESH_TOKEN,
+    }
   });

@@ -88,7 +88,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
               maxAge: config.token.refreshToken.expiresIn,
               httpOnly: true,
               secure: true,
-              path: '/token',
+              path: config.cookie.refreshToken.pathCookie,
             });
             if(process.env.DEVELOP === "true") console.log('refreshToken setCookie');
           
@@ -138,7 +138,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
               maxAge: config.token.refreshToken.expiresIn,
               httpOnly: true,
               secure: true,
-              path: '/token',
+              path: config.cookie.refreshToken.pathCookie,
             });
             if(process.env.DEVELOP === "true") console.log('refreshToken setCookie');
           
@@ -548,4 +548,4 @@ exports.login = (req, res, next) => {//connexion
 
 exports.logout = (req, res, next) => {//Déconnexion
 
-}
+};
