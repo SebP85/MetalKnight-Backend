@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/User');
+const RefreshToken = require('../models/RefreshToken');
 
 const config = require('../config/config');
 const crypto = require('crypto');
@@ -9,6 +10,7 @@ const mail = require("../controllers/mail");
 const { logger } = require('../log/winston');
 const { log } = require('util');
 const moment = require('moment');
+const { access } = require('fs');
 
 ////////////////////////////////////////////////////////////////////////////   Fonction    /////////////////////////////////////////////////////////////////////////
 
@@ -30,49 +32,151 @@ function compteSuspendu(user) {//comparer la date actuelle avec la date suspendu
   else return true;
 };
 
-function envoieToken(user, res) {//Permet d'envoyer les données de connexions
+function envoieToken(user, res, next) {//Permet d'envoyer les données de connexions
+  if(process.env.DEVELOP === "true") console.log("fonction envoieToken lancé");
+
+  /* On créer le token CSRF */
+  const xsrfToken = crypto.randomBytes(128).toString('hex');
+  if(process.env.DEVELOP === "true") console.log("xsrfToken", xsrfToken);
+
+  /* On créer le JWT avec le token CSRF dans le payload */
+  if(process.env.DEVELOP === "true") console.log("user.firstName", user.firstName);
+  const accessToken = jwt.sign(
+    { firstName: user.firstName, lastName: user.lastName, xsrfToken },
+    config.token.accessToken.secret,
+    {
+      algorithm: config.token.accessToken.algorithm,
+      audience: config.token.accessToken.audience,
+      expiresIn: config.token.accessToken.expiresIn / 1000, // Le délai avant expiration exprimé en seconde
+      issuer: config.token.accessToken.issuer,
+      subject: user.id.toString() //fonction decoded.sub pour le récupérer
+    }
+  );
+  if(process.env.DEVELOP === "true") console.log("accessToken", accessToken);
+
   // 7. On créer le refresh token et on le stocke en BDD
   const refreshToken = crypto.randomBytes(128).toString('base64');
-                
-  /*await RefreshToken.create({
-    userId: user.id,
-    token: refreshToken,
-    expiresAt: Date.now() + config.refreshToken.expiresIn
-  });*/
+  if(process.env.DEVELOP === "true") console.log('refreshToken', refreshToken);
 
-  if(process.env.DEVELOP === "true") console.log('refreshToken => '+refreshToken);
-  res.status(200).json({message: "coucou"});
+  RefreshToken.findOne({ userId: user.id })
+    .then((result) => {
+      if(result) {
+        if(process.env.DEVELOP === "true") {
+          console.log("id refreshToken trouvé");
+          console.log("result", result);
+        }
 
-  /*res.cookie('test', refreshToken, {
-    maxAge: config.token.refreshToken.expiresIn,
-    httpOnly: true,
-    secure: true,
-    path: '/',
-  });
+        const refresh = new RefreshToken({
+          _id: result._id,
+          userId: user.id,
+          refreshToken: refreshToken,
+          expiresAt: Date.now() + config.token.refreshToken.expiresIn
+        });
+        if(process.env.DEVELOP === "true") console.log("refresh", refresh);
 
-  res.cookie('cookie2', "_ceci_est_mon_deuxieme_cookie", {
-    maxAge: config.token.refreshToken.expiresIn,
-    httpOnly: true,
-    secure: true,
-    path: '/',
-  });
+        RefreshToken.updateOne({ _id: result._id }, refresh)
+          .then(() => {//enregistrement ok
+            if(process.env.DEVELOP === "true") console.log("updateOne ok");
+            res.cookie('access_token', accessToken, {//config du cookie accessToken
+              maxAge: config.token.accessToken.expiresIn,
+              httpOnly: true,
+              secure: true,
+            });
+            if(process.env.DEVELOP === "true") console.log('accessToken setCookie');
+          
+            res.cookie('refresh_token', refreshToken, {//config du cookie refreshToken
+              maxAge: config.token.refreshToken.expiresIn,
+              httpOnly: true,
+              secure: true,
+              path: '/token',
+            });
+            if(process.env.DEVELOP === "true") console.log('refreshToken setCookie');
+          
+            res.status(200).json({//envoie du message
+              accessTokenExpiresIn: config.token.accessToken.expiresIn,
+              refreshTokenExpiresIn: config.token.refreshToken.expiresIn,
+              xsrfToken,
+            });
+            if(process.env.DEVELOP === "true") console.log('Cookie et xsrf envoyé');
 
-  res.status(200).json({
-    userId: user._id,
-    token: jwt.sign(
-      { userId: user._id, userName: user.userName },
-      config.token.accessToken.secret,
-      {
-        algorithm: config.token.accessToken.algorithm,
-        audience: config.token.accessToken.audience,
-        expiresIn: config.token.accessToken.expiresIn / 1000,
-        issuer: config.token.accessToken.issuer,
-        subject: user.id.toString()
+            next();
+            
+          })
+          .catch(error => {//Pb avec la BDD
+            if(process.env.DEVELOP === "true") console.log("updateOne nok");
+            if(process.env.DEVELOP === "true") {
+              console.log('erreur pour enregistrer le refreshToken');
+              console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+              res.status(400).json({ error });
+            } else {
+              logger.error("Erreur MongoDB pour enregistrer refreshToken");
+              console.log(process.env.MSG_ERROR_PRODUCTION);
+              res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
+            }
+          });
+      } else {
+        if(process.env.DEVELOP === "true") console.log("id refreshToken non trouvé");
+        
+        const refresh = new RefreshToken({
+          userId: user.id,
+          refreshToken: refreshToken,
+          expiresAt: Date.now() + config.token.refreshToken.expiresIn
+        });
+        if(process.env.DEVELOP === "true") console.log("refresh", refresh);
+        
+        refresh.save()
+        //RefreshToken.findByIdAndUpdate({ userId: refresh.userId }, refresh)
+          .then(() => {//enregistrement ok
+            res.cookie('access_token', accessToken, {//config du cookie accessToken
+              maxAge: config.token.accessToken.expiresIn,
+              httpOnly: true,
+              secure: true,
+            });
+            if(process.env.DEVELOP === "true") console.log('accessToken setCookie');
+          
+            res.cookie('refresh_token', refreshToken, {//config du cookie refreshToken
+              maxAge: config.token.refreshToken.expiresIn,
+              httpOnly: true,
+              secure: true,
+              path: '/token',
+            });
+            if(process.env.DEVELOP === "true") console.log('refreshToken setCookie');
+          
+            res.status(200).json({//envoie du message
+              accessTokenExpiresIn: config.token.accessToken.expiresIn,
+              refreshTokenExpiresIn: config.token.refreshToken.expiresIn,
+              xsrfToken,
+            });
+            if(process.env.DEVELOP === "true") console.log('Cookie et xsrf envoyé');
+
+            next();
+            
+          })
+          .catch(error => {//Pb avec la BDD
+            if(process.env.DEVELOP === "true") {
+              console.log('erreur pour enregistrer le refreshToken');
+              console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+              res.status(400).json({ error });
+            } else {
+              logger.error("Erreur MongoDB pour enregistrer refreshToken");
+              console.log(process.env.MSG_ERROR_PRODUCTION);
+              res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
+            }
+          });
       }
-    ),
-    tokenRefresh: refreshToken,
-    expiresAt: new Date(Date.now() + config.token.refreshToken.expiresIn)
-  });*/
+    })
+    .catch(error => {//Pb avec la BDD
+      if(process.env.DEVELOP === "true") {
+        console.log("erreur BDD : pour trouver l'id du refreshToken");
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        res.status(400).json({ error });
+      } else {
+        logger.error("Erreur MongoDB pour enregistrer refreshToken");
+        console.log(process.env.MSG_ERROR_PRODUCTION);
+        res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
+      }
+    });
+  
 }
 
 /////////////////////////////////////////////////////////////////////////////   Exports    //////////////////////////////////////////////////////////////////////////
@@ -269,7 +373,7 @@ exports.signup = (req, res, next) => {//Enregistrement du nouvel utilisateur
   
 };
 
-exports.login = (req, res, next) => { //  ===> ajouter refreshToken
+exports.login = (req, res, next) => {//connexion
   if(process.env.DEVELOP === "true") console.log('Requete login');
   else logger.info("requête login");
   /*
@@ -394,12 +498,12 @@ exports.login = (req, res, next) => { //  ===> ajouter refreshToken
                     user.tentativesConnexion=0;
 
                     User.updateOne({ email: user.email }, user)
-                      .then((user) => {
+                      .then(() => {
                         if(process.env.DEVELOP === "true") console.log("initNbreTentativeConnexion initialisé à 0");
                         else logger.info("initNbreTentativeConnexion initialisé à 0");
 
-                        envoieToken(user, res);
-                        next();
+                        if(process.env.DEVELOP === "true") console.log("firstName", user.firstName);
+                        envoieToken(user, res, next);
                       })
                       .catch(error => {
                         if(process.env.DEVELOP === "true") {
@@ -441,3 +545,7 @@ exports.login = (req, res, next) => { //  ===> ajouter refreshToken
       }
     });
 };
+
+exports.logout = (req, res, next) => {//Déconnexion
+
+}
