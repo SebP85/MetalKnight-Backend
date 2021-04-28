@@ -2,6 +2,8 @@
  * Transforme les messages avec des scripts
  */
 
+ const { logger } = require('../log/winston');
+
 var xss = require("xss");
 
 exports.filterRegister = function (req, res, next) {//on transforme les données si danger

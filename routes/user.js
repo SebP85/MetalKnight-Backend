@@ -14,6 +14,8 @@
  * brute force pour passer le mot de passe (bloquer l'adresse IP après x tentative + MDP avec 8 carac/symbole/majuscule + captcha=image + double identification)
  */
 
+ const { logger } = require('../log/winston');
+
 const express = require('express');
 const router = express.Router();
 

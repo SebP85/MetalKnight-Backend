@@ -1,6 +1,7 @@
 /**
  * Vérifie les données d'entrées de la requête
  */
+ const { logger } = require('../log/winston');
 
 //const { body, validationResult, oneOf } = require('express-validator');//valide les paramètres avec des fonctions préprogrammées
 const v8n = require('v8n');//valide les paramètres d'entrées et peutajouter des fonctions chainés
@@ -208,7 +209,7 @@ exports.validParamLogout = function (req, res, next){
     //valid param req.body.csrf ?
 
     //v8n
-    if(isXSRFToken(req.body.xsrfToken)){
+    if(isXSRFToken(req.headers.xsrftoken)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
         else logger.info("Données d'entrées ok");
         next();
