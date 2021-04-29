@@ -109,7 +109,7 @@ function isCivilite(val){
     return v;
 }
 
-function isToken(val){
+function isTokenHex(val){
     var v = v8n()
         .string()
         .not.null()
@@ -131,8 +131,38 @@ function isXSRFToken(val){
         .pattern(/^[a-zA-Z0-9]+$/)//autorisé
         .test(val);
 
-    console.log("xsrfToken", v);
+    //console.log("xsrfToken", v);
     if(!v && process.env.DEVELOP === "false") logger.error("xsrfToken =>", val);
+
+    return v;
+}
+
+function isTokenJWT(val){
+    //console.log("jwt =>", val);
+
+    var v = v8n()
+        .string()
+        .not.null()
+        .length(632)
+        .pattern(/^[a-zA-Z0-9._-]+$/)//autorisé
+        .test(val);
+
+    //console.log("jwtToken", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("jwtToken =>", val);
+
+    return v;
+}
+
+function isTokenBase64(val){
+    var v = v8n()
+        .string()
+        .not.null()
+        .length(256)
+        .pattern(/^[a-zA-Z0-9/+=]+$/)//autorisé
+        .test(val);
+
+    console.log("Base64Token", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("Base64Token =>", val);
 
     return v;
 }
@@ -169,7 +199,7 @@ exports.validParamVerify = function (req, res, next){
     console.log(refreshToken.length);*/
 
     //v8n
-    if(isToken(token) && isToken(refreshToken)){
+    if(isTokenHex(token) && isTokenHex(refreshToken)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
         else logger.info("Données d'entrées ok");
         next();
@@ -207,10 +237,9 @@ exports.validParamLogout = function (req, res, next){
     else logger.info("Vérification des données d'entrées");
 
     //valid param req.body.csrf ?
-    //const { cookies, headers } = req;
 
     //v8n
-    if(isXSRFToken(req.headers.xsrftoken)){
+    if(isXSRFToken(req.headers.xsrftoken) && isTokenJWT(req.cookies.access_token)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
         else logger.info("Données d'entrées ok");
         next();
