@@ -39,13 +39,13 @@ const csrfProtectionCtrl = require('../controllers/csrf');
 router.get('/auth/register', csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, mail.checkEmail, userCtrl.signup);//=>post
 router.get('/auth/verify/:token/:refreshToken', csrfProtection, checkBody.validParamVerify, xssFilter.filterVerify, userCtrl.verify);
 router.get('/auth/login', csrfProtection, csrfProtectionCtrl.getToken, checkBody.validParamLogin, xssFilter.filterLogin, userCtrl.login);
-router.get('/auth/logout', parseForm, csrfProtection, checkBody.validParamLogout, xssFilter.filterLogout, auth, userCtrl.logout);
-router.get('/auth/updateToken', userCtrl.refreshToken);
+router.get('/auth/logout', parseForm, csrfProtection, checkBody.validParamLogout, xssFilter.filterLogout, auth.normal, userCtrl.logout);
+router.get('/auth/updateToken', parseForm, csrfProtection, checkBody.validParamUpdateToken, xssFilter.filterUpdateToken, auth.refreshToken, userCtrl.refreshToken);
 router.get('/auth/updatePass', userCtrl.newPassword);//changement de mot de passe
 router.get('/auth/mailPass', userCtrl.mailNewPassword);//mail pour changer de mot de passe
 
 //Routes principales
-//exemple: router.get('/register', /*parseForm,*/ csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, xml, auth, role, objectifRoute);
-router.get('/getProfile', parseForm, csrfProtection, /*checkBody.validParamLogout, xssFilter.filterProfil, auth, role, objectifRoute*/);
+//exemple: router.get('/register', /*parseForm,*/ csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, xml, auth.normal, role.levelAuthorize("free"), objectifRoute);
+router.get('/getProfile', parseForm, csrfProtection, /*checkBody.validParamLogout, xssFilter.filterProfil, auth.normal, role.levelAuthorize("free"), objectifRoute*/);
 
 module.exports = router;

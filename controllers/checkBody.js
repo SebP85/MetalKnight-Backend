@@ -252,6 +252,26 @@ exports.validParamLogout = function (req, res, next){
     }
 }
 
+exports.validParamUpdateToken = function (req, res, next){
+    if(process.env.DEVELOP === "true") console.log("checkBody");
+    else logger.info("Vérification des données d'entrées");
+
+    //valid param req.body.csrf ?
+
+    //v8n
+    if(isXSRFToken(req.headers.xsrftoken) && isTokenJWT(req.headers.refresh_token)){
+        if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
+        else logger.info("Données d'entrées ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données d'entrées nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données d'entrées nok");
+        
+    }
+}
+
 //exemple
 /*exports.reqValidation = function (req, res, next) {
     // username must be an email

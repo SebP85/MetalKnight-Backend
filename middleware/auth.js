@@ -5,7 +5,7 @@ const RefreshToken = require('../models/RefreshToken');
 const User = require('../models/User');
 const moment = require('moment');
 
-module.exports = (req, res, next) => {//Vérification des tokens
+exports.normal = (req, res, next) => {//Vérification des tokens
   try {
     if(process.env.DEVELOP === "true") console.log("début authentification");
     else logger.info("début fonction authentification")
@@ -147,4 +147,136 @@ module.exports = (req, res, next) => {//Vérification des tokens
         
       });
   }
+};
+
+exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken et xsrfToken
+  try {
+    if(process.env.DEVELOP === "true") console.log("début authentification");
+    else logger.info("début fonction authentification")
+    const { cookies, headers } = req;
+    
+    if (!cookies || !cookies.refresh_token) {//cookie présent ?
+      if(process.env.DEVELOP === "true") {
+        console.log('refreshToken manquant');
+        console.log('---------------------------------------------------------   Requête traitée   ------------------------------------------------------------------');    
+        return res.status(401).json({ message: 'Missing token in cookie' });
+      } else {
+        logger.error('refreshToken manquant');
+        return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+      }
+      
+    }
+    const refreshToken = cookies.refresh_token;
+
+    if (!headers || !headers['xsrftoken']) {
+      if(process.env.DEVELOP === "true") {
+        console.log('xsrfToken manquant');
+        console.log('---------------------------------------------------------   Requête traitée   ------------------------------------------------------------------');    
+        return res.status(401).json({ message: 'Missing XSRF token in headers' });
+      } else {
+        logger.error('xsrfToken manquant');
+        return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+      }
+    }
+    const xsrfToken = headers['xsrftoken'];
+
+    const decodedToken = jwt.verify(refreshToken, config.token.refreshToken.secret, {
+      algorithms: config.token.refreshToken.algorithm
+    });
+    if(process.env.DEVELOP === "true") console.log('decodedToken', decodedToken);
+
+    //Recherche du refreshToken dans la BDD
+    RefreshToken.findOne({ userId: decodedToken.sub })
+    .then((result) => {//Pas de problème avec la BDD
+      if(!result) {//user et refreshToken n'existent pas dans la BDD
+        if(process.env.DEVELOP === "true") {
+          console.log('refreshToken introuvable dans la BDD');
+          console.log('---------------------------------------------------------   Requête traitée   ------------------------------------------------------------------');    
+          return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+        } else {
+          logger.error('refreshToken introuvable dans la BDD');
+          return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+        }
+      } else {//user et refreshToken existent dans la BDD
+        if(process.env.DEVELOP === "true") console.log("Date d'expiration refreshToken", moment(result.expiresAt));
+        var dateExpireRefreshTokenTheorique = new Date(result.expiresAt - config.token.refreshToken.expiresIn + config.token.accessToken.expiresIn);
+        if(moment(dateExpireRefreshTokenTheorique).isAfter(Date.now())){
+          if(process.env.DEVELOP === "true") console.log("Date d'expiration ok");
+          else logger.info("Date d'expiration ok");
+        } else {
+          if(process.env.DEVELOP === "true") console.log("Date d'expiration nok");
+          else logger.info("Date d'expiration nok");
+        }
+
+        if(process.env.DEVELOP === "true") {
+          console.log('xsrfToken', xsrfToken); 
+        }
+
+        if (xsrfToken !== decodedToken.xsrfToken) {//si les tokens ne correspondent pas, on sort
+          if(process.env.DEVELOP === "true") {
+            console.log('xsrfToken ne correspond pas');
+            console.log('---------------------------------------------------------   Requête traitée   ------------------------------------------------------------------');    
+            return res.status(401).json({ message: 'Bad xsrf token' });
+          } else {
+            logger.error('xsrfToken ne correspond pas');
+            return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+          }
+        }
+        
+        if(process.env.DEVELOP === "true") console.log('xsrfToken identique');
+        else logger.info('xsrfToken identique');
+
+        //On vérifie la présence de l'utilisateur dans la base de données
+        const userId = decodedToken.sub;
+
+        User.findOne({ _id: userId })
+          .then((result) => {
+            if(process.env.DEVELOP === "true") console.log('user authentifié');
+            else logger.info("user authentifié")
+
+            //On enregistre le nom de l'utilisateur dans la req
+            req.user = result;
+            next();
+          })
+          .catch(error => {
+            if(process.env.DEVELOP === "true") {  
+              console.log(error, error);      
+              console.log("Pb BDD User");
+              console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+              res.status(500).redirect("http://localhost:8080/login");
+            } else {
+              logger.error("Pb BDD User");
+              res.status(500).redirect("http://localhost:8080/login");
+            }
+          });
+      }
+    })
+    .catch(error => {
+      if(process.env.DEVELOP === "true") {  
+        console.log(error, error);      
+        console.log("Pb BDD refreshToken");
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        res.status(500).redirect("http://localhost:8080/login");
+      } else {
+        logger.error("Pb BDD refreshToken");
+        res.status(500).redirect("http://localhost:8080/login");
+      }
+    });
+
+    
+
+  } catch {
+    if(process.env.DEVELOP === "true") console.log("erreur authentification !")
+    if(process.env.DEVELOP === "true")
+      res.status(401).json({
+        error: new Error('Invalid request!')
+        
+      });
+    else
+      res.status(401).json({
+        error: new Error(process.env.MSG_ERROR_PRODUCTION)
+        
+      });
+  }
+
 };

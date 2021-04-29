@@ -55,7 +55,18 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
   if(process.env.DEVELOP === "true") console.log("accessToken", accessToken);
 
   // 7. On créer le refresh token et on le stocke en BDD
-  const refreshToken = crypto.randomBytes(128).toString('base64');
+  const refToken = crypto.randomBytes(128).toString('base64');
+  const refreshToken = jwt.sign(
+    { firstName: user.firstName, lastName: user.lastName, refToken, xsrfToken },
+    config.token.refreshToken.secret,
+    {
+      algorithm: config.token.refreshToken.algorithm,
+      audience: Date.now() + config.token.refreshToken.audience,
+      expiresIn: config.token.refreshToken.expiresIn, // Le délai avant expiration exprimé en seconde
+      issuer: config.token.refreshToken.issuer,
+      subject: user.id.toString() //fonction decoded.sub pour le récupérer
+    }
+  );
   if(process.env.DEVELOP === "true") console.log('refreshToken', refreshToken);
 
   RefreshToken.findOne({ userId: user.id })
@@ -69,7 +80,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
         const refresh = new RefreshToken({
           _id: result._id,
           userId: user.id,
-          refreshToken: refreshToken,
+          refreshToken: refToken,
           expiresAt: Date.now() + config.token.refreshToken.expiresIn
         });
         if(process.env.DEVELOP === "true") console.log("refresh", refresh);
@@ -558,7 +569,7 @@ exports.logout = (req, res, next) => {//Déconnexion
     .then(() => {
       if(process.env.DEVELOP === "true") console.log("Déconnexion réussie");
       else logger.info("Déconnexion réussie");
-      
+
       res.status(200).json({ message: 'déconnexion réussie' });
       next();
     })
@@ -582,15 +593,7 @@ exports.refreshToken = (req, res, next) => {//MAJ du refreshToken
   if(process.env.DEVELOP === "true") console.log('Requete refreshToken');
   else logger.info("requête refreshToken");
 
-  //On vérifie la présence du refreshToken dans l'en-tête
-
-  //On vérifie la présence du refreshToken dans la BDD et le nom de l'utilisateur, ...
-
-  //On génère un nouveau xsrfToken, accessToken et refreshToken
-
-  //Et on envoie les éléments
-
-  console.log('req test', req);
+  envoieToken(req.user, res, next);
 };
 
 exports.newPassword = (req, res, next) => {//MAJ du mdp

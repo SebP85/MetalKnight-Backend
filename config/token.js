@@ -17,6 +17,11 @@ module.exports = env => ({
     issuer: env.ACCESS_TOKEN_ISSUER
   },
   refreshToken: {
-    expiresIn: env.REFRESH_TOKEN_EXPIRES_IN
+    type: env.ACCESS_TOKEN_TYPE || 'Bearer',
+    algorithm: env.ACCESS_TOKEN_ALGORITHM || 'HS256',
+    secret: env.REFRESH_TOKEN_SECRET,
+    expiresIn: env.REFRESH_TOKEN_EXPIRES_IN,
+    audience: env.ACCESS_TOKEN_AUDIENCE,
+    issuer: env.ACCESS_TOKEN_ISSUER
   }
 });
