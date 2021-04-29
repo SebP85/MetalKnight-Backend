@@ -46,8 +46,8 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
     config.token.accessToken.secret,
     {
       algorithm: config.token.accessToken.algorithm,
-      audience: config.token.accessToken.audience,
-      expiresIn: config.token.accessToken.expiresIn / 1000, // Le délai avant expiration exprimé en seconde
+      audience: Date.now() + config.token.accessToken.audience,
+      expiresIn: config.token.accessToken.expiresIn, // Le délai avant expiration exprimé en seconde
       issuer: config.token.accessToken.issuer,
       subject: user.id.toString() //fonction decoded.sub pour le récupérer
     }
@@ -536,11 +536,11 @@ exports.login = (req, res, next) => {//connexion
     })
     .catch(error => {
       if(process.env.DEVELOP === "true") {        
-        console.log("Utilisateur non trouvé");
+        console.log("Pb BDD users");
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         res.status(500).json({ error });
       } else {
-        logger.error("Utilisateur non trouvé");
+        logger.error("Pb BDD users");
         res.status(500).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
     });
@@ -550,7 +550,61 @@ exports.logout = (req, res, next) => {//Déconnexion
   if(process.env.DEVELOP === "true") console.log('Requete login');
   else logger.info("requête login");
 
-  //Dans la BDD refreshToken on modifie la date expiresAt à Date.now
+  if(process.env.DEVELOP === "true") console.log("user", req.user);
+
+  //Dans la BDD refreshToken on supprime l'utilisateur
+  //on recherche l'id de l'utilisateur et on supprime l'id dans la BDD refreshToken
+  RefreshToken.deleteOne({ userId: req.user })
+    .then(() => {
+      if(process.env.DEVELOP === "true") console.log("Déconnexion réussie");
+      else logger.info("Déconnexion réussie");
+      
+      res.status(200).json({ message: 'déconnexion réussie' });
+      next();
+    })
+    .catch(error => {
+      if(process.env.DEVELOP === "true") {  
+        console.log(error, error);      
+        console.log("Pb BDD refreshToken pour supprimer");
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        res.status(500).redirect("http://localhost:8080/login");
+      } else {
+        logger.error("Pb BDD refreshToken pour supprimer");
+        res.status(500).redirect("http://localhost:8080/login");
+      }
+    });
 
   //côté client, on supprime xsrfToken et les cookies
+  
+};
+
+exports.refreshToken = (req, res, next) => {//MAJ du refreshToken
+  if(process.env.DEVELOP === "true") console.log('Requete refreshToken');
+  else logger.info("requête refreshToken");
+
+  //On vérifie la présence du refreshToken dans l'en-tête
+
+  //On vérifie la présence du refreshToken dans la BDD et le nom de l'utilisateur, ...
+
+  //On génère un nouveau xsrfToken, accessToken et refreshToken
+
+  //Et on envoie les éléments
+
+  console.log('req test', req);
+};
+
+exports.newPassword = (req, res, next) => {//MAJ du mdp
+  if(process.env.DEVELOP === "true") console.log('Requete newPassword');
+  else logger.info("requête newPassword");
+
+  
+  console.log('req mdp', req);
+};
+
+exports.mailNewPassword = (req, res, next) => {//envoie un mail pour MAJ le MDP
+  if(process.env.DEVELOP === "true") console.log('Requete mailNewPassword');
+  else logger.info("requête mailNewPassword");
+
+  
+  console.log('req mail-mdp', req);
 };

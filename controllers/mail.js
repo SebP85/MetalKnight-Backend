@@ -60,7 +60,7 @@ exports.sendVerifyEmail = (email, token, refreshToken, callback) => {
     var text = 'Mail de vérification';
     var html =  '<h1>Bienvenue sur '+config.email.NOM_APP+'</h1>'+
                 '<p>Vous venez de vous inscrire sur notre site et nous vous en remercions.<br />'+
-                `<a href=https://localhost:4000/apiMetalKnight/verify/:${token}/:${refreshToken}>Cliquez ici</a> pour finaliser la vérification de votre compte.</p>`+
+                `<a href=https://localhost:4000/apiMetalKnight/auth/verify/:${token}/:${refreshToken}>Cliquez ici</a> pour finaliser la vérification de votre compte.</p>`+
                 '<p>Merci</p>';
     var subject = "Confirmation d'E-mail";
 

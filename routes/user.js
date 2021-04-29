@@ -14,7 +14,8 @@
  * brute force pour passer le mot de passe (bloquer l'adresse IP après x tentative + MDP avec 8 carac/symbole/majuscule + captcha=image + double identification)
  */
 
- const { logger } = require('../log/winston');
+const config = require('../config/config')
+const { logger } = require('../log/winston');
 
 const express = require('express');
 const router = express.Router();
@@ -35,10 +36,13 @@ const csrfProtectionCtrl = require('../controllers/csrf');
 
 //Routes connexion
 //exemple: router.get('/register', /*parseForm,*/ csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, xml, objectifRoute);
-router.get('/register', csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, mail.checkEmail, userCtrl.signup);//=>post
-router.get('/verify/:token/:refreshToken', csrfProtection, checkBody.validParamVerify, xssFilter.filterVerify, userCtrl.verify);
-router.get('/login', csrfProtection, csrfProtectionCtrl.getToken, checkBody.validParamLogin, xssFilter.filterLogin, userCtrl.login);
-router.get('/logout', parseForm, csrfProtection, checkBody.validParamLogout, xssFilter.filterLogout, auth, userCtrl.logout);
+router.get('/auth/register', csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, mail.checkEmail, userCtrl.signup);//=>post
+router.get('/auth/verify/:token/:refreshToken', csrfProtection, checkBody.validParamVerify, xssFilter.filterVerify, userCtrl.verify);
+router.get('/auth/login', csrfProtection, csrfProtectionCtrl.getToken, checkBody.validParamLogin, xssFilter.filterLogin, userCtrl.login);
+router.get('/auth/logout', parseForm, csrfProtection, checkBody.validParamLogout, xssFilter.filterLogout, auth, userCtrl.logout);
+router.get('/auth/updateToken', userCtrl.refreshToken);
+router.get('/auth/updatePass', userCtrl.newPassword);//changement de mot de passe
+router.get('/auth/mailPass', userCtrl.mailNewPassword);//mail pour changer de mot de passe
 
 //Routes principales
 //exemple: router.get('/register', /*parseForm,*/ csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, xml, auth, role, objectifRoute);

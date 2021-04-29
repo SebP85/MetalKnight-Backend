@@ -207,6 +207,7 @@ exports.validParamLogout = function (req, res, next){
     else logger.info("Vérification des données d'entrées");
 
     //valid param req.body.csrf ?
+    //const { cookies, headers } = req;
 
     //v8n
     if(isXSRFToken(req.headers.xsrftoken)){
