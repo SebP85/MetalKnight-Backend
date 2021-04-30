@@ -68,14 +68,12 @@ exports.sendVerifyEmail = (email, token, refreshToken, callback) => {
 
     sendMail(email, subject, text, html)
         .then(r=> {
-            //console.log("then sendveryfyemail");
             if(process.env.DEVELOP === "true") console.log('Email sent ...', r);
             else logger.info("email de vérification envoyé !");
 
             callback(true);
         })
         .catch(err => {
-            //console.log("catch sendveryfyemail");
             if(process.env.DEVELOP === "true"){
                 console.log(err.message);
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
@@ -132,3 +130,39 @@ exports.checkEmail = async (req, res, next) => {//vérifie le domaine et si l'ad
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("La vérification de l'email est nok (domaine et écrit)");
 };
+
+exports.sendUpdateEmailMDP = (email, token, refreshToken, callback) => {//Mail pour envoyer les tokens pour changement de mot de passe
+    if(process.env.DEVELOP === "true") {
+        console.log("Préparation de l'email");
+        console.log("email", email);
+        console.log("token", token);
+        console.log("refreshToken", refreshToken);
+    } else logger.info("Préparation de l'email pour mise à jour du mot de passe !");
+
+    //text = message court et html le message quand on l'ouvre
+    var text = 'Mise à jour du mot de passe';
+    var html =  '<h1>'+config.email.NOM_APP+'</h1>'+
+                '<p>Vous avez demandé à mettre à jour votre mot de passe !</p>'+
+                `<p><a href=https://localhost:4000/apiMetalKnight/auth/updateMailMDP/:${token}/:${refreshToken}>Cliquez ici</a> pour lancer la mise à jour de votre mot de passe.</p>`+
+                "<p>Si vous n'êtes pas à l'origine de cette action. Veuillez nous contacter le plus rapidemment possible.</p>"+
+                ''+config.email.NOM_APP;
+    var subject = "Mise à jour du mot de passe";
+
+    if(process.env.DEVELOP === "true") console.log("Préparation de l'email ok");
+
+    sendMail(email, subject, text, html)
+        .then(r=> {
+            if(process.env.DEVELOP === "true") console.log('Email sent ...', r);
+            else logger.info("email de vérification envoyé !");
+
+            callback(true);
+        })
+        .catch(err => {
+            if(process.env.DEVELOP === "true"){
+                console.log(err.message);
+                console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+            } else logger.error("Problème pour envoyer l'email de vérification !", err.message);
+
+            callback(false);
+        });
+}

@@ -8,7 +8,7 @@ var xss = require("xss");
 
 exports.filterRegister = function (req, res, next) {//on transforme les données si danger
     if(process.env.DEVELOP === "true") console.log("fonction xss");
-    if(process.env.DEVELOP === "false") logger.info('Traitement contre XSS attack');
+    else logger.info('Traitement contre XSS attack');
 
     req.body.email = xss(req.body.email);
     req.body.password = xss(req.body.password);
@@ -24,7 +24,7 @@ exports.filterRegister = function (req, res, next) {//on transforme les données
 
 exports.filterVerify = function (req, res, next) {//on transforme les données si danger
     if(process.env.DEVELOP === "true") console.log("fonction xss");
-    if(process.env.DEVELOP === "false") logger.info('Traitement contre XSS attack');
+    else logger.info('Traitement contre XSS attack');
 
     req.params.token = xss(req.params.token);
     req.params.refreshToken = xss(req.params.refreshToken);
@@ -35,7 +35,7 @@ exports.filterVerify = function (req, res, next) {//on transforme les données s
 
 exports.filterLogin = function (req, res, next) {//on transforme les données si danger
     if(process.env.DEVELOP === "true") console.log("fonction xss");
-    if(process.env.DEVELOP === "false") logger.info('Traitement contre XSS attack');
+    else logger.info('Traitement contre XSS attack');
 
     req.body.email = xss(req.body.email);
     req.body.password = xss(req.body.password);
@@ -48,7 +48,7 @@ exports.filterLogin = function (req, res, next) {//on transforme les données si
 
 exports.filterLogout = function (req, res, next) {//on transforme les données si danger
     if(process.env.DEVELOP === "true") console.log("fonction xss");
-    if(process.env.DEVELOP === "false") logger.info('Traitement contre XSS attack');
+    else logger.info('Traitement contre XSS attack');
 
     req.headers.xsrfToken = xss(req.headers.xsrfToken);
     req.cookies.access_token = xss(req.cookies.access_token);
@@ -61,13 +61,34 @@ exports.filterLogout = function (req, res, next) {//on transforme les données s
 
 exports.filterUpdateToken = function (req, res, next) {//on transforme les données si danger
     if(process.env.DEVELOP === "true") console.log("fonction xss");
-    if(process.env.DEVELOP === "false") logger.info('Traitement contre XSS attack');
+    else logger.info('Traitement contre XSS attack');
 
     req.headers.xsrfToken = xss(req.headers.xsrfToken);
     req.cookies.access_token = xss(req.cookies.access_token);
     req.headers.refresh_token = xss(req.headers.refresh_token);
 
     //req.body.csrf à faire ?
+    
+    //console.log(req);
+    next();
+}
+
+exports.filterMailMDP = function (req, res, next) {//on transforme les données si danger
+    if(process.env.DEVELOP === "true") console.log("fonction xss");
+    else logger.info('Traitement contre XSS attack');
+
+    req.body.email = xss(req.body.email);
+    
+    //console.log(req);
+    next();
+}
+
+exports.filterMailnewMDP = function (req, res, next) {//on transforme les données si danger
+    if(process.env.DEVELOP === "true") console.log("fonction xss");
+    else logger.info('Traitement contre XSS attack');
+
+    req.params.accessToken = xss(req.params.accessToken);
+    req.params.refreshToken = xss(req.params.refreshToken);
     
     //console.log(req);
     next();

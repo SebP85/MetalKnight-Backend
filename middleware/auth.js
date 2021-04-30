@@ -151,11 +151,11 @@ exports.normal = (req, res, next) => {//Vérification des tokens
 
 exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken et xsrfToken
   try {
-    if(process.env.DEVELOP === "true") console.log("début authentification");
-    else logger.info("début fonction authentification")
-    const { cookies, headers } = req;
+    if(process.env.DEVELOP === "true") console.log("début authentification refreshToken");
+    else logger.info("début fonction authentification refreshToken")
+    const { headers } = req;
     
-    if (!cookies || !cookies.refresh_token) {//cookie présent ?
+    if (!headers || !headers.refresh_token) {//cookie présent ?
       if(process.env.DEVELOP === "true") {
         console.log('refreshToken manquant');
         console.log('---------------------------------------------------------   Requête traitée   ------------------------------------------------------------------');    
@@ -166,7 +166,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
       }
       
     }
-    const refreshToken = cookies.refresh_token;
+    const refreshToken = headers.refresh_token;
 
     if (!headers || !headers['xsrftoken']) {
       if(process.env.DEVELOP === "true") {

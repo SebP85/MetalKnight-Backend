@@ -137,7 +137,7 @@ function isXSRFToken(val){
     return v;
 }
 
-function isTokenJWT(val){
+function isTokenJWTaccess(val){
     //console.log("jwt =>", val);
 
     var v = v8n()
@@ -147,7 +147,23 @@ function isTokenJWT(val){
         .pattern(/^[a-zA-Z0-9._-]+$/)//autorisé
         .test(val);
 
-    //console.log("jwtToken", v);
+    console.log("jwtToken", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("jwtToken =>", val);
+
+    return v;
+}
+
+function isTokenJWTrefresh(val){
+    //console.log("jwt =>", val);
+
+    var v = v8n()
+        .string()
+        .not.null()
+        .length(880)
+        .pattern(/^[a-zA-Z0-9._-]+$/)//autorisé
+        .test(val);
+
+    console.log("jwtToken", v);
     if(!v && process.env.DEVELOP === "false") logger.error("jwtToken =>", val);
 
     return v;
@@ -163,6 +179,40 @@ function isTokenBase64(val){
 
     console.log("Base64Token", v);
     if(!v && process.env.DEVELOP === "false") logger.error("Base64Token =>", val);
+
+    return v;
+}
+
+function isTokenJWTaccessnewMDP(val){
+    console.log("jwt =>", val);
+
+    var v = v8n()
+        .string()
+        .not.null()
+        .length(600)
+        //.includes(':')//caractère autorisé
+        .pattern(/^[a-zA-Z0-9:._-]+$/)//autorisé
+        .test(val);
+
+    console.log("jwtTokenNewMDP", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("jwtTokenNewMDP =>", val);
+
+    return v;
+}
+
+function isTokenJWTrefreshnewMDP(val){
+    console.log("jwt =>", val);
+
+    var v = v8n()
+        .string()
+        .not.null()
+        .length(600)
+        //.includes(':')//caractère autorisé
+        .pattern(/^[a-zA-Z0-9:._-]+$/)//autorisé
+        .test(val);
+
+    console.log("jwtTokenRefreshNewMDP", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("jwtTokenRefreshNewMDP =>", val);
 
     return v;
 }
@@ -239,7 +289,7 @@ exports.validParamLogout = function (req, res, next){
     //valid param req.body.csrf ?
 
     //v8n
-    if(isXSRFToken(req.headers.xsrftoken) && isTokenJWT(req.cookies.access_token)){
+    if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTaccess(req.cookies.access_token)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
         else logger.info("Données d'entrées ok");
         next();
@@ -259,7 +309,46 @@ exports.validParamUpdateToken = function (req, res, next){
     //valid param req.body.csrf ?
 
     //v8n
-    if(isXSRFToken(req.headers.xsrftoken) && isTokenJWT(req.headers.refresh_token)){
+    if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTrefresh(req.headers.refresh_token)){
+        if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
+        else logger.info("Données d'entrées ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données d'entrées nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données d'entrées nok");
+        
+    }
+}
+
+exports.validParamMailMDP = function (req, res, next){
+    if(process.env.DEVELOP === "true") console.log("checkBody");
+    else logger.info("Vérification des données d'entrées");
+
+    //v8n
+    if(isEmail(req.body.email)){
+        if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
+        else logger.info("Données d'entrées ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données d'entrées nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données d'entrées nok");
+        
+    }
+}
+
+exports.validParamMailnewMDP = function (req, res, next){
+    if(process.env.DEVELOP === "true") console.log("checkBody");
+    else logger.info("Vérification des données d'entrées");
+
+    const { accessToken } = req.params;
+    const { refreshToken } = req.params;
+
+    //v8n
+    if(isTokenJWTaccessnewMDP(accessToken) && isTokenJWTrefreshnewMDP(refreshToken)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
         else logger.info("Données d'entrées ok");
         next();

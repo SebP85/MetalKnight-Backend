@@ -8,9 +8,7 @@ const config = require('../config/config');
 const crypto = require('crypto');
 const mail = require("../controllers/mail");
 const { logger } = require('../log/winston');
-const { log } = require('util');
 const moment = require('moment');
-const { access } = require('fs');
 
 ////////////////////////////////////////////////////////////////////////////   Fonction    /////////////////////////////////////////////////////////////////////////
 
@@ -468,13 +466,12 @@ exports.login = (req, res, next) => {//connexion
                   if (!valid) {
                     if(process.env.DEVELOP === "true") {
                       console.log('Mot de passe incorrect !');
+                      console.log("tentativesConnexion", user.tentativesConnexion);
+                      console.log("email", user.email);
                     } else {
                       logger.error('Mot de passe incorrect !');
                     }
-                    if(process.env.DEVELOP === "true") {
-                      console.log("tentativesConnexion", user.tentativesConnexion);
-                      console.log("email", user.email);
-                    }
+                    
                     user.tentativesConnexion=user.tentativesConnexion+1;
                     if(process.env.DEVELOP === "true") console.log("tentativesConnexion", user.tentativesConnexion);
                     else logger.error('tentativesConnexion', user.tentativesConnexion);
@@ -507,6 +504,8 @@ exports.login = (req, res, next) => {//connexion
                     //Initialisation du nombre de tentatives de connexion
                     if(process.env.DEVELOP === "true") console.log("tentativesConnexion",user.tentativesConnexion);
                     user.tentativesConnexion=0;
+                    user.token=crypto.randomBytes(128).toString('hex');//nouveau token par sécurité
+                    user.refreshToken=crypto.randomBytes(128).toString('hex');//nouveau token par sécurité
 
                     User.updateOne({ email: user.email }, user)
                       .then(() => {
@@ -596,18 +595,149 @@ exports.refreshToken = (req, res, next) => {//MAJ du refreshToken
   envoieToken(req.user, res, next);
 };
 
+exports.mailNewPassword = (req, res, next) => {//envoie un mail pour MAJ le MDP
+  if(process.env.DEVELOP === "true") console.log('Requete mailNewPassword');
+  else logger.info("requête mailNewPassword");
+
+  //Vérification que le mail est dans la BDD
+  User.findOne({ email: req.body.email })
+    .then((user) => {
+      if(!user){//Si l'email n'est pas dans la BDD
+        if(process.env.DEVELOP === "true") {  
+          console.log(error, error);      
+          console.log("Email non trouvé");
+          console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+          res.status(400).redirect("http://localhost:8080/login");
+        } else {
+          logger.error("Email non trouvé");
+          res.status(400).redirect("http://localhost:8080/login");
+        }
+      } else {//email trouvé
+        //vérification que l'utilisateur est activé et que le compte n'est pas suspendu
+        if(user.userConfirmed && !compteSuspendu(user)) {
+          if(process.env.DEVELOP === "true") console.log('userConfirmed', user.userConfirmed);
+          //Génération des tokens pour changer le mdp
+          if(process.env.DEVELOP === "true") console.log('génération des tokens');
+          const token = crypto.randomBytes(128).toString('hex');
+          if(process.env.DEVELOP === "true") console.log('génération token');
+          const accessToken = jwt.sign(
+            { email: user.email , token},
+            config.token.accessToken.secret,
+            {
+              algorithm: config.token.accessToken.algorithm,
+              audience: Date.now() + config.token.accessToken.audience,
+              expiresIn: config.token.refreshToken.expiresIn, // Le délai avant expiration exprimé en seconde
+              issuer: config.token.accessToken.issuer,
+              subject: user.id.toString() //fonction decoded.sub pour le récupérer
+            }
+          );
+          if(process.env.DEVELOP === "true") console.log('génération accessToken');
+
+          const refreshToken = jwt.sign(
+            { email: user.email , token},
+            config.token.refreshToken.secret,
+            {
+              algorithm: config.token.refreshToken.algorithm,
+              audience: Date.now() + config.token.refreshToken.audience,
+              expiresIn: config.token.refreshToken.expiresIn, // Le délai avant expiration exprimé en seconde
+              issuer: config.token.refreshToken.issuer,
+              subject: user.id.toString() //fonction decoded.sub pour le récupérer
+            }
+          );
+          if(process.env.DEVELOP === "true") console.log('génération refreshToken');
+
+          if(process.env.DEVELOP === "true") {
+            console.log("email", user.email);
+            console.log("accessToken", accessToken);
+            console.log("refreshToken", refreshToken);
+            console.log("token", token);
+          }
+
+          //On enregistre token dans la base de donnée users
+          User.updateOne({ _id: user._id }, { token: accessToken, refreshToken: refreshToken })
+            .then(() => {
+              //Envoie du mail
+              mail.sendUpdateEmailMDP(user.email, accessToken, refreshToken, (result) => {
+                if(result){
+                  if(process.env.DEVELOP === "true") {
+                    console.log("mail envoyé");
+                    res.status(200).json({ message: "mail envoyé" });
+                  } else {
+                    logger.info("Mail envoyé");
+                    res.status(200).json({ message: process.env.MSG_OK_PRODUCTION });
+                  }
+
+                  next();
+                } else {
+                  if(process.env.DEVELOP === "true") {
+                    console.log("pb mail");
+                    console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+                    res.status(500).json({ message: "error 500, pb mail" });
+                  } else {
+                    logger.error("Erreur 500 problème avec l'envoie du mail");
+                    res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
+                  }
+                }
+              });
+            })
+            .catch(error => {
+              if(process.env.DEVELOP === "true") {
+                console.log("pb pour envoyer le mail");
+                console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+                res.status(500).json({ message: "error 500, pb mail", error });
+              } else {
+                logger.error("Erreur 500 problème avec l'envoie du mail", error);
+                res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
+              }
+            });
+
+        
+        } else {
+          if(process.env.DEVELOP === "true") {
+            console.log("Compte suspendu ou pas encore activé");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+            res.status(500).json({ message: "Compte suspendu ou pas encore activé" });
+          } else {
+            logger.error("Compte suspendu ou pas encore activé");
+            res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
+          }
+        }
+        
+      }
+    })
+    .catch(error => {
+      if(process.env.DEVELOP === "true") {        
+        console.log("Pb BDD users");
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        res.status(500).json({ error });
+      } else {
+        logger.error("Pb BDD users");
+        res.status(500).json({ error: process.env.MSG_ERROR_PRODUCTION });
+      }
+    });
+
+};
+
+exports.verifMailNewPassword = (req, res, next) => {//Vérif mail et token avant de pouvoir changer de mot de passe
+  if(process.env.DEVELOP === "true") console.log('Requete newPassword');
+  else logger.info("requête newPassword");
+
+  //Vérif des tokens
+
+  //Vérif si expiré
+
+  
+  //console.log('req mdp', req);
+
+  //Si tout ok on redirige vers la page de mise à jour du mot de passe et on envoie les tokens
+  next();
+};
+
 exports.newPassword = (req, res, next) => {//MAJ du mdp
   if(process.env.DEVELOP === "true") console.log('Requete newPassword');
   else logger.info("requête newPassword");
 
   
-  console.log('req mdp', req);
-};
-
-exports.mailNewPassword = (req, res, next) => {//envoie un mail pour MAJ le MDP
-  if(process.env.DEVELOP === "true") console.log('Requete mailNewPassword');
-  else logger.info("requête mailNewPassword");
-
-  
-  console.log('req mail-mdp', req);
+  //console.log('req mdp', req);
+  next();
 };
