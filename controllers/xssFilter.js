@@ -73,7 +73,7 @@ exports.filterUpdateToken = function (req, res, next) {//on transforme les donn�
     next();
 }
 
-exports.filterMailMDP = function (req, res, next) {//on transforme les données si danger
+exports.filterEmailNewMDP = function (req, res, next) {//on transforme les données si danger
     if(process.env.DEVELOP === "true") console.log("fonction xss");
     else logger.info('Traitement contre XSS attack');
 
@@ -83,12 +83,29 @@ exports.filterMailMDP = function (req, res, next) {//on transforme les données 
     next();
 }
 
-exports.filterMailnewMDP = function (req, res, next) {//on transforme les données si danger
+exports.filterVerifMailNewMDP = function (req, res, next) {//on transforme les données si danger
     if(process.env.DEVELOP === "true") console.log("fonction xss");
     else logger.info('Traitement contre XSS attack');
 
     req.params.accessToken = xss(req.params.accessToken);
     req.params.refreshToken = xss(req.params.refreshToken);
+    
+    //console.log(req);
+    next();
+}
+
+exports.filterUpdateMailNewMDP = function (req, res, next) {//on transforme les données si danger
+    if(process.env.DEVELOP === "true") console.log("fonction xss");
+    else logger.info('Traitement contre XSS attack');
+
+    req.headers.xsrfToken = xss(req.headers.xsrfToken);
+    req.cookies.access_token = xss(req.cookies.access_token);
+    req.cookies.refresh_token = xss(req.cookies.refresh_token);
+
+    req.body.email = xss(req.body.email);
+    req.body.password = xss(req.body.password);
+
+    //req.body.csrf à faire ?
     
     //console.log(req);
     next();

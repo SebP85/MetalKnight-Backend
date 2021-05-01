@@ -41,9 +41,11 @@ router.get('/auth/verify/:token/:refreshToken', csrfProtection, checkBody.validP
 router.get('/auth/login', csrfProtection, csrfProtectionCtrl.getToken, checkBody.validParamLogin, xssFilter.filterLogin, userCtrl.login);
 router.get('/auth/logout', parseForm, csrfProtection, checkBody.validParamLogout, xssFilter.filterLogout, auth.normal, userCtrl.logout);
 router.get('/auth/updateToken', parseForm, csrfProtection, checkBody.validParamUpdateToken, xssFilter.filterUpdateToken, auth.refreshToken, userCtrl.refreshToken);
-router.get('/auth/mailPass', csrfProtection, checkBody.validParamMailMDP, xssFilter.filterMailMDP, userCtrl.mailNewPassword);//mail pour changer de mot de passe
-router.get('/auth/updateMailMDP/:accessToken/:refreshToken', csrfProtection, checkBody.validParamMailnewMDP, xssFilter.filterMailnewMDP, userCtrl.verifMailNewPassword);//vérification du mail pour changer de mot de passe
-router.get('/auth/updateMDP', csrfProtection, /*checkBody.validParamNewMDP, xssFilter.filterNewMDP, userCtrl.newPassword*/);//Changement de mot de passe
+
+router.get('/auth/mailNewPassword', csrfProtection, checkBody.validParamEmailNewMDP, xssFilter.filterEmailNewMDP, userCtrl.mailNewPassword);//mail pour changer de mot de passe
+router.get('/auth/verifMailNewMDP/:accessToken/:refreshToken', csrfProtection, checkBody.validParamVerifMailNewMDP, xssFilter.filterVerifMailNewMDP, userCtrl.verifMailNewPassword);//Vérif mail pour changement du mot de passe et envoie vers la page pour changer de mot de passe
+router.get('/auth/updateMailNewMDP', parseForm, csrfProtection, checkBody.validParamUpdateMailNewMDP, xssFilter.filterUpdateMailNewMDP, userCtrl.UpdateMailNewPassword);//changement de mot de passe grâce au mail, envoie xsrfToken et cookie pour vérification
+router.get('/auth/updateMDP', parseForm, csrfProtection, /*checkBody.validParamMailNewMDP, xssFilter.filterMailNewMDP,*/ auth.normal, /*userCtrl.newPassword*/);//changement de mot de passe depuis le profil
 
 //Routes principales
 //exemple: router.get('/register', /*parseForm,*/ csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, xml, auth.normal, role.levelAuthorize("free"), objectifRoute);

@@ -143,12 +143,12 @@ function isTokenJWTaccess(val){
     var v = v8n()
         .string()
         .not.null()
-        .length(632)
+        //.length(632)
         .pattern(/^[a-zA-Z0-9._-]+$/)//autorisé
         .test(val);
 
-    console.log("jwtToken", v);
-    if(!v && process.env.DEVELOP === "false") logger.error("jwtToken =>", val);
+    console.log("jwtAccessToken", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("jwtAccessToken =>", val);
 
     return v;
 }
@@ -159,12 +159,12 @@ function isTokenJWTrefresh(val){
     var v = v8n()
         .string()
         .not.null()
-        .length(880)
+        //.length(880)
         .pattern(/^[a-zA-Z0-9._-]+$/)//autorisé
         .test(val);
 
-    console.log("jwtToken", v);
-    if(!v && process.env.DEVELOP === "false") logger.error("jwtToken =>", val);
+    console.log("jwtRefreshToken", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("jwtRefreshToken =>", val);
 
     return v;
 }
@@ -174,45 +174,11 @@ function isTokenBase64(val){
         .string()
         .not.null()
         .length(256)
-        .pattern(/^[a-zA-Z0-9/+=]+$/)//autorisé
+        .pattern(/^[a-zA-Z0-9]+$/)//autorisé
         .test(val);
 
     console.log("Base64Token", v);
     if(!v && process.env.DEVELOP === "false") logger.error("Base64Token =>", val);
-
-    return v;
-}
-
-function isTokenJWTaccessnewMDP(val){
-    console.log("jwt =>", val);
-
-    var v = v8n()
-        .string()
-        .not.null()
-        .length(600)
-        //.includes(':')//caractère autorisé
-        .pattern(/^[a-zA-Z0-9:._-]+$/)//autorisé
-        .test(val);
-
-    console.log("jwtTokenNewMDP", v);
-    if(!v && process.env.DEVELOP === "false") logger.error("jwtTokenNewMDP =>", val);
-
-    return v;
-}
-
-function isTokenJWTrefreshnewMDP(val){
-    console.log("jwt =>", val);
-
-    var v = v8n()
-        .string()
-        .not.null()
-        .length(600)
-        //.includes(':')//caractère autorisé
-        .pattern(/^[a-zA-Z0-9:._-]+$/)//autorisé
-        .test(val);
-
-    console.log("jwtTokenRefreshNewMDP", v);
-    if(!v && process.env.DEVELOP === "false") logger.error("jwtTokenRefreshNewMDP =>", val);
 
     return v;
 }
@@ -322,7 +288,7 @@ exports.validParamUpdateToken = function (req, res, next){
     }
 }
 
-exports.validParamMailMDP = function (req, res, next){
+exports.validParamEmailNewMDP = function (req, res, next){
     if(process.env.DEVELOP === "true") console.log("checkBody");
     else logger.info("Vérification des données d'entrées");
 
@@ -340,7 +306,7 @@ exports.validParamMailMDP = function (req, res, next){
     }
 }
 
-exports.validParamMailnewMDP = function (req, res, next){
+exports.validParamVerifMailNewMDP = function (req, res, next){
     if(process.env.DEVELOP === "true") console.log("checkBody");
     else logger.info("Vérification des données d'entrées");
 
@@ -348,7 +314,26 @@ exports.validParamMailnewMDP = function (req, res, next){
     const { refreshToken } = req.params;
 
     //v8n
-    if(isTokenJWTaccessnewMDP(accessToken) && isTokenJWTrefreshnewMDP(refreshToken)){
+    if(isTokenHex(accessToken) && isTokenHex(refreshToken)){
+        if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
+        else logger.info("Données d'entrées ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données d'entrées nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données d'entrées nok");
+        
+    }
+}
+
+exports.validParamUpdateMailNewMDP = function (req, res, next){
+    if(process.env.DEVELOP === "true") console.log("checkBody");
+    else logger.info("Vérification des données d'entrées");
+
+    //v8n
+    if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTaccess(req.cookies.access_token) && isTokenJWTrefresh(req.cookies.refresh_token) && 
+        isEmail(req.body.email) && isStrongPassword(req.body.password)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
         else logger.info("Données d'entrées ok");
         next();

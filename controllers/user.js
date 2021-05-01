@@ -188,6 +188,89 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
   
 }
 
+function envoieTokenMDP(user, res, next) {//Permet d'envoyer les données pour changer le mot de passe
+  if(process.env.DEVELOP === "true") console.log("fonction envoieTokenMDP lancé");
+
+  /* On créer le token CSRF */
+  const xsrfToken = crypto.randomBytes(128).toString('hex');
+  if(process.env.DEVELOP === "true") console.log("xsrfToken", xsrfToken);
+
+  /* On créer le JWT avec le token CSRF dans le payload */
+  if(process.env.DEVELOP === "true") console.log("user.firstName", user.firstName);
+  const accessToken = jwt.sign(
+    { firstName: user.firstName, lastName: user.lastName, xsrfToken },
+    config.token.accessToken.secret,
+    {
+      algorithm: config.token.accessToken.algorithm,
+      audience: Date.now() + config.token.accessToken.audience,
+      expiresIn: config.token.accessToken.expiresIn, // Le délai avant expiration exprimé en seconde
+      issuer: config.token.accessToken.issuer,
+      subject: user.id.toString() //fonction decoded.sub pour le récupérer
+    }
+  );
+  if(process.env.DEVELOP === "true") console.log("accessToken", accessToken);
+
+  // 7. On créer le refresh token et on le stocke en BDD
+  const refToken = crypto.randomBytes(128).toString('base64');
+  const refreshToken = jwt.sign(
+    { firstName: user.firstName, lastName: user.lastName, refToken, xsrfToken },
+    config.token.refreshToken.secret,
+    {
+      algorithm: config.token.refreshToken.algorithm,
+      audience: Date.now() + config.token.refreshToken.audience,
+      expiresIn: config.token.refreshToken.expiresIn, // Le délai avant expiration exprimé en seconde
+      issuer: config.token.refreshToken.issuer,
+      subject: user.id.toString() //fonction decoded.sub pour le récupérer
+    }
+  );
+  if(process.env.DEVELOP === "true") console.log('refreshToken', refreshToken);
+
+  User.updateOne({ _id: user._id }, { token: xsrfToken, refreshToken: refToken})
+    .then(() => {//enregistrement ok
+      if(process.env.DEVELOP === "true") console.log("updateOne ok");
+      res.cookie('access_token', accessToken, {//config du cookie accessToken
+        maxAge: config.token.accessToken.expiresIn,
+        httpOnly: true,
+        secure: true,
+      });
+      if(process.env.DEVELOP === "true") console.log('accessToken setCookie');
+    
+      res.cookie('refresh_token', refreshToken, {//config du cookie refreshToken
+        maxAge: config.token.refreshToken.expiresIn,
+        httpOnly: true,
+        secure: true,
+        path: config.cookie.refreshToken.pathCookie,
+      });
+      if(process.env.DEVELOP === "true") console.log('refreshToken setCookie');
+    
+      res.status(200).json({//envoie du message
+        accessTokenExpiresIn: config.token.accessToken.expiresIn,
+        refreshTokenExpiresIn: config.token.refreshToken.expiresIn,
+        xsrfToken,
+      });
+      if(process.env.DEVELOP === "true") {
+        console.log('Cookie et xsrf envoyé');
+        console.log("Redirection de l'utilisateur vers la bonne page");
+      }
+      next();
+      
+    })
+    .catch(error => {//Pb avec la BDD
+      if(process.env.DEVELOP === "true") {
+        console.log("updateOne nok");
+        console.log('erreur pour enregistrer le refreshToken');
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        res.status(400).json({ error });
+      } else {
+        logger.error("Erreur MongoDB pour enregistrer refreshToken");
+        console.log(process.env.MSG_ERROR_PRODUCTION);
+        res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
+      }
+    });
+      
+  
+}
+
 /////////////////////////////////////////////////////////////////////////////   Exports    //////////////////////////////////////////////////////////////////////////
 
 exports.verify = (req, res, next) => {//vérification que l'email existe et validation de l'utilisateur
@@ -620,44 +703,21 @@ exports.mailNewPassword = (req, res, next) => {//envoie un mail pour MAJ le MDP
           if(process.env.DEVELOP === "true") console.log('génération des tokens');
           const token = crypto.randomBytes(128).toString('hex');
           if(process.env.DEVELOP === "true") console.log('génération token');
-          const accessToken = jwt.sign(
-            { email: user.email , token},
-            config.token.accessToken.secret,
-            {
-              algorithm: config.token.accessToken.algorithm,
-              audience: Date.now() + config.token.accessToken.audience,
-              expiresIn: config.token.refreshToken.expiresIn, // Le délai avant expiration exprimé en seconde
-              issuer: config.token.accessToken.issuer,
-              subject: user.id.toString() //fonction decoded.sub pour le récupérer
-            }
-          );
-          if(process.env.DEVELOP === "true") console.log('génération accessToken');
 
-          const refreshToken = jwt.sign(
-            { email: user.email , token},
-            config.token.refreshToken.secret,
-            {
-              algorithm: config.token.refreshToken.algorithm,
-              audience: Date.now() + config.token.refreshToken.audience,
-              expiresIn: config.token.refreshToken.expiresIn, // Le délai avant expiration exprimé en seconde
-              issuer: config.token.refreshToken.issuer,
-              subject: user.id.toString() //fonction decoded.sub pour le récupérer
-            }
-          );
+          const refreshtoken = crypto.randomBytes(128).toString('hex');
           if(process.env.DEVELOP === "true") console.log('génération refreshToken');
 
           if(process.env.DEVELOP === "true") {
             console.log("email", user.email);
-            console.log("accessToken", accessToken);
-            console.log("refreshToken", refreshToken);
-            console.log("token", token);
+            console.log("token BDD users", token);
+            console.log("refreshtoken BDD users", refreshtoken);
           }
 
-          //On enregistre token dans la base de donnée users
-          User.updateOne({ _id: user._id }, { token: accessToken, refreshToken: refreshToken })
+          //On enregistre token et refreshtoken dans la base de donnée users
+          User.updateOne({ _id: user._id }, { token: token, refreshToken: refreshtoken })
             .then(() => {
               //Envoie du mail
-              mail.sendUpdateEmailMDP(user.email, accessToken, refreshToken, (result) => {
+              mail.sendUpdateEmailMDP(user.email, token, refreshtoken, (result) => {
                 if(result){
                   if(process.env.DEVELOP === "true") {
                     console.log("mail envoyé");
@@ -719,25 +779,93 @@ exports.mailNewPassword = (req, res, next) => {//envoie un mail pour MAJ le MDP
 };
 
 exports.verifMailNewPassword = (req, res, next) => {//Vérif mail et token avant de pouvoir changer de mot de passe
-  if(process.env.DEVELOP === "true") console.log('Requete newPassword');
-  else logger.info("requête newPassword");
+  if(process.env.DEVELOP === "true") console.log('Requete verifMailNewPassword');
+  else logger.info("requête verifMailNewPassword");
 
-  //Vérif des tokens
+  var { accessToken } = req.params;
+  var { refreshToken } = req.params;
 
-  //Vérif si expiré
+  //enlever les : au début de accessToken et refreshToken
+  accessToken = accessToken.substring(1,accessToken.length)
+  refreshToken = refreshToken.substring(1,refreshToken.length)
+  if(process.env.DEVELOP === "true") {
+    console.log('accessToken', accessToken);
+    console.log('refreshToken', refreshToken);
+  }
 
-  
-  //console.log('req mdp', req);
+  //Recherche dans la BDD s'ils existent
+  User.findOne({ token: accessToken, refreshToken: refreshToken })
+    .then((user) => {
+      if(!user){//Utilisateur non trouvé
+        if(process.env.DEVELOP === "true") {
+          console.log("Utilisateur non trouvé !");
+          console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+          res.status(401).json({ error: 'Utilisateur non trouvé !' });
+        } else {
+          logger.error("Utilisateur non trouvé !");
+          res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        }
+      } else {
+        if(!user.userConfirmed){//utilisateur non validé
+          if(process.env.DEVELOP === "true") {
+            console.log("UserConfirmed", user.userConfirmed);
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+            return res.status(401).json({ error: 'Utilisateur pas encore confirmé dans la BDD !' });
+          } else {
+            logger.error("Utilisateur pas encore confirmé dans la BDD");
+            return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+          }
+        } else {//si compte suspendu
+          if(compteSuspendu(user)){
+            if(process.env.DEVELOP === "true") {
+              console.log("Compte suspendu");
+              console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+              return res.status(401).json({ error: 'Compte suspendu' });
+            }
+            else {
+              logger.error("Compte suspendu");
+              return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+            }
+          } else {//si nombre de tentatives de connexion atteint
+            if(user.tentativesConnexion >= config.login.MAX_CONNEXION){
+              if(process.env.DEVELOP === "true") {
+                console.log("nombre de tentatives de connexion max atteint");
+                console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+                return res.status(401).json({ error: 'nombre de tentatives de connexion max atteint' });
+              } else {
+                logger.error("nombre de tentatives de connexion max atteint");
+                return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+              }
+            } else {
+              if(process.env.DEVELOP === "true") {
+                console.log("Mise à jour du mot de passe autorisé");
+              } else {
+                logger.error("Mise à jour du mot de passe autorisé");
+              }
 
-  //Si tout ok on redirige vers la page de mise à jour du mot de passe et on envoie les tokens
-  next();
+              //On créai les tokens d'identification xsrfToken, accessToken, refreshToken mais on les enregistres sur la BDD Users
+              //On renvoie vers la page de changement de mot de passe
+              envoieTokenMDP(user, res, next);
+            }
+          }
+        }
+      }
+    })
+    .catch(error => {
+      if(process.env.DEVELOP === "true") {        
+        console.log("Pb BDD users");
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        res.status(500).json({ error });
+      } else {
+        logger.error("Pb BDD users");
+        res.status(500).json({ error: process.env.MSG_ERROR_PRODUCTION });
+      }
+    });
 };
 
-exports.newPassword = (req, res, next) => {//MAJ du mdp
-  if(process.env.DEVELOP === "true") console.log('Requete newPassword');
-  else logger.info("requête newPassword");
+exports.UpdateMailNewPassword = (req, res, next) => {//Mise à jour du mot de passe par mail
+  if(process.env.DEVELOP === "true") console.log('Requete UpdateMailNewPassword');
+  else logger.info("requête UpdateMailNewPassword");
 
-  
-  //console.log('req mdp', req);
   next();
-};
+}

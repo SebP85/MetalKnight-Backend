@@ -133,7 +133,7 @@ exports.checkEmail = async (req, res, next) => {//vérifie le domaine et si l'ad
 
 exports.sendUpdateEmailMDP = (email, token, refreshToken, callback) => {//Mail pour envoyer les tokens pour changement de mot de passe
     if(process.env.DEVELOP === "true") {
-        console.log("Préparation de l'email");
+        console.log("-------   Préparation de l'email   -------");
         console.log("email", email);
         console.log("token", token);
         console.log("refreshToken", refreshToken);
@@ -143,7 +143,7 @@ exports.sendUpdateEmailMDP = (email, token, refreshToken, callback) => {//Mail p
     var text = 'Mise à jour du mot de passe';
     var html =  '<h1>'+config.email.NOM_APP+'</h1>'+
                 '<p>Vous avez demandé à mettre à jour votre mot de passe !</p>'+
-                `<p><a href=https://localhost:4000/apiMetalKnight/auth/updateMailMDP/:${token}/:${refreshToken}>Cliquez ici</a> pour lancer la mise à jour de votre mot de passe.</p>`+
+                `<p><a href=https://localhost:8080/verifMailNewMDP/:${token}/:${refreshToken}>Cliquez ici</a> pour lancer la mise à jour de votre mot de passe.</p>`+
                 "<p>Si vous n'êtes pas à l'origine de cette action. Veuillez nous contacter le plus rapidemment possible.</p>"+
                 ''+config.email.NOM_APP;
     var subject = "Mise à jour du mot de passe";
