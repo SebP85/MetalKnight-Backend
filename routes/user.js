@@ -27,6 +27,8 @@ const checkBody = require("../controllers/checkBody");
 const userCtrl = require("../controllers/user");
 const role = require("../controllers/role");
 
+const profile = require("../controllers/profile");
+
 //Protection contre CSRF
 const csrf = require("csurf");
 var csrfProtection = csrf({ cookie: true });
@@ -50,6 +52,6 @@ router.get('/auth/updateMDP', parseForm, csrfProtection, checkBody.validParamMai
 
 //Routes principales
 //exemple: router.get('/register', /*parseForm,*/ csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, xml, auth.normal, role.levelAuthorize("free"), objectifRoute);
-router.get('/getProfile', parseForm, csrfProtection, checkBody.validParamGetProfile, xssFilter.filterGetProfile, auth.normal, role.levelAuthorizeFree, /*objectifRoute*/);
+router.get('/getProfile', parseForm, csrfProtection, checkBody.validParamGetProfile, xssFilter.filterGetProfile, auth.normal, role.levelAuthorizeFree, profile.getProfile);
 
 module.exports = router;
