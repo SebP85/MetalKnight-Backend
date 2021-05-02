@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 const moment = require('moment');
+const config = require('../config/config')
 
 const userSchema = mongoose.Schema({
     email: { type: String, required: true, unique: true },
@@ -10,7 +11,7 @@ const userSchema = mongoose.Schema({
     individu: { type: String, required: true },//un particulier ou un professionel
     birthday: { type: Date, required: true },//> à 18 ans
     civilite: { type: String, required: true },//madame ou monsieur
-    role: { type: String, default: "free" },//free, expert, ...
+    role: { type: String, default: config.role.roleFree },//free, expert, ...
     suspendu: { type: Date, default: moment() },//date:heure:minute:seconde de fin de suspension
     tentativesConnexion: { type: Number, default: 0 },
     userConfirmed: { type: Boolean, default: false },

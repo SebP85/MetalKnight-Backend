@@ -480,10 +480,10 @@ exports.login = (req, res, next) => {//connexion
         if(process.env.DEVELOP === "true") {
           console.log("Utilisateur non trouvé !");
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-          res.status(401).json({ error: 'Utilisateur non trouvé !' });
+          return res.status(401).json({ error: 'Utilisateur non trouvé !' });
         } else {
           logger.error("Utilisateur non trouvé !");
-          res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+          return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
         }
       } else {
         if(!user.userConfirmed){//utilisateur non validé
@@ -566,21 +566,21 @@ exports.login = (req, res, next) => {//connexion
                         if(process.env.DEVELOP === "true") {
                           console.log('Mot de passe incorrect !');
                           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-                          res.status(401).json({ error: 'Mot de passe incorrect !' });
+                          return res.status(401).json({ error: 'Mot de passe incorrect !' });
                         } else {
                           logger.error('Mot de passe incorrect !');
-                          res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+                          return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
                         }
                       })
                       .catch(error => {
                         if(process.env.DEVELOP === "true") {
                           console.log("Erreur 500: addTentativeConnexion impossible");
                           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-                          res.status(500).json({ error });
+                          return res.status(500).json({ error });
                         } else {
                           console.log(process.env.MSG_ERROR_PRODUCTION);
                           logger.error("Erreur 500: addTentativeConnexion impossible", error.message);
-                          res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
+                          return res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
                         }
                       });
                   } else {
@@ -602,11 +602,11 @@ exports.login = (req, res, next) => {//connexion
                         if(process.env.DEVELOP === "true") {
                           console.log("Erreur 500: initNbreTentativeConnexion initialisation impossible");
                           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-                          res.status(500).json({ error });
+                          return res.status(500).json({ error });
                         } else {
                           console.log(process.env.MSG_ERROR_PRODUCTION);
                           logger.error("Erreur 500: initNbreTentativeConnexion initialisation impossible", error.message);
-                          res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
+                          return res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
                         }
                       });
                   }
@@ -615,11 +615,11 @@ exports.login = (req, res, next) => {//connexion
                   if(process.env.DEVELOP === "true") {
                     console.log("Problème avec Bcrypt");
                     console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-                    res.status(500).json({ error });
+                    return res.status(500).json({ error });
                   } else {
                     console.log(process.env.MSG_ERROR_PRODUCTION);
                     logger.error("Erreur 500: Problème avec Bcrypt", error.message);
-                    res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
+                    return res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
                   }
                 });
             }
@@ -631,10 +631,10 @@ exports.login = (req, res, next) => {//connexion
       if(process.env.DEVELOP === "true") {        
         console.log("Pb BDD users");
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-        res.status(500).json({ error });
+        return res.status(500).json({ error });
       } else {
         logger.error("Pb BDD users");
-        res.status(500).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        return res.status(500).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
     });
 };
