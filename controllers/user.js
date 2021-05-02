@@ -867,5 +867,185 @@ exports.UpdateMailNewPassword = (req, res, next) => {//Mise à jour du mot de pa
   if(process.env.DEVELOP === "true") console.log('Requete UpdateMailNewPassword');
   else logger.info("requête UpdateMailNewPassword");
 
-  next();
-}
+  //Mise à jour du mot de passe
+  if(process.env.DEVELOP === "true") console.log("MAJ du MDP authorisé !")
+
+  const { cookies } = req;
+
+  if (!cookies || !cookies.access_token) {//cookie présent ?
+    if(process.env.DEVELOP === "true") {
+      console.log('accessToken manquant');
+      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
+      return res.status(401).json({ message: 'Missing token in cookie' });
+    } else {
+      logger.error('accessToken manquant');
+      return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+    }
+    
+  }
+  const accessToken = cookies.access_token;
+
+  const decodedAccessToken = jwt.verify(accessToken, config.token.accessToken.secret, {
+    algorithms: config.token.accessToken.algorithm
+  });
+  if(process.env.DEVELOP === "true") console.log('decodedAccessToken', decodedAccessToken);
+
+  if(process.env.DEVELOP === "true") console.log('nouveau mot de passe', req.body.password);
+
+  bcrypt.hash(req.body.password, 10)
+    .then(hash => {
+      if(process.env.DEVELOP === "true") console.log('Hash du pwd');
+
+      //Envoie l'email
+      if(process.env.DEVELOP === "true") console.log("Envoie de l'email");
+      mail.sendConfirmeNewMDPEmail( req.body.email, (result) => {
+        if(result){
+          //changer token
+          const xsrfToken = crypto.randomBytes(138).toString('base64');
+          const refToken = crypto.randomBytes(138).toString('hex');
+          User.updateOne({ _id: decodedAccessToken.sub }, { token: xsrfToken, refreshToken: refToken, password: hash })
+            .then((user) => {
+              if(process.env.DEVELOP === "true") {
+                console.log("then user");
+                res.status(201).json({ message: 'MAJ mot de passe ok !' });
+              } else {
+                res.status(201).json({ message: process.env.MSG_OK_PRODUCTION });
+                logger.info("MAJ mot de passe ok", user.email);
+              }
+            })
+            .catch(error => {
+              if(process.env.DEVELOP === "true") {
+                console.log("MAJ MDP user nok");
+                console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+                res.status(400).json({ error });
+              } else {
+                console.log(process.env.MSG_ERROR_PRODUCTION);
+                logger.error("Erreur 400 MAJ MDP user nok", error.message);
+                res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
+              }
+            });
+        } else {
+          if(process.env.DEVELOP === "true") {
+            console.log("pb mail");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+            res.status(500).json({ message: "error 500, pb mail" });
+          } else {
+            logger.error("Erreur 500 problème avec l'envoie du mail", error.message);
+            res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
+          }
+        }
+      });
+      
+    })
+    .catch(error => {
+      if(process.env.DEVELOP === "true") {
+        console.log('erreur 500');
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        res.status(500).json({ error });
+      } else {
+        logger.error("Erreur 500 d'enregistrement du nouvelle utilisateur", error.message);
+        res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
+      }
+    });
+};
+
+exports.newPassword = (req, res, next) => {//Mise à jour du mot de passe via le profile
+  if(process.env.DEVELOP === "true") console.log('Requete UpdateMailNewPassword');
+  else logger.info("requête UpdateMailNewPassword");
+
+  //Mise à jour du mot de passe
+  if(process.env.DEVELOP === "true") {
+    console.log("MAJ du MDP authorisé !");
+  }
+
+  const { cookies } = req;
+
+  if (!cookies || !cookies.access_token) {//cookie présent ?
+    if(process.env.DEVELOP === "true") {
+      console.log('accessToken manquant');
+      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
+      return res.status(401).json({ message: 'Missing token in cookie' });
+    } else {
+      logger.error('accessToken manquant');
+      return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+    }
+    
+  }
+  const accessToken = cookies.access_token;
+
+  const decodedAccessToken = jwt.verify(accessToken, config.token.accessToken.secret, {
+    algorithms: config.token.accessToken.algorithm
+  });
+  if(process.env.DEVELOP === "true") console.log('decodedAccessToken', decodedAccessToken);
+
+  if(process.env.DEVELOP === "true") console.log('nouveau mot de passe', req.body.password);
+
+  User.findOne({ _id: decodedAccessToken.sub })
+    .then((user) =>{
+      bcrypt.hash(req.body.password, 10)
+        .then(hash => {
+          if(process.env.DEVELOP === "true") console.log('Hash du pwd');
+
+          //Envoie l'email
+          if(process.env.DEVELOP === "true") console.log("Envoie de l'email");
+          mail.sendConfirmeNewMDPEmail( user.email, (result) => {
+            if(result){
+              //changer token
+              const xsrfToken = crypto.randomBytes(138).toString('base64');
+              const refToken = crypto.randomBytes(138).toString('hex');
+              User.updateOne({ _id: decodedAccessToken.sub }, { token: xsrfToken, refreshToken: refToken, password: hash })
+                .then((user) => {
+                  if(process.env.DEVELOP === "true") {
+                    console.log("then user");
+                    res.status(201).json({ message: 'MAJ mot de passe ok !' });
+                  } else {
+                    res.status(201).json({ message: process.env.MSG_OK_PRODUCTION });
+                    logger.info("MAJ mot de passe ok", user.email);
+                  }
+                })
+                .catch(error => {
+                  if(process.env.DEVELOP === "true") {
+                    console.log("MAJ MDP user nok");
+                    console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+                    res.status(400).json({ error });
+                  } else {
+                    console.log(process.env.MSG_ERROR_PRODUCTION);
+                    logger.error("Erreur 400 MAJ MDP user nok", error.message);
+                    res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
+                  }
+                });
+            } else {
+              if(process.env.DEVELOP === "true") {
+                console.log("pb mail");
+                console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+                res.status(500).json({ message: "error 500, pb mail" });
+              } else {
+                logger.error("Erreur 500 problème avec l'envoie du mail", error.message);
+                res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
+              }
+            }
+          });
+          
+        })
+        .catch(error => {
+          if(process.env.DEVELOP === "true") {
+            console.log('erreur 500, pour crypter le mdp');
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+            res.status(500).json({ error });
+          } else {
+            logger.error("Erreur 500 pour crypter le mdp", error.message);
+            res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
+          }
+        });
+    })
+    .catch(error => {
+      if(process.env.DEVELOP === "true") {
+        console.log('erreur 500, problème avec BDD Users');
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        res.status(500).json({ error });
+      } else {
+        logger.error("Erreur 500 problème avec BDD Users", error.message);
+        res.status(500).json({ message: process.env.MSG_ERROR_PRODUCTION });
+      }
+    });
+};

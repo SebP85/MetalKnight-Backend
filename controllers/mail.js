@@ -46,7 +46,7 @@ async function sendMail(email, subject, text, html) {
     }catch(err){
         return err;
     }
-}
+};
 
 exports.sendVerifyEmail = (email, token, refreshToken, callback) => {
     if(process.env.DEVELOP === "true") {
@@ -81,7 +81,7 @@ exports.sendVerifyEmail = (email, token, refreshToken, callback) => {
 
             callback(false);
         });
-}
+};
 
 exports.sendConfirmationEmail = (email, callback) => {//Envoie le confirmation que le compte et l'email sont validé
     var text = 'Bienvenue sur '+config.email.NOM_APP+'\rNous vous informons que votre compte est validé !\rMerci de votre inscription';
@@ -106,7 +106,7 @@ exports.sendConfirmationEmail = (email, callback) => {//Envoie le confirmation q
 
             callback(false);
         });
-}
+};
 
 exports.checkEmail = async (req, res, next) => {//vérifie le domaine et si l'adresse est bien écrite pas si elle existe réellement
     const emailValidator = new EmailValidator({ timeout: 5000, verifyMailbox: true, verifyDomain: true });
@@ -165,4 +165,28 @@ exports.sendUpdateEmailMDP = (email, token, refreshToken, callback) => {//Mail p
 
             callback(false);
         });
-}
+};
+
+exports.sendConfirmeNewMDPEmail = (email, callback) => {//Mail pour confirmer le changement de mot de passe
+    var text = 'Mise à jour du mot de passe sur le site '+config.email.NOM_APP+'.\rNous vous informons que votre mot de passe a été mis à jour !';
+
+    var html =  '<h1>Mise à jour du mot de passe sur '+config.email.NOM_APP+'</h1>'+
+                '<p>Nous vous informons que votre mot de passe a été mis à jour !</p>';
+    var subject = "Mot de passe modifié";
+
+    sendMail(email, subject, text, html)
+        .then(r=> {//communication avec le serveur ok
+            if(process.env.DEVELOP === "true") console.log('Email sent ...', r);
+            else logger.info("Email pour confirmation de la maj du mdp envoyé !");
+
+            callback(true);
+        })
+        .catch(err => {//erreur avec la communication du serveur
+            if(process.env.DEVELOP === "true"){
+                console.log(err.message);
+                console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+            } else logger.error("Problème pour envoyer l'email de confirmation de la maj du mdp envoyé !", err.message);
+
+            callback(false);
+        });
+};

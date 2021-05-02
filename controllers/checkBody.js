@@ -147,7 +147,7 @@ function isTokenJWTaccess(val){
         .pattern(/^[a-zA-Z0-9._-]+$/)//autorisé
         .test(val);
 
-    console.log("jwtAccessToken", v);
+    //console.log("jwtAccessToken", v);
     if(!v && process.env.DEVELOP === "false") logger.error("jwtAccessToken =>", val);
 
     return v;
@@ -163,7 +163,7 @@ function isTokenJWTrefresh(val){
         .pattern(/^[a-zA-Z0-9._-]+$/)//autorisé
         .test(val);
 
-    console.log("jwtRefreshToken", v);
+    //console.log("jwtRefreshToken", v);
     if(!v && process.env.DEVELOP === "false") logger.error("jwtRefreshToken =>", val);
 
     return v;
@@ -246,7 +246,7 @@ exports.validParamLogin = function (req, res, next){
         } else logger.error("Données d'entrées nok");
         
     }
-}
+};
 
 exports.validParamLogout = function (req, res, next){
     if(process.env.DEVELOP === "true") console.log("checkBody");
@@ -266,7 +266,7 @@ exports.validParamLogout = function (req, res, next){
         } else logger.error("Données d'entrées nok");
         
     }
-}
+};
 
 exports.validParamUpdateToken = function (req, res, next){
     if(process.env.DEVELOP === "true") console.log("checkBody");
@@ -286,7 +286,7 @@ exports.validParamUpdateToken = function (req, res, next){
         } else logger.error("Données d'entrées nok");
         
     }
-}
+};
 
 exports.validParamEmailNewMDP = function (req, res, next){
     if(process.env.DEVELOP === "true") console.log("checkBody");
@@ -304,7 +304,7 @@ exports.validParamEmailNewMDP = function (req, res, next){
         } else logger.error("Données d'entrées nok");
         
     }
-}
+};
 
 exports.validParamVerifMailNewMDP = function (req, res, next){
     if(process.env.DEVELOP === "true") console.log("checkBody");
@@ -325,15 +325,17 @@ exports.validParamVerifMailNewMDP = function (req, res, next){
         } else logger.error("Données d'entrées nok");
         
     }
-}
+};
 
 exports.validParamUpdateMailNewMDP = function (req, res, next){
     if(process.env.DEVELOP === "true") console.log("checkBody");
     else logger.info("Vérification des données d'entrées");
 
+    //console.log(req.headers.refresh_token);
+
     //v8n
-    if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTaccess(req.cookies.access_token) && isTokenJWTrefresh(req.cookies.refresh_token) && 
-        isEmail(req.body.email) && isStrongPassword(req.body.password)){
+    if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTaccess(req.cookies.access_token) && isTokenJWTrefresh(req.headers.refresh_token) && 
+        isStrongPassword(req.body.password)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
         else logger.info("Données d'entrées ok");
         next();
@@ -344,7 +346,46 @@ exports.validParamUpdateMailNewMDP = function (req, res, next){
         } else logger.error("Données d'entrées nok");
         
     }
-}
+};
+
+exports.validParamMailNewMDP = function (req, res, next){
+    if(process.env.DEVELOP === "true") console.log("checkBody");
+    else logger.info("Vérification des données d'entrées");
+
+    //valid param req.body.csrf ?
+
+    //v8n
+    if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTaccess(req.cookies.access_token) && isStrongPassword(req.body.password)){
+        if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
+        else logger.info("Données d'entrées ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données d'entrées nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données d'entrées nok");
+        
+    }
+};
+
+exports.validParamGetProfile = function (req, res, next){
+    if(process.env.DEVELOP === "true") console.log("checkBody");
+    else logger.info("Vérification des données d'entrées");
+
+    //valid param req.body.csrf ?
+
+    //v8n
+    if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTaccess(req.cookies.access_token)){
+        if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
+        else logger.info("Données d'entrées ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données d'entrées nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données d'entrées nok");
+    }
+};
 
 //exemple
 /*exports.reqValidation = function (req, res, next) {

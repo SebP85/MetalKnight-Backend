@@ -6,6 +6,7 @@ const googleAPI = require('./google_api');
 const email = require('./mail');
 const cookie = require('./cookie');
 const login = require('./login');
+const role = require('./role');
 
 const {resolve} = require('path');
 
@@ -24,4 +25,5 @@ module.exports = {
   email: email(env),
   cookie: cookie(env),
   login: login(env),
+  role: role(env),
 };

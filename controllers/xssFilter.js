@@ -57,7 +57,7 @@ exports.filterLogout = function (req, res, next) {//on transforme les données s
     
     //console.log(req);
     next();
-}
+};
 
 exports.filterUpdateToken = function (req, res, next) {//on transforme les données si danger
     if(process.env.DEVELOP === "true") console.log("fonction xss");
@@ -71,7 +71,7 @@ exports.filterUpdateToken = function (req, res, next) {//on transforme les donn�
     
     //console.log(req);
     next();
-}
+};
 
 exports.filterEmailNewMDP = function (req, res, next) {//on transforme les données si danger
     if(process.env.DEVELOP === "true") console.log("fonction xss");
@@ -81,7 +81,7 @@ exports.filterEmailNewMDP = function (req, res, next) {//on transforme les donn�
     
     //console.log(req);
     next();
-}
+};
 
 exports.filterVerifMailNewMDP = function (req, res, next) {//on transforme les données si danger
     if(process.env.DEVELOP === "true") console.log("fonction xss");
@@ -92,7 +92,7 @@ exports.filterVerifMailNewMDP = function (req, res, next) {//on transforme les d
     
     //console.log(req);
     next();
-}
+};
 
 exports.filterUpdateMailNewMDP = function (req, res, next) {//on transforme les données si danger
     if(process.env.DEVELOP === "true") console.log("fonction xss");
@@ -109,4 +109,32 @@ exports.filterUpdateMailNewMDP = function (req, res, next) {//on transforme les 
     
     //console.log(req);
     next();
-}
+};
+
+exports.filterMailNewMDP = function (req, res, next) {
+    if(process.env.DEVELOP === "true") console.log("fonction xss");
+    else logger.info('Traitement contre XSS attack');
+
+    req.headers.xsrfToken = xss(req.headers.xsrfToken);
+    req.cookies.access_token = xss(req.cookies.access_token);
+
+    req.body.password = xss(req.body.password);
+
+    //req.body.csrf à faire ?
+    
+    //console.log(req);
+    next();
+};
+
+exports.filterGetProfile = function (req, res, next) {//on transforme les données si danger
+    if(process.env.DEVELOP === "true") console.log("fonction xss");
+    else logger.info('Traitement contre XSS attack');
+
+    req.headers.xsrfToken = xss(req.headers.xsrfToken);
+    req.cookies.access_token = xss(req.cookies.access_token);
+
+    //req.body.csrf à faire ?
+    
+    //console.log(req);
+    next();
+};
