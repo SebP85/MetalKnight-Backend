@@ -39,9 +39,9 @@ const csrfProtectionCtrl = require('../controllers/csrf');
 
 //Routes connexion
 //exemple: router.get('/register', /*parseForm,*/ csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, xml, objectifRoute);
-router.get('/auth/register', csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, mail.checkEmail, userCtrl.signup);//=>post
+router.post('/auth/register', checkBody.validParamRegister, xssFilter.filterRegister, mail.checkEmail, userCtrl.signup);//=>post
 router.get('/auth/verify/:token/:refreshToken', csrfProtection, checkBody.validParamVerify, xssFilter.filterVerify, userCtrl.verify);
-router.get('/auth/login', csrfProtection, csrfProtectionCtrl.getToken, checkBody.validParamLogin, xssFilter.filterLogin, userCtrl.login);
+router.get('/auth/login', csrfProtectionCtrl.getToken, checkBody.validParamLogin, xssFilter.filterLogin, userCtrl.login);
 router.get('/auth/logout', parseForm, csrfProtection, checkBody.validParamLogout, xssFilter.filterLogout, auth.normal, userCtrl.logout);
 router.get('/auth/updateToken', parseForm, csrfProtection, checkBody.validParamUpdateToken, xssFilter.filterUpdateToken, auth.refreshToken, userCtrl.refreshToken);
 

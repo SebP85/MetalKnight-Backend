@@ -64,6 +64,12 @@ app.use(function (req, res, next) {
   next();
 });
 
+app.use(function (req, res, next) {
+  if(process.env.DEVELOP === "true") console.log("body", req.body);
+
+  next();
+});
+
 app.use('/api'+config.email.NOM_APP, userRoutes);
 
 app.use(function (req, res, next) {
