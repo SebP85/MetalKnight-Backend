@@ -36,10 +36,10 @@ exports.getProfile = (req, res, next) => {//Role autorisé Free
             if(process.env.DEVELOP === "true") {
                 console.log('Profil introuvable dans la BDD');
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-                return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+                return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
             } else {
                 logger.error('Profil introuvable dans la BDD');
-                return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+                return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
             }
           } else {
             res.status(200).json({
@@ -60,10 +60,10 @@ exports.getProfile = (req, res, next) => {//Role autorisé Free
             console.log(error, error);      
             console.log("Pb BDD Users");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-            res.status(500).redirect("http://localhost:8080/login");
+            res.status(500).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
         } else {
             logger.error("Pb BDD Users");
-            res.status(500).redirect("http://localhost:8080/login");
+            res.status(500).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
         }
     });
 };

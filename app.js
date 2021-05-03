@@ -37,7 +37,7 @@ app.use(morgan('dev', { stream: logger.stream.write }));
 app.use(mongoSanitize());
 
 var optionsCors = {
-  origin: 'http://localhost:8080',
+  origin: 'https://'+process.env.SITE_HOST+':'+process.env.SITE_PORT,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content', 'Accept', 'Content-Type', 'Authorization'],
   credentials: true,

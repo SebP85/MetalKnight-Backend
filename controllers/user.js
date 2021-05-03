@@ -293,7 +293,7 @@ exports.verify = (req, res, next) => {//vérification que l'email existe et vali
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Email vérifié et non validé");
         
-        return res.status(401).redirect("http://localhost:8080/login");
+        return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
       }
 
       if(user.userConfirmed) {
@@ -302,7 +302,7 @@ exports.verify = (req, res, next) => {//vérification que l'email existe et vali
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Email déjà vérifié");
 
-        return res.status(401).redirect("http://localhost:8080/login");//Si déjà confirmé
+        return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//Si déjà confirmé
       }
 
       user.userConfirmed = true;
@@ -316,7 +316,7 @@ exports.verify = (req, res, next) => {//vérification que l'email existe et vali
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
           } else logger.info("Email vérifié et validé");
           
-          res.status(200).redirect("http://localhost:8080/login");
+          res.status(200).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
 
           //Envoyer email de confirmation
           mail.sendConfirmationEmail(user.email, result => {
@@ -660,10 +660,10 @@ exports.logout = (req, res, next) => {//Déconnexion
         console.log(error, error);      
         console.log("Pb BDD refreshToken pour supprimer");
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-        res.status(500).redirect("http://localhost:8080/login");
+        res.status(500).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
       } else {
         logger.error("Pb BDD refreshToken pour supprimer");
-        res.status(500).redirect("http://localhost:8080/login");
+        res.status(500).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
       }
     });
 
@@ -690,10 +690,10 @@ exports.mailNewPassword = (req, res, next) => {//envoie un mail pour MAJ le MDP
           console.log(error, error);      
           console.log("Email non trouvé");
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-          res.status(400).redirect("http://localhost:8080/login");
+          res.status(400).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
         } else {
           logger.error("Email non trouvé");
-          res.status(400).redirect("http://localhost:8080/login");
+          res.status(400).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
         }
       } else {//email trouvé
         //vérification que l'utilisateur est activé et que le compte n'est pas suspendu

@@ -49,10 +49,10 @@ exports.normal = (req, res, next) => {//Vérification des tokens
         if(process.env.DEVELOP === "true") {
           console.log('refreshToken introuvable dans la BDD');
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-          return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+          return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
         } else {
           logger.error('refreshToken introuvable dans la BDD');
-          return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+          return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
         }
       } else {//user et refreshToken existent dans la BDD
         if(process.env.DEVELOP === "true") console.log("Date d'expiration refreshToken", moment(result.expiresAt));
@@ -67,10 +67,10 @@ exports.normal = (req, res, next) => {//Vérification des tokens
           if(process.env.DEVELOP === "true") {
             console.log('date expiration cookie incohérent');
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-            return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+            return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
           } else {
             logger.error('date expiration cookie incohérent');
-            return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+            return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
           }
         }
 
@@ -113,10 +113,10 @@ exports.normal = (req, res, next) => {//Vérification des tokens
               console.log(error, error);      
               console.log("Pb BDD User");
               console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-              res.status(500).redirect("http://localhost:8080/login");
+              res.status(500).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
             } else {
               logger.error("Pb BDD User");
-              res.status(500).redirect("http://localhost:8080/login");
+              res.status(500).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
             }
           });
       }
@@ -126,10 +126,10 @@ exports.normal = (req, res, next) => {//Vérification des tokens
         console.log(error, error);      
         console.log("Pb BDD refreshToken");
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-        res.status(500).redirect("http://localhost:8080/login");
+        res.status(500).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
       } else {
         logger.error("Pb BDD refreshToken");
-        res.status(500).redirect("http://localhost:8080/login");
+        res.status(500).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
       }
     });
 
@@ -163,7 +163,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
         return res.status(401).json({ message: 'Missing token in cookie' });
       } else {
         logger.error('refreshToken manquant');
-        return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+        return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
       
     }
@@ -176,7 +176,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
         return res.status(401).json({ message: 'Missing XSRF token in headers' });
       } else {
         logger.error('xsrfToken manquant');
-        return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+        return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
     }
     const xsrfToken = headers['xsrftoken'];
@@ -193,10 +193,10 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
         if(process.env.DEVELOP === "true") {
           console.log('refreshToken introuvable dans la BDD');
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-          return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+          return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
         } else {
           logger.error('refreshToken introuvable dans la BDD');
-          return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+          return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
         }
       } else {//user et refreshToken existent dans la BDD
         //On compare le refreshToken dans la BDD à celui dans la requête
@@ -263,10 +263,10 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
               console.log(error, error);      
               console.log("Pb BDD User");
               console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-              res.status(500).redirect("http://localhost:8080/login");
+              res.status(500).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
             } else {
               logger.error("Pb BDD User");
-              res.status(500).redirect("http://localhost:8080/login");
+              res.status(500).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
             }
           });
       }
@@ -276,10 +276,10 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
         console.log(error, error);      
         console.log("Pb BDD refreshToken");
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-        res.status(500).redirect("http://localhost:8080/login");
+        res.status(500).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
       } else {
         logger.error("Pb BDD refreshToken");
-        res.status(500).redirect("http://localhost:8080/login");
+        res.status(500).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
       }
     });
 
@@ -325,7 +325,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         return res.status(401).json({ message: 'Missing token in cookie' });
       } else {
         logger.error('refreshToken manquant');
-        return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+        return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
       
     }
@@ -338,7 +338,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         return res.status(401).json({ message: 'Missing XSRF token in headers' });
       } else {
         logger.error('xsrfToken manquant');
-        return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+        return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
     }
     const xsrfToken = headers['xsrftoken'];
@@ -362,7 +362,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         return res.status(401).json({ message: 'xsrfToken different' });
       } else {
         logger.error('xsrfToken different');
-        return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+        return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
     }
 
@@ -375,7 +375,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         return res.status(401).json({ message: 'Token different' });
       } else {
         logger.error('Token different');
-        return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+        return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
     }
 
@@ -407,7 +407,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         return res.status(401).json({ message: 'Token delai expireIn différent' });
       } else {
         logger.error('Token delai expireIn différent');
-        return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+        return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
     }
     if(process.env.DEVELOP === "true") console.log("vérification delai expireIn ok");
@@ -420,7 +420,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         return res.status(401).json({ message: 'Token expiré' });
       } else {
         logger.error('Token expiré');
-        return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+        return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
     }
     if(process.env.DEVELOP === "true") console.log("cookie expiré ok");
@@ -432,10 +432,10 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         if(process.env.DEVELOP === "true") {
           console.log('user introuvable dans la BDD');
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-          return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+          return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
         } else {
           logger.error('user introuvable dans la BDD');
-          return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+          return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
         }
       } else {
 
@@ -447,7 +447,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
             return res.status(401).json({ message: 'Token non trouvé dans la BDD Users' });
           } else {
             logger.error('Token non trouvé dans la BDD Users');
-            return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+            return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
           }
         }
 
@@ -459,7 +459,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
             return res.status(401).json({ message: 'refreshToken non trouvé dans la BDD Users' });
           } else {
             logger.error('refreshToken non trouvé dans la BDD Users');
-            return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+            return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
           }
         }
 
@@ -474,10 +474,10 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         console.log(error, error);      
         console.log("Pb BDD Users");
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-        res.status(500).redirect("http://localhost:8080/login");
+        res.status(500).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
       } else {
         logger.error("Pb BDD Users");
-        res.status(500).redirect("http://localhost:8080/login");
+        res.status(500).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
       }
     });
 
