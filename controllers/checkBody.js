@@ -92,7 +92,7 @@ function isDate(val){//type => mm/jj/aaaa
         //.length(10)
         .test(val);
 
-    console.log("date", v);
+    //console.log("date", v);
     if(!v && process.env.DEVELOP === "false") logger.error("date =>", val);
 
     return v;
