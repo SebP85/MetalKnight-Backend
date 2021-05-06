@@ -313,7 +313,6 @@ exports.verify = (req, res, next) => {//vérification que l'email existe et vali
         .then(() => {
           if(process.env.DEVELOP === "true") {
             console.log("Email vérifié et validé");
-            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
           } else logger.info("Email vérifié et validé");
           
           res.status(200).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
