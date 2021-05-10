@@ -4,12 +4,14 @@ const { logger } = require('../log/winston');
 const config = require('../config/config');
 
 //ATTENTION = requête get = pas de protection
+//var csrf = require('csurf');
+//var bodyParser = require('body-parser');
 
-exports.getToken = (req, res, next) => {//On envoie le token CSRF pour s'assurer que la personne s'est connecté
+exports.getTokenCSRF = (req, res, next) => {//On envoie le token CSRF pour s'assurer que la personne s'est connecté
     if(process.env.DEVELOP === "true") console.log('Envoie du csrfToken');
     else logger.info('Envoie du CSRF Token');
 
-    res.cookie("XSRF-TOKEN", req.csrfToken(),
+    res.cookie("csrf-token", req.csrfToken(),
     {
         maxAge: config.token.accessToken.expiresIn,
         httpOnly: true,
@@ -18,6 +20,7 @@ exports.getToken = (req, res, next) => {//On envoie le token CSRF pour s'assurer
         signed: true,
     });
     
+    res.json({ message: "Token CSRF envoyé"/*req.csrfToken()*/ });
     
     next();
 };
