@@ -11,16 +11,22 @@ exports.getTokenCSRF = (req, res, next) => {//On envoie le token CSRF pour s'ass
     if(process.env.DEVELOP === "true") console.log('Envoie du csrfToken');
     else logger.info('Envoie du CSRF Token');
 
-    res.cookie("csrf-token", req.csrfToken(),
+    var token  = req.csrfToken();
+
+    res.cookie('XSRF-TOKEN', token,
     {
         maxAge: config.token.accessToken.expiresIn,
         httpOnly: true,
         secure: true,
-        path: config.cookie.pathCookie,
+        //path: config.cookie.pathCookie,
         signed: true,
     });
+    res.locals.csrfToken = token;
     
-    res.json({ message: "Token CSRF envoyé"/*req.csrfToken()*/ });
+    if(process.env.DEVELOP)
+        res.json({ message: "Token CSRF envoyé :", token });
+    else
+        res.json({ message: process.env.MSG_OK_PRODUCTION });
     
     next();
 };
