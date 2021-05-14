@@ -6,6 +6,7 @@
 //const { body, validationResult, oneOf } = require('express-validator');//valide les paramètres avec des fonctions préprogrammées
 const v8n = require('v8n');//valide les paramètres d'entrées et peutajouter des fonctions chainés
 //voir https://imbrn.github.io/v8n/#what-s-v8n et https://github.com/imbrn/v8n/tree/master/src et https://imbrn.github.io/v8n/api/#testasync
+const chatty = true;
 
 function isEmail(val){
     var v = v8n()
@@ -17,7 +18,7 @@ function isEmail(val){
         .some.equal('.')
         .test(val);
 
-    //console.log("email", v);
+    if(chatty) console.log("email", v);
     if(!v && process.env.DEVELOP === "false") logger.error("Email =>", val);
 
     return v;
@@ -32,12 +33,12 @@ function isStrongPassword(val){//Caractère spéciaux => %@_$|#?!
         .some.lowercase()
         .some.uppercase()
         .some.numeric()
-        .pattern(/[%@_$|#?!]/)//doit avoir un des caractères acceptés entre [], ne peut pas être /[]
-        .not.includes('&')//caractère spéciaux interdits
+        .pattern(/[&%@_$|#?!]/)//doit avoir un des caractères acceptés entre [], ne peut pas être /[]
+        .not.includes('}')//caractère spéciaux interdits
         .not.includes('{')
         .test(val);
 
-    //console.log("password", v);
+    if(chatty) console.log("password", v);
     if(!v && process.env.DEVELOP === "false") logger.error("Password =>", val);
 
     return v;
@@ -49,7 +50,7 @@ function isIndividu(val){
         .passesAnyOf(v8n().exact("un particulier"), v8n().exact("un professionnel"))
         .test(val);
 
-    //console.log("individu", v);
+    if(chatty) console.log("individu", v);
     if(!v && process.env.DEVELOP === "false") logger.error("Individu =>", val);
 
     return v;
@@ -63,7 +64,7 @@ function isFirstName(val){
         .pattern(/^[^0-9.;,?:!§%*µ$£ø^¨"~&{()}|_`@=+-<>]+$/)//interdit
         .test(val);
 
-    //console.log("firstName", v);
+    if(chatty) console.log("firstName", v);
     if(!v && process.env.DEVELOP === "false") logger.error("firstName =>", val);
 
     return v;
@@ -77,7 +78,7 @@ function isLastName(val){
         .pattern(/^[^0-9.;,?:!§%*µ$£ø^¨"~&{()}|_`@=+-<>]+$/)//interdit
         .test(val);
 
-    //console.log("lastName", v);
+    if(chatty) console.log("lastName", v);
     if(!v && process.env.DEVELOP === "false") logger.error("lastName =>", val);
 
     return v;
@@ -92,7 +93,7 @@ function isDate(val){//type => mm/jj/aaaa
         //.length(10)
         .test(val);
 
-    //console.log("date", v);
+    if(chatty) console.log("date", v);
     if(!v && process.env.DEVELOP === "false") logger.error("date =>", val);
 
     return v;
@@ -104,7 +105,7 @@ function isCivilite(val){
         .passesAnyOf(v8n().exact("monsieur"), v8n().exact("madame"))
         .test(val);
 
-    //console.log("civilite", v);
+    if(chatty) console.log("civilite", v);
     if(!v && process.env.DEVELOP === "false") logger.error("civilite =>", val);
 
     return v;
@@ -118,7 +119,7 @@ function isTokenHex(val){
         .pattern(/^[a-f0-9:]+$/)//autorisé
         .test(val);
 
-    //console.log("token/refreshToken", v);
+    if(chatty) console.log("token/refreshToken", v);
     if(!v && process.env.DEVELOP === "false") logger.error("token/refreshToken =>", val);
 
     return v;
@@ -132,7 +133,7 @@ function isXSRFToken(val){
         .pattern(/^[a-zA-Z0-9]+$/)//autorisé
         .test(val);
 
-    //console.log("xsrfToken", v);
+    if(chatty) console.log("xsrfToken", v);
     if(!v && process.env.DEVELOP === "false") logger.error("xsrfToken =>", val);
 
     return v;
@@ -148,7 +149,7 @@ function isTokenJWTaccess(val){
         .pattern(/^[a-zA-Z0-9._-]+$/)//autorisé
         .test(val);
 
-    //console.log("jwtAccessToken", v);
+    if(chatty) console.log("jwtAccessToken", v);
     if(!v && process.env.DEVELOP === "false") logger.error("jwtAccessToken =>", val);
 
     return v;
@@ -164,7 +165,7 @@ function isTokenJWTrefresh(val){
         .pattern(/^[a-zA-Z0-9._-]+$/)//autorisé
         .test(val);
 
-    //console.log("jwtRefreshToken", v);
+    if(chatty) console.log("jwtRefreshToken", v);
     if(!v && process.env.DEVELOP === "false") logger.error("jwtRefreshToken =>", val);
 
     return v;
@@ -178,7 +179,7 @@ function isTokenBase64(val){
         .pattern(/^[a-zA-Z0-9]+$/)//autorisé
         .test(val);
 
-    console.log("Base64Token", v);
+    if(chatty) console.log("Base64Token", v);
     if(!v && process.env.DEVELOP === "false") logger.error("Base64Token =>", val);
 
     return v;
