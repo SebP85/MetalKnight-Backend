@@ -13,7 +13,8 @@ async function sendMail(email, subject, text, html) {
         oAuth2Client.setCredentials({ refresh_token: config.googleAPI.REFRESH_TOKEN });
 
         if(process.env.DEVELOP === "true") console.log("fonction sendEmail");
-        const accessToken = await oAuth2Client.getAccessToken();//erreur
+        const accessToken = await oAuth2Client.getAccessToken();
+        //var authUrl = oAuth2Client.generateAuthUrl({ access_type: 'offline', scope: SCOPES, approval_prompt:'force' });
 
         if(process.env.DEVELOP === "true") console.log("fonction createTransport");
         const transport = nodemailer.createTransport({
