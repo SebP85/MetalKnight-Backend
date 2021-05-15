@@ -33,9 +33,11 @@ function isStrongPassword(val){//Caractère spéciaux => %@_$|#?!
         .some.lowercase()
         .some.uppercase()
         .some.numeric()
-        .pattern(/[&%@_$|#?!]/)//doit avoir un des caractères acceptés entre [], ne peut pas être /[]
+        .pattern(/[&~`!@#$%\^*()\-_=+[\];:\x27.,\x22\\|/?]/)//doit avoir un des caractères acceptés entre [], ne peut pas être /[]
         .not.includes('}')//caractère spéciaux interdits
         .not.includes('{')
+        .not.includes('>')
+        .not.includes('<')
         .test(val);
 
     if(chatty) console.log("password", v);
