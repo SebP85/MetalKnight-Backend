@@ -80,12 +80,13 @@ exports.sendVerifyEmail = (email, token, refreshToken, callback) => {
                 console.log(err.message);
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
             } else logger.error("Problème pour envoyer l'email de vérification !", err.message);
+            res.status(500).json({ MSG_ERROR_PRODUCTION });
 
             callback(false);
         });
 };
 
-exports.sendConfirmationEmail = (email, callback) => {//Envoie le confirmation que le compte et l'email sont validé
+exports.sendConfirmationEmail = (email, callback) => {//Envoie la confirmation que le compte et l'email sont validé
     var text = 'Bienvenue sur '+config.email.NOM_APP+'\rNous vous informons que votre compte est validé !\rMerci de votre inscription';
 
     var html =  '<h1>Bienvenue sur '+config.email.NOM_APP+'</h1>'+
@@ -105,6 +106,7 @@ exports.sendConfirmationEmail = (email, callback) => {//Envoie le confirmation q
                 console.log(err.message);
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
             } else logger.error("Problème pour envoyer l'email de validation du compte !", err.message);
+            res.status(500).json({ MSG_ERROR_PRODUCTION });
 
             callback(false);
         });
@@ -131,6 +133,7 @@ exports.checkEmail = async (req, res, next) => {//vérifie le domaine et si l'ad
             console.log("email nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("La vérification de l'email est nok (domaine et écrit)");
+        res.status(400).json({ MSG_ERROR_PRODUCTION });
 };
 
 exports.sendUpdateEmailMDP = (email, token, refreshToken, callback) => {//Mail pour envoyer les tokens pour changement de mot de passe
@@ -165,6 +168,7 @@ exports.sendUpdateEmailMDP = (email, token, refreshToken, callback) => {//Mail p
                 console.log(err.message);
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
             } else logger.error("Problème pour envoyer l'email de vérification !", err.message);
+            res.status(400).json({ MSG_ERROR_PRODUCTION });
 
             callback(false);
         });
@@ -189,6 +193,7 @@ exports.sendConfirmeNewMDPEmail = (email, callback) => {//Mail pour confirmer le
                 console.log(err.message);
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
             } else logger.error("Problème pour envoyer l'email de confirmation de la maj du mdp envoyé !", err.message);
+            res.status(500).json({ MSG_ERROR_PRODUCTION });
 
             callback(false);
         });

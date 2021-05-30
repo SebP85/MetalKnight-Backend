@@ -203,7 +203,7 @@ exports.validParamRegister = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        
+        res.status(400).json({ MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -228,7 +228,7 @@ exports.validParamVerify = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        
+        res.status(400).json({ MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -248,7 +248,7 @@ exports.validParamLogin = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        
+        res.status(400).json({ MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -268,7 +268,7 @@ exports.validParamLogout = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        
+        res.status(400).json({ MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -288,7 +288,7 @@ exports.validParamUpdateToken = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        
+        res.status(400).json({ MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -306,7 +306,7 @@ exports.validParamEmailNewMDP = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        
+        res.status(400).json({ MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -327,7 +327,7 @@ exports.validParamVerifMailNewMDP = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        
+        res.status(400).json({ MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -348,7 +348,7 @@ exports.validParamUpdateMailNewMDP = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        
+        res.status(400).json({ MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -368,7 +368,7 @@ exports.validParamMailNewMDP = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        
+        res.status(400).json({ MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -388,6 +388,7 @@ exports.validParamGetProfile = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
+        res.status(400).json({ MSG_ERROR_PRODUCTION });
     }
 };
 

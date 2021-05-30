@@ -160,10 +160,10 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
       if(process.env.DEVELOP === "true") {
         console.log('refreshToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(401).json({ message: 'Missing token in cookie' });
+        return res.status(403).json({ message: 'Missing token in cookie' });
       } else {
         logger.error('refreshToken manquant');
-        return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+        return res.status(403).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
       
     }
@@ -173,10 +173,10 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
       if(process.env.DEVELOP === "true") {
         console.log('xsrfToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(401).json({ message: 'Missing XSRF token in headers' });
+        return res.status(403).json({ message: 'Missing XSRF token in headers' });
       } else {
         logger.error('xsrfToken manquant');
-        return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+        return res.status(403).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
     }
     const xsrfToken = headers['xsrftoken'];
@@ -193,10 +193,10 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
         if(process.env.DEVELOP === "true") {
           console.log('refreshToken introuvable dans la BDD');
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-          return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+          return res.status(403).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
         } else {
           logger.error('refreshToken introuvable dans la BDD');
-          return res.status(401).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+          return res.status(403).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
         }
       } else {//user et refreshToken existent dans la BDD
         //On compare le refreshToken dans la BDD à celui dans la requête
@@ -204,10 +204,10 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
           if(process.env.DEVELOP === "true") {
             console.log('refToken ne correspond pas');
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-            return res.status(401).json({ message: 'Bad refToken' });
+            return res.status(403).json({ message: 'Bad refToken' });
           } else {
             logger.error('refToken ne correspond pas');
-            return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+            return res.status(403).json({ error: process.env.MSG_ERROR_PRODUCTION });
           }
         }
         
@@ -225,7 +225,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------'); 
           } else logger.info("Date d'expiration nok");
 
-          return res.status(401).json({ message: "Date d'expiration nok" });
+          return res.status(403).json({ message: "Date d'expiration nok" });
         }
 
         if(process.env.DEVELOP === "true") {
@@ -236,10 +236,10 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
           if(process.env.DEVELOP === "true") {
             console.log('xsrfToken ne correspond pas');
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-            return res.status(401).json({ message: 'Bad xsrf token' });
+            return res.status(403).json({ message: 'Bad xsrf token' });
           } else {
             logger.error('xsrfToken ne correspond pas');
-            return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+            return res.status(403).json({ error: process.env.MSG_ERROR_PRODUCTION });
           }
         }
         
@@ -289,11 +289,11 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
     if(process.env.DEVELOP === "true") {
       console.log("erreur authentification !")
       console.log("---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------")
-      res.status(401).json({error: new Error('Invalid request!')});
+      res.status(403).json({error: new Error('Invalid request!')});
       
     } else {
       logger.error("erreur authentification !", err);
-      res.status(401).json({error: new Error(process.env.MSG_ERROR_PRODUCTION)});
+      res.status(403).json({error: new Error(process.env.MSG_ERROR_PRODUCTION)});
     }
   }
 

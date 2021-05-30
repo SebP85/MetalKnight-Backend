@@ -61,3 +61,6 @@ const xml = builder.buildObject(xmlObject);
 
 console.log(xml);
 */
+
+//si erreur
+//res.status(400).json({ MSG_ERROR_PRODUCTION });
