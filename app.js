@@ -40,7 +40,7 @@ app.use(mongoSanitize());
 var optionsCors = {
   origin: 'https://'+process.env.SITE_HOST+':'+process.env.SITE_PORT,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ['Origin', 'X-Requested-With', 'Content', 'Accept', 'Content-Type', 'Authorization', 'x-xsrf-token', 'x-csrf-token', 'xsrftoken'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content', 'Accept', 'Content-Type', 'Authorization', 'x-xsrf-token', 'x-csrf-token', 'xsrftoken', 'refresh_token'],
   credentials: true,
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
   //maxAge: 3600,
