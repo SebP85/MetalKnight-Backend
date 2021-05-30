@@ -3,6 +3,7 @@
 const fs = require('fs');
 const xml2js = require('xml2js');
 const util = require('util');
+config
 
 const parser = new xml2js.Parser();
 
@@ -63,4 +64,4 @@ console.log(xml);
 */
 
 //si erreur
-//res.status(400).json({ MSG_ERROR_PRODUCTION });
+//res.status(500).json({ error: process.env.MSG_ERROR_PRODUCTION });

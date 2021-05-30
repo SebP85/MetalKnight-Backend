@@ -2,6 +2,7 @@
  * Vérifie les données d'entrées de la requête
  */
  const { logger } = require('../log/winston');
+ const config = require('../config/config');
 
 //const { body, validationResult, oneOf } = require('express-validator');//valide les paramètres avec des fonctions préprogrammées
 const v8n = require('v8n');//valide les paramètres d'entrées et peutajouter des fonctions chainés
@@ -203,7 +204,7 @@ exports.validParamRegister = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        res.status(400).json({ MSG_ERROR_PRODUCTION });
+        res.status(400).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -228,7 +229,7 @@ exports.validParamVerify = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        res.status(400).json({ MSG_ERROR_PRODUCTION });
+        res.status(400).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -248,7 +249,7 @@ exports.validParamLogin = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        res.status(400).json({ MSG_ERROR_PRODUCTION });
+        res.status(400).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -268,7 +269,7 @@ exports.validParamLogout = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        res.status(400).json({ MSG_ERROR_PRODUCTION });
+        res.status(400).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -288,7 +289,7 @@ exports.validParamUpdateToken = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        res.status(400).json({ MSG_ERROR_PRODUCTION });
+        res.status(400).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -306,7 +307,7 @@ exports.validParamEmailNewMDP = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        res.status(400).json({ MSG_ERROR_PRODUCTION });
+        res.status(400).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -327,7 +328,7 @@ exports.validParamVerifMailNewMDP = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        res.status(400).json({ MSG_ERROR_PRODUCTION });
+        res.status(400).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -348,7 +349,7 @@ exports.validParamUpdateMailNewMDP = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        res.status(400).json({ MSG_ERROR_PRODUCTION });
+        res.status(400).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -368,7 +369,7 @@ exports.validParamMailNewMDP = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        res.status(400).json({ MSG_ERROR_PRODUCTION });
+        res.status(400).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
 };
 
@@ -388,7 +389,7 @@ exports.validParamGetProfile = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        res.status(400).json({ MSG_ERROR_PRODUCTION });
+        res.status(400).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
 };
 
