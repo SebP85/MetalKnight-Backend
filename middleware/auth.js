@@ -154,9 +154,22 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
   try {
     if(process.env.DEVELOP === "true") console.log("début authentification refreshToken");
     else logger.info("début fonction authentification refreshToken")
-    const { headers } = req;
+    const { headers, cookies } = req;
+
+    if (!cookies || !cookies.access_token) {//cookie présent ?
+      if(process.env.DEVELOP === "true") {
+        console.log('accessToken manquant');
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
+        return res.status(403).json({ message: 'Missing token in cookie' });
+      } else {
+        logger.error('accessToken manquant');
+        return res.status(403).json({ error: process.env.MSG_ERROR_PRODUCTION });
+      }
+      
+    }
+    const accessToken = cookies.access_token;
     
-    if (!headers || !headers.refresh_token) {//cookie présent ?
+    if (!cookies || !cookies.refresh_token) {//cookie présent ?
       if(process.env.DEVELOP === "true") {
         console.log('refreshToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
@@ -167,7 +180,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
       }
       
     }
-    const refreshToken = headers.refresh_token;
+    const refreshToken = cookies.refresh_token;
 
     if (!headers || !headers['xsrftoken']) {
       if(process.env.DEVELOP === "true") {
@@ -180,6 +193,28 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
       }
     }
     const xsrfToken = headers['xsrftoken'];
+
+    //Vérification du accessToken
+    const decodedAccessToken = jwt.verify(accessToken, config.token.accessToken.secret, {
+      algorithms: config.token.accessToken.algorithm
+    });
+    if(process.env.DEVELOP === "true") console.log('decodedAccessToken', decodedAccessToken);
+
+    if(process.env.DEVELOP === "true") {
+      console.log('xsrfToken', xsrfToken);
+      console.log('decodedAccessToken.xsrfToken', decodedAccessToken.xsrfToken);    
+    }
+
+    if (xsrfToken !== decodedAccessToken.xsrfToken) {//si les tokens ne correspondent pas, on sort
+      if(process.env.DEVELOP === "true") {
+        console.log('xsrfToken ne correspond pas');
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
+        return res.status(403).json({ message: 'Bad xsrf token' });
+      } else {
+        logger.error('xsrfToken ne correspond pas');
+        return res.status(403).json({ error: process.env.MSG_ERROR_PRODUCTION });
+      }
+    }
 
     const decodedToken = jwt.verify(refreshToken, config.token.refreshToken.secret, {
       algorithms: config.token.refreshToken.algorithm

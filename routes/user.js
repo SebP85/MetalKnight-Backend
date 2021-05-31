@@ -44,7 +44,7 @@ router.get('/auth/verify/:token/:refreshToken', /*csrfProtection,*/ checkBody.va
 router.get('/auth/getCSRF', /*csrfProtection,*/ csrfProtectionCtrl.getTokenCSRF);
 router.post('/auth/login', /*parseForm, csrfProtection,*/ checkBody.validParamLogin, xssFilter.filterLogin, userCtrl.login);
 router.post('/auth/logout', /*parseForm, csrfProtection,*/ checkBody.validParamLogout, xssFilter.filterLogout, auth.normal, userCtrl.logout);
-router.get('/auth/updateToken', /*parseForm, csrfProtection,*/ checkBody.validParamUpdateToken, xssFilter.filterUpdateToken, auth.refreshToken, userCtrl.refreshToken);
+router.post('/auth/updateToken', /*parseForm, csrfProtection,*/ checkBody.validParamUpdateToken, xssFilter.filterUpdateToken, auth.refreshToken, userCtrl.refreshToken);
 
 router.get('/auth/mailNewPassword', /*csrfProtection,*/ checkBody.validParamEmailNewMDP, xssFilter.filterEmailNewMDP, userCtrl.mailNewPassword);//mail pour changer de mot de passe
 router.get('/auth/verifMailNewMDP/:accessToken/:refreshToken', /*csrfProtection,*/ checkBody.validParamVerifMailNewMDP, xssFilter.filterVerifMailNewMDP, userCtrl.verifMailNewPassword);//Vérif mail pour changement du mot de passe et envoie vers la page pour changer de mot de passe

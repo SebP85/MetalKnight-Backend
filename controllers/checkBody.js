@@ -280,7 +280,7 @@ exports.validParamUpdateToken = function (req, res, next){
     //valid param req.body.csrf ?
 
     //v8n
-    if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTrefresh(req.headers.refresh_token)){
+    if(isXSRFToken(req.headers.xsrftoken) /*&& isTokenJWTrefresh(req.headers.refresh_token)*/){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
         else logger.info("Données d'entrées ok");
         next();
