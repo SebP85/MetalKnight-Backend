@@ -12,10 +12,10 @@ exports.levelAuthorizeFree = (req, res, next) => {//Role autorisé Free
       if(process.env.DEVELOP === "true") {
         console.log('accessToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(401).json({ message: 'Missing token in cookie' });
+        return res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
       } else {
         logger.error('accessToken manquant');
-        return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
       
     }
@@ -33,10 +33,10 @@ exports.levelAuthorizeFree = (req, res, next) => {//Role autorisé Free
         if(process.env.DEVELOP === "true") {
             console.log('user introuvable dans la BDD');
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-            return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+            return res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
         } else {
             logger.error('user introuvable dans la BDD');
-            return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+            return res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
         }
       } else {
           if((result.role === config.role.roleFree) || (result.role === config.role.roleAmateur) ||
@@ -47,10 +47,10 @@ exports.levelAuthorizeFree = (req, res, next) => {//Role autorisé Free
             if(process.env.DEVELOP === "true") {
                 console.log('droit du role interdit');
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-                return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+                return res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
             } else {
                 logger.error('droit du role interdit');
-                return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+                return res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
             }
           }
       }
@@ -60,10 +60,10 @@ exports.levelAuthorizeFree = (req, res, next) => {//Role autorisé Free
             console.log(error, error);      
             console.log("Pb BDD Users");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-            res.status(500).redirect("http://localhost:8080/login");
+            res.status(config.erreurServer.ERREUR_SERVER).redirect("http://localhost:8080/login");
         } else {
             logger.error("Pb BDD Users");
-            res.status(500).redirect("http://localhost:8080/login");
+            res.status(config.erreurServer.ERREUR_SERVER).redirect("http://localhost:8080/login");
         }
     });
 
@@ -82,10 +82,10 @@ exports.levelAuthorizeAmateur = (req, res, next) => {//Role autorisé Amateur
       if(process.env.DEVELOP === "true") {
         console.log('accessToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(401).json({ message: 'Missing token in cookie' });
+        return res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
       } else {
         logger.error('accessToken manquant');
-        return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
       
     }
@@ -103,10 +103,10 @@ exports.levelAuthorizeAmateur = (req, res, next) => {//Role autorisé Amateur
         if(process.env.DEVELOP === "true") {
             console.log('user introuvable dans la BDD');
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-            return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+            return res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
         } else {
             logger.error('user introuvable dans la BDD');
-            return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+            return res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
         }
       } else {
           if((result.role === config.role.roleAmateur) ||
@@ -117,10 +117,10 @@ exports.levelAuthorizeAmateur = (req, res, next) => {//Role autorisé Amateur
             if(process.env.DEVELOP === "true") {
                 console.log('droit du role interdit');
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-                return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+                return res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
             } else {
                 logger.error('droit du role interdit');
-                return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+                return res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
             }
           }
       }
@@ -130,10 +130,10 @@ exports.levelAuthorizeAmateur = (req, res, next) => {//Role autorisé Amateur
             console.log(error, error);      
             console.log("Pb BDD Users");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-            res.status(500).redirect("http://localhost:8080/login");
+            res.status(config.erreurServer.ERREUR_SERVER).redirect("http://localhost:8080/login");
         } else {
             logger.error("Pb BDD Users");
-            res.status(500).redirect("http://localhost:8080/login");
+            res.status(config.erreurServer.ERREUR_SERVER).redirect("http://localhost:8080/login");
         }
     });
 
@@ -152,10 +152,10 @@ exports.levelAuthorizeExpert = (req, res, next) => {//Role autorisé Expert
       if(process.env.DEVELOP === "true") {
         console.log('accessToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(401).json({ message: 'Missing token in cookie' });
+        return res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
       } else {
         logger.error('accessToken manquant');
-        return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
       
     }
@@ -173,10 +173,10 @@ exports.levelAuthorizeExpert = (req, res, next) => {//Role autorisé Expert
         if(process.env.DEVELOP === "true") {
             console.log('user introuvable dans la BDD');
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-            return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+            return res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
         } else {
             logger.error('user introuvable dans la BDD');
-            return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+            return res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
         }
       } else {
           if((result.role === config.role.roleExpert) || (result.role === config.role.roleAdmin)){
@@ -186,10 +186,10 @@ exports.levelAuthorizeExpert = (req, res, next) => {//Role autorisé Expert
             if(process.env.DEVELOP === "true") {
                 console.log('droit du role interdit');
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-                return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+                return res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
             } else {
                 logger.error('droit du role interdit');
-                return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+                return res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
             }
           }
       }
@@ -199,10 +199,10 @@ exports.levelAuthorizeExpert = (req, res, next) => {//Role autorisé Expert
             console.log(error, error);      
             console.log("Pb BDD Users");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-            res.status(500).redirect("http://localhost:8080/login");
+            res.status(config.erreurServer.ERREUR_SERVER).redirect("http://localhost:8080/login");
         } else {
             logger.error("Pb BDD Users");
-            res.status(500).redirect("http://localhost:8080/login");
+            res.status(config.erreurServer.ERREUR_SERVER).redirect("http://localhost:8080/login");
         }
     });
 };
@@ -220,10 +220,10 @@ exports.levelAuthorizeAdmin = (req, res, next) => {//Role autorisé Admin
       if(process.env.DEVELOP === "true") {
         console.log('accessToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(401).json({ message: 'Missing token in cookie' });
+        return res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
       } else {
         logger.error('accessToken manquant');
-        return res.status(401).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
       
     }
@@ -241,10 +241,10 @@ exports.levelAuthorizeAdmin = (req, res, next) => {//Role autorisé Admin
         if(process.env.DEVELOP === "true") {
             console.log('user introuvable dans la BDD');
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-            return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+            return res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
         } else {
             logger.error('user introuvable dans la BDD');
-            return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+            return res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
         }
       } else {
           if((result.role === config.role.roleAdmin)){
@@ -254,23 +254,23 @@ exports.levelAuthorizeAdmin = (req, res, next) => {//Role autorisé Admin
             if(process.env.DEVELOP === "true") {
                 console.log('droit du role interdit');
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-                return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+                return res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
             } else {
                 logger.error('droit du role interdit');
-                return res.status(401).redirect("http://localhost:8080/login");//page de connexion
+                return res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
             }
           }
       }
     })
     .catch(error => {
-        if(process.env.DEVELOP === "true") {  
+        if(process.env.DEVELOP === "true") {
             console.log(error, error);      
             console.log("Pb BDD Users");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-            res.status(500).redirect("http://localhost:8080/login");
+            res.status(config.erreurServer.ERREUR_SERVER).redirect("http://localhost:8080/login");
         } else {
             logger.error("Pb BDD Users");
-            res.status(500).redirect("http://localhost:8080/login");
+            res.status(config.erreurServer.ERREUR_SERVER).redirect("http://localhost:8080/login");
         }
     });
 };

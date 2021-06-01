@@ -64,4 +64,4 @@ console.log(xml);
 */
 
 //si erreur
-//res.status(500).json({ error: process.env.MSG_ERROR_PRODUCTION });
+//res.status(config.erreurServer.ERREUR_SERVER).json({ error: process.env.MSG_ERROR_PRODUCTION });

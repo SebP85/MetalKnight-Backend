@@ -7,6 +7,7 @@ const email = require('./mail');
 const cookie = require('./cookie');
 const login = require('./login');
 const role = require('./role');
+const erreurServer = require('./erreur_server');
 
 const {resolve} = require('path');
 
@@ -26,4 +27,5 @@ module.exports = {
   cookie: cookie(env),
   login: login(env),
   role: role(env),
+  erreurServer: erreurServer(env),
 };
