@@ -38,21 +38,21 @@ var parseForm = express.urlencoded({
 const csrfProtectionCtrl = require('../controllers/csrf');
 
 //Routes connexion
-//exemple: router.get('/register', /*parseForm,*/ csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, xml, objectifRoute);
-router.post('/auth/register', /*csrfProtection,*/ checkBody.validParamRegister, xssFilter.filterRegister, mail.checkEmail, userCtrl.signup);//=>post
-router.get('/auth/verify/:token/:refreshToken', /*csrfProtection,*/ checkBody.validParamVerify, xssFilter.filterVerify, userCtrl.verify);
-router.get('/auth/getCSRF', /*csrfProtection,*/ csrfProtectionCtrl.getTokenCSRF);
-router.post('/auth/login', /*parseForm, csrfProtection,*/ checkBody.validParamLogin, xssFilter.filterLogin, userCtrl.login);
-router.post('/auth/logout', /*parseForm, csrfProtection,*/ checkBody.validParamLogout, xssFilter.filterLogout, auth.normal, userCtrl.logout);
-router.post('/auth/updateToken', /*parseForm, csrfProtection,*/ checkBody.validParamUpdateToken, xssFilter.filterUpdateToken, auth.refreshToken, userCtrl.refreshToken);
+//exemple: router.get('/register', checkBody.validParamAuth, checkBody.validParamRegister, xssFilter.filterRegister, xml, objectifRoute);
+router.post('/auth/register', checkBody.validParamRegister, xssFilter.filterRegister, mail.checkEmail, userCtrl.signup);//=>post
+router.get('/auth/verify/:token/:refreshToken', checkBody.validParamVerify, xssFilter.filterVerify, userCtrl.verify);
+router.get('/auth/getCSRF', csrfProtectionCtrl.getTokenCSRF);
+router.post('/auth/login', checkBody.validParamLogin, xssFilter.filterLogin, userCtrl.login);
+router.post('/auth/logout', checkBody.validParamAuth, checkBody.validParamLogout, xssFilter.filterLogout, auth.normal, userCtrl.logout);
+router.post('/auth/updateToken', checkBody.validParamAuthRefresh, checkBody.validParamUpdateToken, xssFilter.filterUpdateToken, auth.refreshToken, userCtrl.refreshToken);
 
-router.get('/auth/mailNewPassword', /*csrfProtection,*/ checkBody.validParamEmailNewMDP, xssFilter.filterEmailNewMDP, userCtrl.mailNewPassword);//mail pour changer de mot de passe
-router.get('/auth/verifMailNewMDP/:accessToken/:refreshToken', /*csrfProtection,*/ checkBody.validParamVerifMailNewMDP, xssFilter.filterVerifMailNewMDP, userCtrl.verifMailNewPassword);//Vérif mail pour changement du mot de passe et envoie vers la page pour changer de mot de passe
-router.get('/auth/updateMailNewMDP', /*parseForm, csrfProtection,*/ checkBody.validParamUpdateMailNewMDP, xssFilter.filterUpdateMailNewMDP, auth.mailNewPassword, userCtrl.UpdateMailNewPassword);//changement de mot de passe grâce au mail, envoie xsrfToken et cookie pour vérification
-router.get('/auth/updateMDP', /*parseForm, csrfProtection,*/ checkBody.validParamMailNewMDP, xssFilter.filterMailNewMDP, auth.normal, userCtrl.newPassword);//changement de mot de passe depuis le profil
+router.post('/auth/mailNewPassword', checkBody.validParamEmailNewMDP, xssFilter.filterEmailNewMDP, userCtrl.mailNewPassword);//mail pour changer de mot de passe
+router.get('/auth/verifMailNewMDP/:accessToken/:refreshToken', checkBody.validParamVerifMailNewMDP, xssFilter.filterVerifMailNewMDP, userCtrl.verifMailNewPassword);//Vérif mail pour changement du mot de passe et envoie vers la page pour changer de mot de passe
+router.post('/auth/updateMailNewMDP', checkBody.validParamUpdateMailNewMDP, xssFilter.filterUpdateMailNewMDP, auth.mailNewPassword, userCtrl.UpdateMailNewPassword);//changement de mot de passe grâce au mail, envoie xsrfToken et cookie pour vérification
+router.post('/auth/updateMDP', checkBody.validParamAuth, checkBody.validParamMailNewMDP, xssFilter.filterMailNewMDP, auth.normal, userCtrl.newPassword);//changement de mot de passe depuis le profil
 
 //Routes principales
-//exemple: router.get('/register', /*parseForm,*/ csrfProtection, checkBody.validParamRegister, xssFilter.filterRegister, xml, auth.normal, role.levelAuthorize("free"), objectifRoute);
-router.post('/getProfile', /*parseForm, csrfProtection,*/ checkBody.validParamGetProfile, xssFilter.filterGetProfile, auth.normal, role.levelAuthorizeFree, profile.getProfile);
+//exemple: router.get('/register', checkBody.validParamAuth, checkBody.validParamRegister, xssFilter.filterRegister, xml, auth.normal, role.levelAuthorize("free"), objectifRoute);
+router.post('/getProfile', checkBody.validParamAuth, checkBody.validParamGetProfile, xssFilter.filterGetProfile, auth.normal, role.levelAuthorizeFree, profile.getProfile);
 
 module.exports = router;//test

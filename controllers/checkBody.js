@@ -393,6 +393,34 @@ exports.validParamGetProfile = function (req, res, next){
     }
 };
 
+exports.validParamAuth = function (req, res, next) {
+    if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTaccess(req.cookies.access_token)){
+        if(process.env.DEVELOP === "true") console.log("Données auth ok");
+        else logger.info("Données auth ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données auth nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données auth nok");
+        res.status(config.erreurServer.BAD_IDENTIFICATION).json({ error: process.env.MSG_ERROR_PRODUCTION });
+    }
+};
+
+exports.validParamAuthRefresh = function (req, res, next) {
+    if(isTokenJWTaccess(req.cookies.refresh_token)){
+        if(process.env.DEVELOP === "true") console.log("Données auth via refreshToken ok");
+        else logger.info("Données auth via refreshToken ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données auth via refreshToken nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données auth via refreshToken nok");
+        res.status(config.erreurServer.ACCESS_REFUSED).json({ error: process.env.MSG_ERROR_PRODUCTION });
+    }
+};
+
 //exemple
 /*exports.reqValidation = function (req, res, next) {
     // username must be an email
