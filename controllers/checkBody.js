@@ -289,7 +289,7 @@ exports.validParamUpdateToken = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
-        res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        res.status(config.erreurServer.ACCESS_REFUSED).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
 };
 
