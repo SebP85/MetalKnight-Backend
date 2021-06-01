@@ -81,12 +81,6 @@ app.use(function (req, res, next) {
 
 app.use('/api'+config.email.NOM_APP, userRoutes);
 
-app.use('/test', (req, res, next) => {
-  console.log('requete test')
-
-  next()
-})
-
 app.use(function (req, res, next) {
   if(process.env.DEVELOP === "true") console.log('---------------------------------------------------------   Requête traitée   ------------------------------------------------------------------');
   if(process.env.DEVELOP === "false") {
