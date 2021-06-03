@@ -128,13 +128,12 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
         
         const refresh = new RefreshToken({
           userId: user.id,
-          refreshToken: refreshToken,
+          refreshToken: refToken,
           expiresAt: Date.now() + config.token.refreshToken.expiresIn
         });
         if(process.env.DEVELOP === "true") console.log("refresh", refresh);
         
         refresh.save()
-        //RefreshToken.findByIdAndUpdate({ userId: refresh.userId }, refresh)
           .then(() => {//enregistrement ok
             res.cookie('access_token', accessToken, {//config du cookie accessToken
               maxAge: config.token.accessToken.expiresIn,
