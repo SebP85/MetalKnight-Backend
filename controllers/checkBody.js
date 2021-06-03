@@ -259,6 +259,8 @@ exports.validParamLogout = function (req, res, next){
 
     //valid param req.body.csrf ?
 
+    if(chatty) console.log('xsrf', req.headers.xsrftoken)
+
     //v8n
     if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTaccess(req.cookies.access_token)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
@@ -278,6 +280,7 @@ exports.validParamUpdateToken = function (req, res, next){
     else logger.info("Vérification des données d'entrées");
 
     //valid param req.body.csrf ?
+    if(chatty) console.log('xsrf', req.headers.xsrftoken)
 
     //v8n
     if(isXSRFToken(req.headers.xsrftoken) /*&& isTokenJWTrefresh(req.headers.refresh_token)*/){
@@ -337,6 +340,7 @@ exports.validParamUpdateMailNewMDP = function (req, res, next){
     else logger.info("Vérification des données d'entrées");
 
     //console.log(req.headers.refresh_token);
+    if(chatty) console.log('xsrf', req.headers.xsrftoken)
 
     //v8n
     if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTaccess(req.cookies.access_token) && isTokenJWTrefresh(req.headers.refresh_token) && 
@@ -358,6 +362,7 @@ exports.validParamMailNewMDP = function (req, res, next){
     else logger.info("Vérification des données d'entrées");
 
     //valid param req.body.csrf ?
+    if(chatty) console.log('xsrf', req.headers.xsrftoken)
 
     //v8n
     if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTaccess(req.cookies.access_token) && isStrongPassword(req.body.password)){
@@ -378,6 +383,7 @@ exports.validParamGetProfile = function (req, res, next){
     else logger.info("Vérification des données d'entrées");
 
     //valid param req.body.csrf ?
+    if(chatty) console.log('xsrf', req.headers.xsrftoken)
 
     //v8n
     if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTaccess(req.cookies.access_token)){
@@ -394,6 +400,8 @@ exports.validParamGetProfile = function (req, res, next){
 };
 
 exports.validParamAuth = function (req, res, next) {
+    if(chatty) console.log('xsrf', req.headers.xsrftoken)
+    
     if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTaccess(req.cookies.access_token)){
         if(process.env.DEVELOP === "true") console.log("Données auth ok");
         else logger.info("Données auth ok");
