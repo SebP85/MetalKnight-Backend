@@ -19,6 +19,7 @@ exports.filterRegister = function (req, res, next) {//on transforme les données
     req.body.civilite = xss(req.body.civilite);
     
     //console.log(req);
+    
     next();
 };
 

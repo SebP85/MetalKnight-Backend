@@ -73,16 +73,16 @@ exports.sendVerifyEmail = (email, token, refreshToken, callback) => {
             if(process.env.DEVELOP === "true") console.log('Email sent ...', r);
             else logger.info("email de vérification envoyé !");
 
-            callback(true);
+            callback(true)
         })
         .catch(err => {
             if(process.env.DEVELOP === "true"){
                 console.log(err.message);
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
             } else logger.error("Problème pour envoyer l'email de vérification !", err.message);
-            res.status(config.erreurServer.ERREUR_SERVER).json({ error: process.env.MSG_ERROR_PRODUCTION });
 
-            callback(false);
+            //res.status(config.erreurServer.ERREUR_SERVER).json({ error: process.env.MSG_ERROR_PRODUCTION });
+            callback(false)
         });
 };
 
@@ -127,13 +127,17 @@ exports.checkEmail = async (req, res, next) => {//vérifie le domaine et si l'ad
             console.log("domaine => "+validDomain);
             console.log("mailBox => "+validMailbox);//Ne marche pas
         } else logger.info("La vérification de l'email est ok (domaine et écrit)");
+        
         next();
-    } else
+    } else {
         if(process.env.DEVELOP === "true") {
             console.log("email nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-        } else logger.error("La vérification de l'email est nok (domaine et écrit)");
+        } else 
+            logger.error("La vérification de l'email est nok (domaine et écrit)");
+
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+    }
 };
 
 exports.sendUpdateEmailMDP = (email, token, refreshToken, callback) => {//Mail pour envoyer les tokens pour changement de mot de passe

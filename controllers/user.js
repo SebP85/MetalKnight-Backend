@@ -368,7 +368,7 @@ exports.signup = (req, res, next) => {//Enregistrement du nouvel utilisateur
     console.log('username => '+req.body.firstName);
     console.log('email => '+req.body.email);
   }
-
+  
   //Utilisateur existant ?
   User.findOne({ email: req.body.email })
     .then(user => {
@@ -439,7 +439,17 @@ exports.signup = (req, res, next) => {//Enregistrement du nouvel utilisateur
                   res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
                 }
               }
-            });
+            })/*
+              .then((t) => {
+                console.log('test', t)
+                res.status(201).json({ message: 'Utilisateur créé !' });
+                next()
+              })
+              .catch(err => console.log(err))
+            /*.then()
+            .catch((err) => {
+              if(chatty) console.log(err)
+            });*/
             
           })
           .catch(error => {
