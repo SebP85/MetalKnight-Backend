@@ -986,11 +986,43 @@ exports.newPassword = (req, res, next) => {//Mise à jour du mot de passe via le
   });
   if(process.env.DEVELOP === "true") console.log('decodedAccessToken', decodedAccessToken);
 
-  if(process.env.DEVELOP === "true") console.log('nouveau mot de passe', req.body.password);
+  if(process.env.DEVELOP === "true") {
+    console.log('mot de passe actuel', req.body.password);
+    console.log('nouveau mot de passe', req.body.newPassword);
+  }
 
   User.findOne({ _id: decodedAccessToken.sub })
     .then((user) =>{
-      bcrypt.hash(req.body.password, 10)
+
+      //vérification que l'ancien mot de passe correspond
+      bcrypt.compare(req.body.password, user.password)
+        .then(valid => {
+          if (!valid) {
+            if(process.env.DEVELOP === "true") {
+              console.log('Mot de passe incorrect !');
+              console.log("email", user.email);
+              console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
+              
+            } else {
+              logger.error('Mot de passe incorrect !');
+            }
+
+            return res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Mot de passe incorrect !' });
+          }
+        })
+        .catch(error => {
+          if(process.env.DEVELOP === "true") {
+            console.log("Problème avec Bcrypt");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+            return res.status(config.erreurServer.ERREUR_SERVER).json({ error });
+          } else {
+            console.log(process.env.MSG_ERROR_PRODUCTION);
+            logger.error("Erreur 500: Problème avec Bcrypt", error.message);
+            return res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
+          }
+        });
+
+      bcrypt.hash(req.body.newPassword, 10)
         .then(hash => {
           if(process.env.DEVELOP === "true") console.log('Hash du pwd');
 

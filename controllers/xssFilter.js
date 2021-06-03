@@ -120,6 +120,7 @@ exports.filterMailNewMDP = function (req, res, next) {
     req.cookies.access_token = xss(req.cookies.access_token);
 
     req.body.password = xss(req.body.password);
+    req.body.newPassword = xss(req.body.newPassword);
 
     //req.body.csrf à faire ?
     
