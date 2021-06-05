@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const config = require('../config/config');
 const jwt = require('jsonwebtoken');
+const { logger } = require('../log/winston');
 
 exports.levelAuthorizeFree = (req, res, next) => {//Role autorisé Free
     if(process.env.DEVELOP === "true") console.log("fonction levelAuthorizeFree !");
