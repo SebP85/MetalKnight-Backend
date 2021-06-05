@@ -321,6 +321,11 @@ exports.validParamVerifMailNewMDP = function (req, res, next){
     const { accessToken } = req.params;
     const { refreshToken } = req.params;
 
+    if(chatty){
+        console.log("access", accessToken);
+        console.log("refresh", refreshToken);
+    }
+
     //v8n
     if(isTokenHex(accessToken) && isTokenHex(refreshToken)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
