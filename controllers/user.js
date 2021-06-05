@@ -242,7 +242,6 @@ function envoieTokenMDP(user, res, next) {//Permet d'envoyer les données pour c
       });
       if(process.env.DEVELOP === "true") console.log('refreshToken setCookie');
     
-      res.redirect()
       res.status(200).json({//envoie du message
         accessTokenExpiresIn: config.token.accessToken.expiresIn,
         refreshTokenExpiresIn: config.token.refreshToken.expiresIn,
@@ -251,7 +250,6 @@ function envoieTokenMDP(user, res, next) {//Permet d'envoyer les données pour c
       if(process.env.DEVELOP === "true") {
         console.log('Cookie et xsrf envoyé');
         console.log("Redirection de l'utilisateur vers la bonne page");
-        ///newMDP
       }
       next();
       
