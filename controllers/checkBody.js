@@ -348,7 +348,7 @@ exports.validParamUpdateMailNewMDP = function (req, res, next){
     if(chatty) console.log('xsrf', req.headers.xsrftoken)
 
     //v8n
-    if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTaccess(req.cookies.access_token) && isTokenJWTrefresh(req.headers.refresh_token) && 
+    if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTaccess(req.cookies.access_token) && isTokenJWTrefresh(req.cookies.refresh_token) && 
         isStrongPassword(req.body.password)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
         else logger.info("Données d'entrées ok");

@@ -62,7 +62,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
       audience: Date.now() + config.token.refreshToken.audience,
       expiresIn: config.token.refreshToken.expiresIn, // Le délai avant expiration exprimé en seconde
       issuer: config.token.refreshToken.issuer,
-      subject: user.id.toString() //fonction decoded.sub pour le récupérer
+      subject: user.id.toString(), //fonction decoded.sub pour le récupérer
     }
   );
   if(process.env.DEVELOP === "true") console.log('refreshToken', refreshToken);
@@ -97,7 +97,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
               maxAge: config.token.refreshToken.expiresIn,
               httpOnly: true,
               secure: true,
-              path: config.cookie.refreshToken.pathCookie,
+              path: config.cookie.refreshToken.pathCookieNewPassword,
             });
             if(process.env.DEVELOP === "true") console.log('refreshToken setCookie');
           
