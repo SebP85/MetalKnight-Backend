@@ -65,7 +65,7 @@ exports.filterUpdateToken = function (req, res, next) {//on transforme les donn√
     else logger.info('Traitement contre XSS attack');
 
     req.headers.xsrfToken = xss(req.headers.xsrfToken);
-    req.cookies.access_token = xss(req.cookies.access_token);
+    //req.cookies.access_token = xss(req.cookies.access_token);
     req.headers.refresh_token = xss(req.headers.refresh_token);
 
     //req.body.csrf √† faire ?
