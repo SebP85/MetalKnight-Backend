@@ -6,6 +6,8 @@ const User = require('../models/User');
 const moment = require('moment');
 //const { findByIdAndDelete } = require('../models/RefreshToken');
 
+const chatty = true;
+
 exports.normal = (req, res, next) => {//Vérification des tokens
   try {
     if(process.env.DEVELOP === "true") console.log("début authentification");
@@ -250,7 +252,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
         else logger.info('refToken identique');
 
         if(process.env.DEVELOP === "true") console.log("Date d'expiration refreshToken", moment(result.expiresAt));
-        var dateExpireRefreshTokenTheorique = new Date(result.expiresAt - config.token.refreshToken.expiresIn + config.token.accessToken.expiresIn);
+        var dateExpireRefreshTokenTheorique = new Date(result.expiresAt + config.token.refreshToken.expiresIn);
         if(moment(dateExpireRefreshTokenTheorique).isAfter(Date.now())){
           if(process.env.DEVELOP === "true") console.log("Date d'expiration ok");
           else logger.info("Date d'expiration ok");
@@ -321,7 +323,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
     
 
   } catch(err) {
-    if(process.env.DEVELOP === "true") {
+    if(process.env.DEVELOP === "true" || chatty) {
       console.log("erreur authentification !")
       console.log("---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------")
       res.status(config.erreurServer.ACCESS_REFUSED).json({error: new Error('Invalid request!')});
