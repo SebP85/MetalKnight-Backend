@@ -153,7 +153,7 @@ exports.sendUpdateEmailMDP = (email, token, refreshToken, callback) => {//Mail p
     var html =  '<h1>'+config.email.NOM_APP+'</h1>'+
                 '<p>Vous avez demandé à mettre à jour votre mot de passe !</p>'+
                 '<p><a href=https://'+process.env.SERVER_HOST+':'+process.env.SERVER_PORT+
-                `/verifMailNewMDP/:${token}/:${refreshToken}>Cliquez ici</a> pour lancer la mise à jour de votre mot de passe.</p>`+
+                `/auth/verifMailNewMDP/:${token}/:${refreshToken}>Cliquez ici</a> pour lancer la mise à jour de votre mot de passe.</p>`+
                 "<p>Si vous n'êtes pas à l'origine de cette action. Veuillez nous contacter le plus rapidemment possible.</p>"+
                 ''+config.email.NOM_APP;
     var subject = "Mise à jour du mot de passe";
