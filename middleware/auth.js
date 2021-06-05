@@ -353,7 +353,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
     }
     const accessToken = cookies.access_token;
     
-    if (!headers || !headers.refresh_token) {//cookie présent ?
+    if (!cookies || !cookies.refresh_token) {//cookie présent ?
       if(process.env.DEVELOP === "true") {
         console.log('refreshToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
@@ -364,7 +364,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
       }
       
     }
-    const refreshToken = headers.refresh_token;
+    const refreshToken = cookies.refresh_token;
 
     if (!headers || !headers['xsrftoken']) {
       if(process.env.DEVELOP === "true") {

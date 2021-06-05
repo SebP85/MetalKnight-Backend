@@ -103,8 +103,9 @@ exports.filterUpdateMailNewMDP = function (req, res, next) {//on transforme les 
     req.cookies.access_token = xss(req.cookies.access_token);
     req.cookies.refresh_token = xss(req.cookies.refresh_token);
 
-    req.body.email = xss(req.body.email);
+    //req.body.email = xss(req.body.email);
     req.body.password = xss(req.body.password);
+    req.body.passwordConfirm = xss(req.body.passwordConfirm);
 
     //req.body.csrf à faire ?
     

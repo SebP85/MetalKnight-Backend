@@ -242,7 +242,7 @@ function envoieTokenMDP(user, res, next) {//Permet d'envoyer les données pour c
       });
       if(process.env.DEVELOP === "true") {
         console.log('refreshToken setCookie');
-        console.log('res', res.cookies);
+        //console.log('res', res.cookies);
       }
     
       res.status(200).json({//envoie du message
@@ -923,6 +923,8 @@ exports.UpdateMailNewPassword = (req, res, next) => {//Mise à jour du mot de pa
                 res.status(201).json({ message: process.env.MSG_OK_PRODUCTION });
                 logger.info("MAJ mot de passe ok", user.email);
               }
+
+              next();
             })
             .catch(error => {
               if(process.env.DEVELOP === "true") {
