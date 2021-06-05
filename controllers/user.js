@@ -515,7 +515,7 @@ exports.login = (req, res, next) => {//connexion
             }
             else {
               logger.error("Compte suspendu");
-              return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+              return res.status(config.erreurServer.BAD_REQUEST).json({ error: "Compte suspendu" });
             }
           } else {//si nombre de tentatives de connexion atteint
             if(user.tentativesConnexion >= config.login.MAX_CONNEXION){
