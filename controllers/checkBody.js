@@ -345,7 +345,10 @@ exports.validParamUpdateMailNewMDP = function (req, res, next){
     else logger.info("Vérification des données d'entrées");
 
     //console.log(req.headers.refresh_token);
-    if(chatty) console.log('xsrf', req.headers.xsrftoken)
+    if(chatty) {
+        console.log('xsrf', req.headers.xsrftoken)
+        console.log('cookies', req.cookies)
+    }
 
     //v8n
     if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTaccess(req.cookies.access_token) && isTokenJWTrefresh(req.cookies.refresh_token) && 

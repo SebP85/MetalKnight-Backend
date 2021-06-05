@@ -97,7 +97,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
               maxAge: config.token.refreshToken.expiresIn,
               httpOnly: true,
               secure: true,
-              path: config.cookie.refreshToken.pathCookieNewPassword,
+              path: config.cookie.refreshToken.pathCookie,
             });
             if(process.env.DEVELOP === "true") console.log('refreshToken setCookie');
           
@@ -238,9 +238,12 @@ function envoieTokenMDP(user, res, next) {//Permet d'envoyer les données pour c
         maxAge: config.token.refreshToken.expiresIn,
         httpOnly: true,
         secure: true,
-        path: config.cookie.refreshToken.pathCookie,
+        path: config.cookie.refreshToken.pathCookieNewPassword,
       });
-      if(process.env.DEVELOP === "true") console.log('refreshToken setCookie');
+      if(process.env.DEVELOP === "true") {
+        console.log('refreshToken setCookie');
+        console.log('res', res.cookies);
+      }
     
       res.status(200).json({//envoie du message
         accessTokenExpiresIn: config.token.accessToken.expiresIn,
