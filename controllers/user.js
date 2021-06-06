@@ -1111,21 +1111,26 @@ exports.verifyRecaptcha = (req, res, next) => {//On vérifie le token recaptcha
     }
   }
 
-  const verifyCaptchaOptions = {
-    form: {
+  /*const verifyCaptchaOptions = {
+    params: {
         secret: process.env.CAPTCHA_SECRET,
         response: req.body.tokenRecaptcha
     }
-  };
+  };*/
 
-  const apiURL = 'https://www.google.com/recaptcha/api/siteverify';
-  axios.defaults.headers.common['Content-Type'] = 'application/json';
-  axios.post(apiURL, verifyCaptchaOptions)
-    .then((res) => {
-      if(res){
+  const apiURL = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.CAPTCHA_SECRET}&response=${req.body.tokenRecaptcha}`;
+  //axios.defaults.headers.common['Content-Type'] = 'application/json';
+  axios.post(apiURL)
+    .then((response) => {
+      
+      if(response.data.success){
+        
         next()
       } else {
         if(process.env.DEVELOP === "true") {
+          console.log('data', response.data)
+          console.log('config', response.config.data)
+          console.log('res', response.data.success)
           console.log('erreur 400, token recaptcha mauvais');
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
           return res.status(config.erreurServer.BAD_REQUEST).json({message: "recaptchaToken n'est pas le bon"});
