@@ -7,7 +7,7 @@
 //const { body, validationResult, oneOf } = require('express-validator');//valide les paramètres avec des fonctions préprogrammées
 const v8n = require('v8n');//valide les paramètres d'entrées et peutajouter des fonctions chainés
 //voir https://imbrn.github.io/v8n/#what-s-v8n et https://github.com/imbrn/v8n/tree/master/src et https://imbrn.github.io/v8n/api/#testasync
-const chatty = true;
+const chatty = false;
 
 function isEmail(val){
     var v = v8n()
