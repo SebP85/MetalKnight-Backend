@@ -767,10 +767,10 @@ exports.mailNewPassword = (req, res, next) => {//envoie un mail pour MAJ le MDP
           if(process.env.DEVELOP === "true") {
             console.log("Compte suspendu ou pas encore activé");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-            res.status(config.erreurServer.ERREUR_SERVER).json({ message: "Compte suspendu ou pas encore activé" });
+            res.status(config.erreurServer.BAD_REQUEST).json({ message: "Compte suspendu ou pas encore activé" });
           } else {
             logger.error("Compte suspendu ou pas encore activé");
-            res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
+            res.status(config.erreurServer.BAD_REQUEST).json({ message: process.env.MSG_ERROR_PRODUCTION });
           }
         }
         
