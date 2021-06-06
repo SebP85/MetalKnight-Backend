@@ -42,7 +42,7 @@ const csrfProtectionCtrl = require('../controllers/csrf');
 router.post('/auth/register', checkBody.validParamRegister, xssFilter.filterRegister, mail.checkEmail, userCtrl.signup);//=>post
 router.get('/auth/verify/:token/:refreshToken', checkBody.validParamVerify, xssFilter.filterVerify, userCtrl.verify);
 router.get('/auth/getCSRF', csrfProtectionCtrl.getTokenCSRF);
-router.post('/auth/login', checkBody.validParamLogin, xssFilter.filterLogin, userCtrl.login);
+router.post('/auth/login', checkBody.validParamLogin, checkBody.validParamRecaptcha, xssFilter.filterLogin, xssFilter.filterRecaptcha, userCtrl.verifyRecaptcha, userCtrl.login);
 router.post('/auth/logout', checkBody.validParamAuth, checkBody.validParamLogout, xssFilter.filterLogout, auth.normal, userCtrl.logout);
 router.post('/auth/updateToken', checkBody.validParamAuthRefresh, checkBody.validParamUpdateToken, xssFilter.filterUpdateToken, auth.refreshToken, userCtrl.refreshToken);
 

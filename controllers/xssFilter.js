@@ -141,3 +141,15 @@ exports.filterGetProfile = function (req, res, next) {//on transforme les donné
     //console.log(req);
     next();
 };
+
+exports.filterRecaptcha = function (req, res, next) {//filtre le token recaptcha
+    if(process.env.DEVELOP === "true") console.log("fonction xss");
+    else logger.info('Traitement contre XSS attack');
+
+    req.body.tokenRecaptcha = xss(req.body.tokenRecaptcha);
+
+    //req.body.csrf à faire ?
+    
+    //console.log(req);
+    next();
+}

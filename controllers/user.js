@@ -10,6 +10,8 @@ const mail = require("../controllers/mail");
 const { logger } = require('../log/winston');
 const moment = require('moment');
 
+const axios = require('axios');
+
 ////////////////////////////////////////////////////////////////////////////   Fonction    /////////////////////////////////////////////////////////////////////////
 
 function compteSuspendu(user) {//comparer la date actuelle avec la date suspendu pour savoir si le compte est suspendu
@@ -437,7 +439,7 @@ exports.signup = (req, res, next) => {//Enregistrement du nouvel utilisateur
                   console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
                   res.status(config.erreurServer.ERREUR_SERVER).json({ message: "error 500, pb mail" });
                 } else {
-                  logger.error("Erreur 500 problème avec l'envoie du mail", error.message);
+                  logger.error("Erreur 500 problème avec l'envoie du mail");
                   res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
                 }
               }
@@ -697,8 +699,7 @@ exports.mailNewPassword = (req, res, next) => {//envoie un mail pour MAJ le MDP
   User.findOne({ email: req.body.email })
     .then((user) => {
       if(!user){//Si l'email n'est pas dans la BDD
-        if(process.env.DEVELOP === "true") {  
-          console.log(error, error);      
+        if(process.env.DEVELOP === "true") {
           console.log("Email non trouvé");
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
           res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
@@ -943,7 +944,7 @@ exports.UpdateMailNewPassword = (req, res, next) => {//Mise à jour du mot de pa
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
             res.status(config.erreurServer.ERREUR_SERVER).json({ message: "error 500, pb mail" });
           } else {
-            logger.error("Erreur 500 problème avec l'envoie du mail", error.message);
+            logger.error("Erreur 500 problème avec l'envoie du mail");
             res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
           }
         }
@@ -1065,7 +1066,7 @@ exports.newPassword = (req, res, next) => {//Mise à jour du mot de passe via le
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
                 res.status(config.erreurServer.ERREUR_SERVER).json({ message: "error 500, pb mail" });
               } else {
-                logger.error("Erreur 500 problème avec l'envoie du mail", error.message);
+                logger.error("Erreur 500 problème avec l'envoie du mail");
                 res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
               }
             }
@@ -1094,3 +1095,54 @@ exports.newPassword = (req, res, next) => {//Mise à jour du mot de passe via le
       }
     });
 };
+
+exports.verifyRecaptcha = (req, res, next) => {//On vérifie le token recaptcha
+  if(process.env.DEVELOP === "true") console.log('Requete verifyRecaptcha');
+  else logger.info("requête verifyRecaptcha");
+
+  if (!req.body.tokenRecaptcha) {//Présence du token ?
+    if(process.env.DEVELOP === "true") {
+      console.log('erreur 400, token recaptcha manquant');
+      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+      return res.status(config.erreurServer.BAD_REQUEST).json({message: "recaptchaToken is required"});
+    } else {
+      logger.error("erreur 400, token recaptcha manquant");
+      res.status(config.erreurServer.BAD_REQUEST).json({ message: process.env.MSG_ERROR_PRODUCTION });
+    }
+  }
+
+  const verifyCaptchaOptions = {
+    form: {
+        secret: process.env.CAPTCHA_SECRET,
+        response: req.body.tokenRecaptcha
+    }
+  };
+
+  const apiURL = 'https://www.google.com/recaptcha/api/siteverify';
+  axios.defaults.headers.common['Content-Type'] = 'application/json';
+  axios.post(apiURL, verifyCaptchaOptions)
+    .then((res) => {
+      if(res){
+        next()
+      } else {
+        if(process.env.DEVELOP === "true") {
+          console.log('erreur 400, token recaptcha mauvais');
+          console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+          return res.status(config.erreurServer.BAD_REQUEST).json({message: "recaptchaToken n'est pas le bon"});
+        } else {
+          logger.error("erreur 400, token recaptcha mauvais");
+        }
+          res.status(config.erreurServer.BAD_REQUEST).json({ message: process.env.MSG_ERROR_PRODUCTION });
+      }
+    })
+    .catch((err) => {
+      if(process.env.DEVELOP === "true") {
+        console.log('erreur 500, problème server recaptcha');
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+      } else {
+        logger.error("Erreur 500 problème server recaptcha", err.message);
+      }
+      res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
+    })
+
+}

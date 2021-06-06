@@ -7,7 +7,7 @@
 //const { body, validationResult, oneOf } = require('express-validator');//valide les paramètres avec des fonctions préprogrammées
 const v8n = require('v8n');//valide les paramètres d'entrées et peutajouter des fonctions chainés
 //voir https://imbrn.github.io/v8n/#what-s-v8n et https://github.com/imbrn/v8n/tree/master/src et https://imbrn.github.io/v8n/api/#testasync
-const chatty = false;
+const chatty = true;
 
 function isEmail(val){
     var v = v8n()
@@ -188,6 +188,20 @@ function isTokenBase64(val){
     return v;
 }
 
+function isRecaptcha(val){
+    var v = v8n()
+        .string()
+        .not.null()
+        //.length(462)
+        .pattern(/^[a-zA-Z0-9_-]+$/)//autorisé
+        .test(val);
+
+    if(chatty) console.log("Recaptcha", val, v);
+    if(!v && process.env.DEVELOP === "false") logger.error("Recaptcha =>", val);
+
+    return v;
+}
+
 exports.validParamRegister = function (req, res, next){
     if(process.env.DEVELOP === "true") console.log("checkBody");
     else logger.info("Vérification des données d'entrées");
@@ -238,7 +252,8 @@ exports.validParamLogin = function (req, res, next){
     else logger.info("Vérification des données d'entrées");
 
     //valid param req.body.csrf ?
-
+    if(chatty) console.log(req.body)
+    
     //v8n
     if(isEmail(req.body.email) && isStrongPassword(req.body.password)){
         if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
@@ -434,6 +449,20 @@ exports.validParamAuthRefresh = function (req, res, next) {
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données auth via refreshToken nok");
         res.status(config.erreurServer.ACCESS_REFUSED).json({ error: process.env.MSG_ERROR_PRODUCTION });
+    }
+};
+
+exports.validParamRecaptcha = function (req, res, next) {
+    if(isRecaptcha(req.body.tokenRecaptcha)){
+        if(process.env.DEVELOP === "true") console.log("Données recaptcha ok");
+        else logger.info("Données recaptcha ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données recaptcha nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données recaptcha nok");
+        res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
 };
 
