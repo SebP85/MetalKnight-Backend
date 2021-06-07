@@ -39,7 +39,7 @@ const csrfProtectionCtrl = require('../controllers/csrf');
 
 //Routes connexion
 //exemple: router.get('/register', checkBody.validParamAuth, checkBody.validParamRegister, xssFilter.filterRegister, xml, objectifRoute);
-router.post('/auth/register', checkBody.validParamRegister, xssFilter.filterRegister, mail.checkEmail, userCtrl.signup);//=>post
+router.post('/auth/register', checkBody.validParamRegister, checkBody.validParamRecaptcha, xssFilter.filterRegister, xssFilter.filterRecaptcha, mail.checkEmail, userCtrl.verifyRecaptcha, userCtrl.signup);//=>post
 router.get('/auth/verify/:token/:refreshToken', checkBody.validParamVerify, xssFilter.filterVerify, userCtrl.verify);
 router.get('/auth/getCSRF', csrfProtectionCtrl.getTokenCSRF);
 router.post('/auth/login', checkBody.validParamLogin, checkBody.validParamRecaptcha, xssFilter.filterLogin, xssFilter.filterRecaptcha, userCtrl.verifyRecaptcha, userCtrl.login);
@@ -53,6 +53,6 @@ router.post('/auth/updateMDP', checkBody.validParamAuth, checkBody.validParamMai
 
 //Routes principales
 //exemple: router.get('/register', checkBody.validParamAuth, checkBody.validParamRegister, xssFilter.filterRegister, xml, auth.normal, role.levelAuthorize("free"), objectifRoute);
-router.post('/getProfile', checkBody.validParamAuth, checkBody.validParamGetProfile, xssFilter.filterGetProfile, auth.normal, role.levelAuthorizeFree, profile.getProfile);
+router.post('/getProfile', checkBody.validParamAuth, checkBody.validParamRecaptcha, checkBody.validParamGetProfile, xssFilter.filterGetProfile, xssFilter.filterRecaptcha, auth.normal, userCtrl.verifyRecaptcha, role.levelAuthorizeFree, profile.getProfile);
 
 module.exports = router;//test
