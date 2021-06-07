@@ -53,6 +53,6 @@ router.post('/auth/updateMDP', checkBody.validParamAuth, checkBody.validParamMai
 
 //Routes principales
 //exemple: router.get('/register', checkBody.validParamAuth, checkBody.validParamRegister, xssFilter.filterRegister, xml, auth.normal, role.levelAuthorize("free"), objectifRoute);
-router.post('/getProfile', checkBody.validParamAuth, checkBody.validParamRecaptcha, checkBody.validParamGetProfile, xssFilter.filterGetProfile, xssFilter.filterRecaptcha, auth.normal, userCtrl.verifyRecaptcha, role.levelAuthorizeFree, profile.getProfile);
+router.post('/getProfile', checkBody.validParamAuth, checkBody.validParamGetProfile, xssFilter.filterGetProfile, auth.normal, role.levelAuthorizeFree, profile.getProfile);
 
 module.exports = router;//test
