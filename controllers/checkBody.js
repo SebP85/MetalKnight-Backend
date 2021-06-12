@@ -383,7 +383,7 @@ exports.validParamUpdateMailNewMDP = function (req, res, next){
 exports.validParamMailNewMDP = function (req, res, next){
     if(process.env.DEVELOP === "true") console.log("checkBody");
     else logger.info("Vérification des données d'entrées");
-
+    
     //valid param req.body.csrf ?
     if(chatty) console.log('xsrf', req.headers.xsrftoken)
 
