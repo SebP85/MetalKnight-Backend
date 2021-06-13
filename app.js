@@ -33,7 +33,10 @@ mongoose.connect(config.db.database,
 
 const app = express();
 
-app.use(helmet());
+app.use(helmet({
+  frameguard: false // for SAMEORIGIN
+}));
+app.disable('x-powered-by');
 app.use(morgan('dev', { stream: logger.stream.write }));
 
 app.use(mongoSanitize());
@@ -50,7 +53,12 @@ var optionsCors = {
 app.use(cors(optionsCors));
 
 app.use(cookieParser(process.env.COOKIE_PARSER_SECRET));
-const csrfProtection = csrf({ cookie: true, maxAge: config.token.refreshToken.expiresIn, httpOnly: true, secure: true, sameSite: 'strict' });
+const csrfProtection = csrf({ cookie: {
+  maxAge: config.token.refreshToken.expiresIn,
+  httpOnly: true,
+  secure: true,
+  sameSite: 'strict'
+}});
 var parseForm = express.urlencoded({
   extended: true
 });
