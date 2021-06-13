@@ -50,7 +50,7 @@ var optionsCors = {
 app.use(cors(optionsCors));
 
 app.use(cookieParser(process.env.COOKIE_PARSER_SECRET));
-const csrfProtection = csrf({ cookie: true, maxAge: config.token.refreshToken.expiresIn, httpOnly: true, secure: true, sameSite: strict });
+const csrfProtection = csrf({ cookie: true, maxAge: config.token.refreshToken.expiresIn, httpOnly: true, secure: true, sameSite: 'strict' });
 var parseForm = express.urlencoded({
   extended: true
 });

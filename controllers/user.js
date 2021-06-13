@@ -92,7 +92,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
               maxAge: config.token.accessToken.expiresIn,
               httpOnly: true,
               secure: true,
-              SameSite: 'Strict',
+              SameSite: 'strict',
             });
             if(process.env.DEVELOP === "true") console.log('accessToken setCookie');
           
@@ -101,7 +101,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
               httpOnly: true,
               secure: true,
               path: config.cookie.refreshToken.pathCookie,
-              SameSite: 'Strict',
+              SameSite: 'strict',
             });
             if(process.env.DEVELOP === "true") console.log('refreshToken setCookie');
           
@@ -143,7 +143,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
               maxAge: config.token.accessToken.expiresIn,
               httpOnly: true,
               secure: true,
-              SameSite: 'Strict',
+              SameSite: 'strict',
             });
             if(process.env.DEVELOP === "true") console.log('accessToken setCookie');
           
@@ -152,7 +152,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
               httpOnly: true,
               secure: true,
               path: config.cookie.refreshToken.pathCookie,
-              SameSite: 'Strict',
+              SameSite: 'strict',
             });
             if(process.env.DEVELOP === "true") console.log('refreshToken setCookie');
           
@@ -237,7 +237,7 @@ function envoieTokenMDP(user, res, next) {//Permet d'envoyer les données pour c
         maxAge: config.token.accessToken.expiresIn,
         httpOnly: true,
         secure: true,
-        SameSite: 'Strict',
+        SameSite: 'strict',
       });
       if(process.env.DEVELOP === "true") console.log('accessToken setCookie');
     
@@ -246,7 +246,7 @@ function envoieTokenMDP(user, res, next) {//Permet d'envoyer les données pour c
         httpOnly: true,
         secure: true,
         path: config.cookie.refreshToken.pathCookieNewPassword,
-        SameSite: 'Strict',
+        SameSite: 'strict',
       });
       if(process.env.DEVELOP === "true") {
         console.log('refreshToken setCookie');
