@@ -8,6 +8,7 @@ const config = require('./config/config');
 const winston = require('./log/winston');//enregistre les logs dans un fichier
 const { logger } = require('./log/winston');
 const csrf = require("csurf");
+const noCache = require('nocache')
 if(process.env.DEVELOP === "false") logger.info('API '+process.env.NOM_APP+' Lancée');
 
 const mongoSanitize = require('express-mongo-sanitize');//contre les attaques noSQL pour mongodb
@@ -33,10 +34,9 @@ mongoose.connect(config.db.database,
 
 const app = express();
 
-app.use(helmet({
-  frameguard: false // for SAMEORIGIN
-}));
-app.disable('x-powered-by');
+app.use(helmet());
+app.use(noCache());
+app.disable("x-powered-by")
 app.use(morgan('dev', { stream: logger.stream.write }));
 
 app.use(mongoSanitize());
@@ -53,12 +53,12 @@ var optionsCors = {
 app.use(cors(optionsCors));
 
 app.use(cookieParser(process.env.COOKIE_PARSER_SECRET));
-const csrfProtection = csrf({ cookie: {
+const csrfProtection = csrf({ cookie:  {
   maxAge: config.token.refreshToken.expiresIn,
   httpOnly: true,
   secure: true,
   sameSite: 'strict'
-}});
+}})
 var parseForm = express.urlencoded({
   extended: true
 });

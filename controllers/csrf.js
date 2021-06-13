@@ -15,15 +15,16 @@ exports.getTokenCSRF = (req, res, next) => {//On envoie le token CSRF pour s'ass
 
     res.cookie('XSRF-TOKEN', token,
     {
-        //maxAge: config.token.accessToken.expiresIn,
+        maxAge: config.token.refreshToken.expiresIn,
         //httpOnly: true,
-        //secure: true,
-        //path: config.cookie.pathCookie,
         //signed: true,
+        secure: true,
+        path: '/',
+        sameSite: 'strict',
     });
     res.locals.csrfToken = token;
     
-    if(process.env.DEVELOP)
+    if(config.param.develop)
         res.status(200).json({ message: "Token CSRF envoyé :", token });
     else
         res.status(200).json({ message: process.env.MSG_OK_PRODUCTION });
