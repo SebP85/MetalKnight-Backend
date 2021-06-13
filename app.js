@@ -15,6 +15,7 @@ const mongoSanitize = require('express-mongo-sanitize');//contre les attaques no
 const userRoutes = require('./routes/user');
 
 const path = require('path');
+const { strict } = require('assert');
 
 mongoose.Promise = global.Promise;
 mongoose.set("useCreateIndex", true);//ajout
@@ -49,13 +50,12 @@ var optionsCors = {
 app.use(cors(optionsCors));
 
 app.use(cookieParser(process.env.COOKIE_PARSER_SECRET));
-const csrfProtection = csrf({ cookie: true/*, key:"XSRF-TOKEN", path:"/"*/ });
+const csrfProtection = csrf({ cookie: true, maxAge: config.token.refreshToken.expiresIn, httpOnly: true, secure: true, sameSite: strict });
 var parseForm = express.urlencoded({
   extended: true
 });
 app.use(csrfProtection);
 app.use(parseForm);
-//app.use(csrf({cookie:{key:"XSRF-TOKEN",path:'/'}}));
 
 app.use(express.json());
 app.use(express.urlencoded({

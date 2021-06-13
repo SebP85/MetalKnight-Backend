@@ -1,0 +1,2 @@
+fail : - X-Frame-Options HTTP header - SameSite attribute sur _csrf - cache-control HTTP header - X-Powered-By" HTTP response headers - The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'
+Effacer utilisateur
