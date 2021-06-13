@@ -92,7 +92,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
               maxAge: config.token.accessToken.expiresIn,
               httpOnly: true,
               secure: true,
-              SameSite: Strict,
+              SameSite: 'Strict',
             });
             if(process.env.DEVELOP === "true") console.log('accessToken setCookie');
           
@@ -101,7 +101,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
               httpOnly: true,
               secure: true,
               path: config.cookie.refreshToken.pathCookie,
-              SameSite: Strict,
+              SameSite: 'Strict',
             });
             if(process.env.DEVELOP === "true") console.log('refreshToken setCookie');
           
@@ -118,11 +118,11 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
           .catch(error => {//Pb avec la BDD
             if(process.env.DEVELOP === "true") console.log("updateOne nok");
             if(process.env.DEVELOP === "true") {
-              console.log('erreur pour enregistrer le refreshToken');
+              console.log('erreur pour enregistrer le refreshToken updateOne');
               console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
               res.status(400).json({ error });
             } else {
-              logger.error("Erreur MongoDB pour enregistrer refreshToken");
+              logger.error("Erreur MongoDB pour enregistrer refreshToken updateOne");
               console.log(process.env.MSG_ERROR_PRODUCTION);
               res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
             }
@@ -143,7 +143,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
               maxAge: config.token.accessToken.expiresIn,
               httpOnly: true,
               secure: true,
-              SameSite: Strict,
+              SameSite: 'Strict',
             });
             if(process.env.DEVELOP === "true") console.log('accessToken setCookie');
           
@@ -152,7 +152,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
               httpOnly: true,
               secure: true,
               path: config.cookie.refreshToken.pathCookie,
-              SameSite: Strict,
+              SameSite: 'Strict',
             });
             if(process.env.DEVELOP === "true") console.log('refreshToken setCookie');
           
@@ -168,11 +168,11 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
           })
           .catch(error => {//Pb avec la BDD
             if(process.env.DEVELOP === "true") {
-              console.log('erreur pour enregistrer le refreshToken');
+              console.log('erreur pour enregistrer le refreshToken save');
               console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
               res.status(400).json({ error });
             } else {
-              logger.error("Erreur MongoDB pour enregistrer refreshToken");
+              logger.error("Erreur MongoDB pour enregistrer refreshToken save");
               console.log(process.env.MSG_ERROR_PRODUCTION);
               res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
             }
@@ -237,7 +237,7 @@ function envoieTokenMDP(user, res, next) {//Permet d'envoyer les données pour c
         maxAge: config.token.accessToken.expiresIn,
         httpOnly: true,
         secure: true,
-        SameSite: Strict,
+        SameSite: 'Strict',
       });
       if(process.env.DEVELOP === "true") console.log('accessToken setCookie');
     
@@ -246,7 +246,7 @@ function envoieTokenMDP(user, res, next) {//Permet d'envoyer les données pour c
         httpOnly: true,
         secure: true,
         path: config.cookie.refreshToken.pathCookieNewPassword,
-        SameSite: Strict,
+        SameSite: 'Strict',
       });
       if(process.env.DEVELOP === "true") {
         console.log('refreshToken setCookie');
