@@ -17,6 +17,7 @@ const userSchema = mongoose.Schema({
     userConfirmed: { type: Boolean, default: false },
     token: { type: String, required: true },
     refreshToken: { type: String, required: true },
+    note: { type: Array, default: ["6/5"] },
     
 });
 

@@ -1,5 +1,5 @@
 const config = require('../config/config');
-//emailjs
+//emailjs => https://www.youtube.com/watch?v=-rcRf7yswfM&t et http://console.cloud.google.com/ et https://developers.google.com/oauthplayground
 const EmailValidator = require('email-deep-validator');//Valide un email
 
 //Envoie des emails

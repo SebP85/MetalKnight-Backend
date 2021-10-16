@@ -6,7 +6,7 @@ const User = require('../models/User');
 const moment = require('moment');
 //const { findByIdAndDelete } = require('../models/RefreshToken');
 
-const chatty = true;
+const chatty = false;
 
 exports.normal = (req, res, next) => {//Vérification des tokens
   try {
@@ -51,10 +51,10 @@ exports.normal = (req, res, next) => {//Vérification des tokens
         if(process.env.DEVELOP === "true") {
           console.log('refreshToken introuvable dans la BDD');
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-          return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+          return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/expired");//page de connexion
         } else {
           logger.error('refreshToken introuvable dans la BDD');
-          return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+          return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/expired");//page de connexion
         }
       } else {//user et refreshToken existent dans la BDD
         if(process.env.DEVELOP === "true") console.log("Date d'expiration refreshToken", moment(result.expiresAt));

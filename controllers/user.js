@@ -1156,4 +1156,4 @@ exports.verifyRecaptcha = (req, res, next) => {//On vérifie le token recaptcha
       res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
     })
 
-}
+};

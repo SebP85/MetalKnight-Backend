@@ -153,3 +153,58 @@ exports.filterRecaptcha = function (req, res, next) {//filtre le token recaptcha
     //console.log(req);
     next();
 }
+
+exports.filterSetZoneRecherche = function (req, res, next) {//filtre le token recaptcha
+    if(process.env.DEVELOP === "true") console.log("fonction xss");
+    else logger.info('Traitement contre XSS attack');
+
+    req.body.lieu = xss(req.body.lieu);
+    req.body.distance = xss(req.body.distance);
+    req.body.budget = xss(req.body.budget);
+    req.body.commentaire = xss(req.body.commentaire);
+    req.body.tel = xss(req.body.tel);
+    req.body.age = xss(req.body.age);
+    req.body.situation = xss(req.body.situation);
+    req.body.rechercheActive = xss(req.body.rechercheActive);
+
+    next();
+}
+
+exports.filterGetZoneRecherche = function (req, res, next) {//on transforme les données si danger
+    if(process.env.DEVELOP === "true") console.log("fonction xss");
+    else logger.info('Traitement contre XSS attack');
+
+    req.headers.xsrfToken = xss(req.headers.xsrfToken);
+    req.cookies.access_token = xss(req.cookies.access_token);
+
+    //req.body.csrf à faire ?
+    
+    //console.log(req);
+    next();
+};
+
+exports.filterInitZoneRecherche = function (req, res, next) {//on transforme les données si danger
+    if(process.env.DEVELOP === "true") console.log("fonction xss");
+    else logger.info('Traitement contre XSS attack');
+
+    req.headers.xsrfToken = xss(req.headers.xsrfToken);
+    req.cookies.access_token = xss(req.cookies.access_token);
+
+    //req.body.csrf à faire ?
+    
+    //console.log(req);
+    next();
+};
+
+exports.filterParamAuth = function (req, res, next) {//on transforme les données si danger
+    if(process.env.DEVELOP === "true") console.log("fonction xss");
+    else logger.info('Traitement contre XSS attack');
+
+    req.headers.xsrfToken = xss(req.headers.xsrfToken);
+    req.cookies.access_token = xss(req.cookies.access_token);
+
+    //req.body.csrf à faire ?
+    
+    //console.log(req);
+    next();
+};

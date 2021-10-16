@@ -28,6 +28,9 @@ const userCtrl = require("../controllers/user");
 const role = require("../controllers/role");
 
 const profile = require("../controllers/profile");
+const coloc = require("../controllers/coloc");
+
+const multer = require("../middleware/multerAvatar")
 
 //Protection contre CSRF
 /*const csrf = require("csurf");
@@ -54,5 +57,13 @@ router.post('/auth/updateMDP', checkBody.validParamAuth, checkBody.validParamMai
 //Routes principales
 //exemple: router.get('/register', checkBody.validParamAuth, checkBody.validParamRegister, xssFilter.filterRegister, xml, auth.normal, role.levelAuthorize("free"), objectifRoute);
 router.post('/getProfile', checkBody.validParamAuth, checkBody.validParamGetProfile, xssFilter.filterGetProfile, auth.normal, role.levelAuthorizeFree, profile.getProfile);
+//router.post('/setProfile', checkBody.validParamAuth, checkBody.validParamSetProfile, xssFilter.filterSetProfile, auth.normal, role.levelAuthorizeFree, profile.setProfile);
+router.post('/getZoneRecherche', checkBody.validParamAuth, checkBody.validParamGetZoneRecherche, xssFilter.filterGetZoneRecherche, auth.normal, role.levelAuthorizeFree, coloc.getZoneRecherche);
+router.post('/setZoneRecherche', checkBody.validParamAuth, checkBody.validParamSetZoneRecherche, xssFilter.filterSetZoneRecherche, auth.normal, role.levelAuthorizeFree, coloc.setZoneRecherche);
+router.post('/initZoneRecherche', checkBody.validParamAuth, xssFilter.filterInitZoneRecherche, auth.normal, role.levelAuthorizeFree, coloc.initZoneRecherche);
+
+//Gestion de l'avatar
+//router.post('/getAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, multer);
+router.post('/setAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, multer, coloc.setAvatar);
 
 module.exports = router;//test

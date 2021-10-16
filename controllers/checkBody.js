@@ -202,6 +202,96 @@ function isRecaptcha(val){
     return v;
 }
 
+function isLieu(val){
+    var v = v8n()
+        .string()
+        .not.null()
+        .minLength(2)
+        .pattern(/^[-a-zA-Zéêèàù'ùëäâ]+$/)//autorisé
+        .pattern(/^[^0-9.;,?:!§%*µ$£ø^¨"~&{()}|_`@=+<>]+$/)//interdit
+        .test(val);
+
+    if(chatty) console.log("Lieu", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("Lieu =>", val);
+
+    return v;
+}
+
+function isCommentaire(val){
+    var v = false;
+
+    if(!v8n().string().exact("").test(val)){
+    v = v8n()
+        .string()
+        .maxLength(255)
+        .pattern(/^[^@<>§;_&\\=+]+$/)//interdit
+        .test(val);
+    } else {
+        v = true;
+    }
+
+    if(chatty) console.log("Commentaire", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("Commentaire =>", val);
+
+    return v;
+}
+
+function isTel(val){
+    var v = false;
+
+    if(!v8n().string().exact("").test(val)){
+        var v = v8n()
+            .string()
+            .maxLength(17)
+            .pattern(/^([+]|[0])[0-9 .]{0,16}$/)//trame autorisé
+            .test(val);
+    } else {
+        v = true;
+    }
+
+    if(chatty) console.log("Tel", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("Tel =>", val);
+
+    return v;
+}
+
+function isNumber(val, min, max){
+    var v = v8n()
+        .numeric()
+        .between(min, max)
+        .test(val);
+
+    if(chatty) console.log("Nombre", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("Nombre =>", val);
+
+    return v;
+}
+
+function isBool(val){
+    var v = v8n()
+        .boolean()
+        .not.null()
+        .test(val);
+
+    if(chatty) console.log("Boolean", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("Boolean =>", val);
+
+    return v;
+}
+
+function isSituation(val){
+    var v = v8n()
+        .string()
+        .not.null()
+        .passesAnyOf(v8n().exact("etudiant"), v8n().exact("alternance"), v8n().exact("chomage"), v8n().exact("embauche"))
+        .test(val);
+
+    if(chatty) console.log("civilite", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("civilite =>", val);
+
+    return v;
+}
+
 exports.validParamRegister = function (req, res, next){
     if(process.env.DEVELOP === "true") console.log("checkBody");
     else logger.info("Vérification des données d'entrées");
@@ -466,6 +556,53 @@ exports.validParamRecaptcha = function (req, res, next) {
     }
 };
 
+exports.validParamSetZoneRecherche = function (req, res, next) {
+    if(chatty) {
+        console.log('ville =', req.body.lieu)
+        console.log('comm =', req.body.commentaire)
+        console.log('tel =', req.body.tel)
+        console.log('distance =', req.body.distance)
+        console.log('budget =', req.body.budget)
+        console.log('age =', req.body.age)
+        console.log('situation =', req.body.situation)
+        console.log('rechercheActive =', req.body.rechercheActive)
+    }
+
+    if(isLieu(req.body.lieu) && isCommentaire(req.body.commentaire) && isTel(req.body.tel) && isNumber(req.body.distance, 0, 999) &&
+        isNumber(req.body.budget, 0, 9999) && isNumber(req.body.age, 18, 99) && isSituation(req.body.situation) && isBool(req.body.rechercheActive)){
+        if(process.env.DEVELOP === "true") console.log("Données setZoneRecherche ok");
+        else logger.info("Données setZoneRecherche ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données setZoneRecherche nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données setZoneRecherche nok");
+        res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+    }
+};
+
+exports.validParamGetZoneRecherche = function (req, res, next){
+    if(process.env.DEVELOP === "true") console.log("checkBody");
+    else logger.info("Vérification des données d'entrées");
+
+    //valid param req.body.csrf ?
+    if(chatty) console.log('xsrf', req.headers.xsrftoken)
+
+    //v8n
+    if(isXSRFToken(req.headers.xsrftoken) && isTokenJWTaccess(req.cookies.access_token)){
+        if(process.env.DEVELOP === "true") console.log("Données d'entrées ok");
+        else logger.info("Données d'entrées ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données d'entrées nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données d'entrées nok");
+        res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+    }
+};
+
 //exemple
 /*exports.reqValidation = function (req, res, next) {
     // username must be an email
@@ -495,6 +632,7 @@ exports.validParamRecaptcha = function (req, res, next) {
         //.some.not.uppercase()
         //.not.every.lowercase()
         /*.some.equal('@')
+        .numeric()
         .some.equal('.')
         .not.includes("<")
         .not.includes("&")

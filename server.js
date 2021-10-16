@@ -5,8 +5,8 @@ const fs = require('fs');
 const path = require('path');
 
 //Pour générer https => ssl
-const key = fs.readFileSync(path.join(__dirname, 'certificate', 'server.key'));
-const cert = fs.readFileSync(path.join(__dirname, 'certificate', 'server.cert'));
+const key = fs.readFileSync(path.join(__dirname, 'certificat', 'localhost.key'));
+const cert = fs.readFileSync(path.join(__dirname, 'certificat', 'localhost.cert'));
 const options = { key, cert };
 
 const normalizePort = val => {
