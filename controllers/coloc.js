@@ -1,9 +1,11 @@
 const User = require('../models/User');
 const Coloc = require('../models/Coloc');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
 const config = require('../config/config');
 const { logger } = require('../log/winston');
+const { collection } = require('../models/User');
 
 exports.setZoneRecherche = (req, res, next) => {//Role autorisé Free
     if(process.env.DEVELOP === "true") console.log("fonction setZoneRecherche !");
@@ -409,9 +411,55 @@ exports.setAvatar = (req, res, next) => {//On vérifie le token recaptcha
   if(process.env.DEVELOP === "true") console.log('Requete setAvatar');
   else logger.info("requête setAvatar");
 
-  console.log('req', req.body);
+  if(process.env.DEVELOP === "true") {
+    res.status(201).json({ message: 'avatar enregistré !' });
+  } else {
+    res.status(201).json({ message: process.env.MSG_OK_PRODUCTION });
+    logger.info("avatar enregistré !");
+  }
+}
 
-  //enregistrer url de l'image dans la bdd coloc
+exports.suppAvatar = (req, res, next) => {//On vérifie le token recaptcha
+  if(process.env.DEVELOP === "true") console.log('Requete suppAvatar');
+  else logger.info("requête suppAvatar");
 
-  res.status(201).json({ message: 'avatar enregistré !' });
+  const { cookies } = req;
+  const accessToken = cookies.access_token;
+  const decodedToken = jwt.verify(accessToken, config.token.accessToken.secret, {
+    algorithms: config.token.accessToken.algorithm
+  });
+
+  Coloc.findOne({ userId: decodedToken.sub })
+    .then(coloc => {
+      const filename = coloc.avatar;
+      coloc.avatar="";
+
+      fs.unlink(`Images/Avatar/${filename}`, () => {
+        Coloc.updateOne({ userId: decodedToken.sub }, coloc)
+          .then(() => {//sauvegarde faite
+            if(process.env.DEVELOP === "true") console.log("updateOne ok");
+            next();
+          })
+          .catch(error => {//pb avec la bdd coloc
+            if(process.env.DEVELOP === "true") {
+              console.log('erreur pour enregistrer le coloc updateOne');
+              console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+              res.status(400).json({ error });
+            } else {
+              logger.error("Erreur MongoDB pour enregistrer coloc updateOne");
+              console.log(process.env.MSG_ERROR_PRODUCTION);
+              res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
+            }
+          });
+      });
+    })
+    .catch(error => {//pb avec la bdd coloc
+      if(process.env.DEVELOP === "true") {  
+        console.log(error, error);      
+        console.log("Pb BDD Coloc");
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------'); 
+      } else {
+          logger.error("Pb BDD Coloc");
+      }
+    });
 }
