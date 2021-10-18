@@ -8,14 +8,15 @@ const userSchema = mongoose.Schema({
     refreshToken: { type: String, required: true },*/
 
     userId: { type: String, required: true, unique: true },
-    lieu: { type: String, required: true },
+    lieu: { type: String, default: "" },
     distance: { type: Number, min: 0, max: 50, required: true },
     budget: { type: Number, min: 1, max: 9999, required: true },
     commentaire: { type: String },
     tel: { type: String },
     age: { type: Number, min: 18, max: 99, required: true },
     situation: { type: String, required: true },
-    rechercheActive: { type: Boolean, required: true }
+    rechercheActive: { type: Boolean, required: true },
+    avatar: { type: String },
     
 });
 

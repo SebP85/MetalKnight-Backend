@@ -8,7 +8,8 @@ const config = require('./config/config');
 const winston = require('./log/winston');//enregistre les logs dans un fichier
 const { logger } = require('./log/winston');
 const csrf = require("csurf");
-const noCache = require('nocache')
+const noCache = require('nocache');
+
 if(process.env.DEVELOP === "false") logger.info('API '+process.env.NOM_APP+' Lancée');
 
 const mongoSanitize = require('express-mongo-sanitize');//contre les attaques noSQL pour mongodb
@@ -86,6 +87,8 @@ app.use(function (req, res, next) {
 
   next();
 });
+
+app.use('/Images/Avatar', express.static(path.join(__dirname, 'Images/Avatar')));//accès au dossiers images
 
 app.use('/api'+config.email.NOM_APP, userRoutes);
 

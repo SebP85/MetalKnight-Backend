@@ -30,7 +30,8 @@ const role = require("../controllers/role");
 const profile = require("../controllers/profile");
 const coloc = require("../controllers/coloc");
 
-const multer = require("../middleware/multerAvatar")
+const multer = require("../middleware/multerAvatar");
+const path = require('path');
 
 //Protection contre CSRF
 /*const csrf = require("csurf");
@@ -63,7 +64,7 @@ router.post('/setZoneRecherche', checkBody.validParamAuth, checkBody.validParamS
 router.post('/initZoneRecherche', checkBody.validParamAuth, xssFilter.filterInitZoneRecherche, auth.normal, role.levelAuthorizeFree, coloc.initZoneRecherche);
 
 //Gestion de l'avatar
-//router.post('/getAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, multer);
+router.post('/getUrlAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, coloc.getUrlAvatar);
 router.post('/setAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, coloc.suppAvatar, multer, coloc.setAvatar);
 
 module.exports = router;//test
