@@ -66,5 +66,6 @@ router.post('/initZoneRecherche', checkBody.validParamAuth, xssFilter.filterInit
 //Gestion de l'avatar
 router.post('/getUrlAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, coloc.getUrlAvatar);
 router.post('/setAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, coloc.suppAvatar, multer, coloc.setAvatar);
+router.post('/getListeColocs', coloc.getListeColocs);
 
 module.exports = router;//test

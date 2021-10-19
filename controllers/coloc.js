@@ -6,6 +6,8 @@ const fs = require('fs');
 const config = require('../config/config');
 const { logger } = require('../log/winston');
 
+var chatty = false;
+
 exports.setZoneRecherche = (req, res, next) => {//Role autorisé Free
     if(process.env.DEVELOP === "true") console.log("fonction setZoneRecherche !");
     else logger.info("Requête setZoneRecherche lancée !");
@@ -638,4 +640,78 @@ exports.getUrlAvatar = (req, res, next) => {
         res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
       }
     });
+}
+
+exports.getListeColocs = async (req, res, next) => {
+  if(process.env.DEVELOP === "true") console.log('Requete getListeColocs');
+  else logger.info("requête getListeColocs");
+
+  var listeColocs = new Array();
+
+  //On recherche la liste des colocataires avec les infos:
+  //prénom, age, avatar, commentaire, rechercheActive
+  await User.find({userConfirmed: true})
+  .then(async (colocs) => {
+    if(chatty) console.log('colocs', colocs.length)
+
+    for (const coloc in colocs) {
+      if(chatty) console.log('userId', colocs[coloc]._id)
+
+      await Coloc.findOne({ userId: colocs[coloc]._id })
+      .then((c) => {
+        if(!c) {//id non trouvé
+              
+          if(chatty) {//Pas de zone de recherche renseignée
+            console.log('id coloc non trouvé');
+          }
+  
+        } else {
+  
+          if(chatty) {
+            console.log('id coloc trouvé');
+          }
+
+          listeColocs.push({
+            'commentaire': c.commentaire,
+            'age': c.age,
+            avatar: {'source': c.avatar, 'alt': 'avatar'},
+            'rechercheActive': c.rechercheActive,
+            'note': colocs[coloc].note,
+            'firstName': colocs[coloc].firstName
+          });
+
+        }
+      })
+      .catch(error => {//Pb avec la BDD
+        if(process.env.DEVELOP === "true") {
+          console.log('erreur pour accèder à la BDD coloc pour getListeColocs');
+          console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+          res.status(400).json({ error });
+        } else {
+          logger.error("erreur pour accèder à la BDD coloc pour getListeColocs");
+          console.log(process.env.MSG_ERROR_PRODUCTION);
+          res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
+        }
+
+        next();
+      });
+    }
+
+    if(chatty) console.log('listeColocs', listeColocs);
+
+    res.status(200).json({ listeColocs: listeColocs });
+    next();
+
+  })
+  .catch(error => {//Pb avec la BDD
+    if(process.env.DEVELOP === "true") {
+      console.log('erreur pour accèder à la BDD User pour getListeColocs');
+      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+      res.status(400).json({ error });
+    } else {
+      logger.error("erreur pour accèder à la BDD User pour getListeColocs");
+      console.log(process.env.MSG_ERROR_PRODUCTION);
+      res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
+    }
+  });
 }
