@@ -29,6 +29,7 @@ const role = require("../controllers/role");
 
 const profile = require("../controllers/profile");
 const coloc = require("../controllers/coloc");
+const annonce = require("../controllers/annonce");
 
 const multer = require("../middleware/multerAvatar");
 const path = require('path');
@@ -67,5 +68,8 @@ router.post('/initZoneRecherche', checkBody.validParamAuth, xssFilter.filterInit
 router.post('/getUrlAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, coloc.getUrlAvatar);
 router.post('/setAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, coloc.suppAvatar, multer, coloc.setAvatar);
 router.post('/getListeColocs', coloc.getListeColocs);
+
+//Gestion des annonces
+router.post('/setAnnonce', checkBody.validParamAuth, checkBody.validParamSetAnnonce, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree/*, annonce.setAnnonce*/);
 
 module.exports = router;//test

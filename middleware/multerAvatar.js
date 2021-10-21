@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
 
     const name = decodedToken.sub;
     const extension = MIME_TYPES[file.mimetype];
-    callback(null, name + '.' + extension);
+    callback(null, name + '_' + new Date().getTime() + '.' + extension);
   }
 
   //Effacer si fichier existant (userId.png et userId.jpg)

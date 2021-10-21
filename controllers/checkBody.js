@@ -236,6 +236,22 @@ function isCommentaire(val){
     return v;
 }
 
+function isDescription(val){
+    var v = false;
+
+    v = v8n()
+        .string()
+        .maxLength(1500)
+        .minLength(20)
+        .pattern(/^[^@<>§;_&\\=+]+$/)//interdit
+        .test(val);
+
+    if(chatty) console.log("Description", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("Description =>", val);
+
+    return v;
+}
+
 function isTel(val){
     var v = false;
 
@@ -288,6 +304,59 @@ function isSituation(val){
 
     if(chatty) console.log("civilite", v);
     if(!v && process.env.DEVELOP === "false") logger.error("civilite =>", val);
+
+    return v;
+}
+
+function isNumberDate(val){
+    var v = v8n()
+        .numeric()
+        .test(val);
+
+    if(chatty) console.log("Number Date", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("Number Date =>", val);
+
+    return v;
+}
+
+function isType(val){
+    var v = v8n()
+        .string()
+        .not.null()
+        .passesAnyOf(v8n().exact("Appartement"), v8n().exact("Maison"), v8n().exact("Bungalow"))
+        .test(val);
+
+    if(chatty) console.log("type", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("type =>", val);
+
+    return v;
+}
+
+function isTitreAnnonce(val){
+    var v = v8n()
+        .string()
+        .not.null()
+        .maxLength(255)
+        .pattern(/^[-a-z0-9A-Zéêèàù'ùëäâ?! ]+$/)//autorisé
+        .pattern(/^[^.;,:§%*µ$£ø^¨"~&{()}|_`@=+<>]+$/)//interdit
+        .test(val);
+
+    if(chatty) console.log("Titre annonce", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("Titre annonce =>", val);
+
+    return v;
+}
+
+function isClassEnergie(val){
+    var v = v8n()
+        .string()
+        .not.null()
+        .passesAnyOf(v8n().exact("vierge"), v8n().exact("A"), v8n().exact("B"), v8n().exact("C"),
+            v8n().exact("D"), v8n().exact("E"), v8n().exact("F"), v8n().exact("G"))
+        .test(val);
+
+    if(chatty) console.log("Catégorie énergie", v);
+    if(!v && process.env.DEVELOP === "false") logger.error("Catégorie énergie =>", val);
 
     return v;
 }
@@ -599,6 +668,47 @@ exports.validParamGetZoneRecherche = function (req, res, next){
             console.log("Données d'entrées nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
+        res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+    }
+};
+
+exports.validParamSetAnnonce = function (req, res, next){
+    if(chatty) {
+        console.log('photos =', req.body.photos)
+        console.log('lieu =', req.body.lieu)
+        console.log('loyerHC =', req.body.loyerHC)
+        console.log('charges =', req.body.charges)
+        console.log('type =', req.body.type)
+        console.log('description =', req.body.description)
+        console.log('nbreColocataire =', req.body.nbreColocataire)
+        console.log('nbreColocOccupants =', req.body.nbreColocOccupants)
+        console.log('mail =', req.body.mail)
+        console.log('tel =', req.body.tel)
+        console.log('titre annonce =', req.body.titreAnnonce)
+        console.log('surface =', req.body.surface)
+        console.log('Nbre pièces =', req.body.nbrePieces)
+        console.log('Classe Energie =', req.body.classEnergie)
+        console.log('ges =', req.body.ges)
+        console.log('masquerNumero =', req.body.masquerNumero)
+        console.log('refuseDemarcheCommercial =', req.body.refuseDemarcheCommercial)
+        console.log('datePoster =', req.body.datePoster)
+        console.log('annonceActive =', req.body.annonceActive)
+    }
+    
+    if(isLieu(req.body.lieu) && isNumber(req.body.loyerHC,0,9999) && isNumber(req.body.charges,0,999) && isType(req.body.type) &&
+    isNumber(req.body.nbreColocataire,0,20) && isNumber(req.body.nbreColocOccupants,0,20) && isEmail(req.body.mail) &&
+    isTel(req.body.tel) && isTitreAnnonce(req.body.titreAnnonce) && isNumber(req.body.surface,0,500) &&
+    isNumber(req.body.nbrePieces,0,30) && isClassEnergie(req.body.classEnergie) && isClassEnergie(req.body.ges) &&
+    isBool(req.body.masquerNumero) && isBool(req.body.refuseDemarcheCommercial) && isNumberDate(req.body.datePoster) &&
+    isBool(req.body.annonceActive) && isDescription(req.body.description)){
+        if(process.env.DEVELOP === "true") console.log("Données setAnnonce ok");
+        else logger.info("Données setAnnonce ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données setAnnonce nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données setAnnonce nok");
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
 };

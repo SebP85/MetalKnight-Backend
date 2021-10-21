@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 //const config = require('../config/config')
 
-const userSchema = mongoose.Schema({
+const colocSchema = mongoose.Schema({
     /*userId: { type: String, required: true, unique: true },
     expiresAt: { type: Date, default: Date.now() + config.token.refreshToken.expiresIn },
     refreshToken: { type: String, required: true },*/
@@ -20,6 +20,6 @@ const userSchema = mongoose.Schema({
     
 });
 
-userSchema.plugin(uniqueValidator);
+colocSchema.plugin(uniqueValidator);
 
-module.exports = mongoose.model('Coloc', userSchema);
+module.exports = mongoose.model('Coloc', colocSchema);
