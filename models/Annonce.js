@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
+const moment = require('moment');
 //const config = require('../config/config')
 
 const annonceSchema = mongoose.Schema({
@@ -21,10 +22,22 @@ const annonceSchema = mongoose.Schema({
     ges: { type: String, required: true},
     masquerNumero: { type: Boolean, required: true },  
     refuseDemarcheCommercial: { type: Boolean, required: true },
-    datePoster: { type: Number, required: true },
+    datePoster: { type: Date, default: moment() },//date:heure:minute:seconde de fin de suspension
     annonceActive: { type: Boolean, required: true },
+    //photos: { type: Array, maxItems: 10, default: [] },
+    photos: {
+        type: [{
+            type: String,//Schema.Types.ObjectId,
+            ref: 'photosModel'
+        }],
+        validate: [arrayLimit, '{PATH} exceeds the limit of 10'],
+    }
     
 });
+
+function arrayLimit(val) {
+    return val.length <= 10;
+}
 
 annonceSchema.plugin(uniqueValidator);
 

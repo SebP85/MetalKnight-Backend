@@ -70,6 +70,6 @@ router.post('/setAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth, a
 router.post('/getListeColocs', coloc.getListeColocs);
 
 //Gestion des annonces
-router.post('/setAnnonce', checkBody.validParamAuth, checkBody.validParamSetAnnonce, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree/*, annonce.setAnnonce*/);
+router.post('/setAnnonce', checkBody.validParamAuth, checkBody.validParamSetAnnonce, xssFilter.filterParamAuth, xssFilter.filterSetAnnonce, auth.normal, role.levelAuthorizeFree, annonce.setAnnonce);
 
 module.exports = router;//test

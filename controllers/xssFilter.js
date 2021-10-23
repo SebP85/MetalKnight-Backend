@@ -208,3 +208,29 @@ exports.filterParamAuth = function (req, res, next) {//on transforme les donnée
     //console.log(req);
     next();
 };
+
+exports.filterSetAnnonce = function (req, res, next) {
+    if(process.env.DEVELOP === "true") console.log("fonction xss");
+    else logger.info('Traitement contre XSS attack');
+
+    req.body.lieu = xss(req.body.lieu);
+    req.body.loyerHC = xss(req.body.loyerHC);
+    req.body.charges = xss(req.body.charges);
+    req.body.type = xss(req.body.type);
+    req.body.description = xss(req.body.description);
+    req.body.nbreColocataire = xss(req.body.nbreColocataire);
+    req.body.nbreColocOccupants = xss(req.body.nbreColocOccupants);
+    req.body.mail = xss(req.body.mail);
+    req.body.tel = xss(req.body.tel);
+    req.body.titreAnnonce = xss(req.body.titreAnnonce);
+    req.body.surface = xss(req.body.surface);
+    req.body.nbrePieces = xss(req.body.nbrePieces);
+    req.body.classEnergie = xss(req.body.classEnergie);
+    req.body.ges = xss(req.body.ges);
+    req.body.masquerNumero = xss(req.body.masquerNumero);
+    req.body.refuseDemarcheCommercial = xss(req.body.refuseDemarcheCommercial);
+    req.body.datePoster = xss(req.body.datePoster);
+    req.body.annonceActive = xss(req.body.annonceActive);
+
+    next();
+};

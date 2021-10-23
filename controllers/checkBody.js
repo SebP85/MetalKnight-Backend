@@ -351,7 +351,7 @@ function isClassEnergie(val){
     var v = v8n()
         .string()
         .not.null()
-        .passesAnyOf(v8n().exact("vierge"), v8n().exact("A"), v8n().exact("B"), v8n().exact("C"),
+        .passesAnyOf(v8n().exact("Vierge"), v8n().exact("A"), v8n().exact("B"), v8n().exact("C"),
             v8n().exact("D"), v8n().exact("E"), v8n().exact("F"), v8n().exact("G"))
         .test(val);
 
