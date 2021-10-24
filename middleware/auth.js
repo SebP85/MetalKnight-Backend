@@ -86,11 +86,11 @@ exports.normal = (req, res, next) => {//Vérification des tokens
 
         if (xsrfToken !== decodedToken.xsrfToken) {//si les tokens ne correspondent pas, on sort
           if(process.env.DEVELOP === "true") {
-            console.log('xsrfToken ne correspond pas');
+            console.log('xsrfToken ne correspond pas (normal)');
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
             return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Bad xsrf token' });
           } else {
-            logger.error('xsrfToken ne correspond pas');
+            logger.error('xsrfToken ne correspond pas (normal)');
             return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ error: process.env.MSG_ERROR_PRODUCTION });
           }
         }
@@ -180,7 +180,6 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
         logger.error('refreshToken manquant');
         return res.status(config.erreurServer.ACCESS_REFUSED).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
-      
     }
     const refreshToken = cookies.refresh_token;
 
@@ -237,6 +236,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
         }
       } else {//user et refreshToken existent dans la BDD
         //On compare le refreshToken dans la BDD à celui dans la requête
+        if(process.env.DEVELOP === "true") console.log('result', result);
         if (result.refreshToken !== decodedToken.refToken) {//si les tokens ne correspondent pas, on sort
           if(process.env.DEVELOP === "true") {
             console.log('refToken ne correspond pas');
@@ -271,11 +271,11 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
 
         if (xsrfToken !== decodedToken.xsrfToken) {//si les tokens ne correspondent pas, on sort
           if(process.env.DEVELOP === "true") {
-            console.log('xsrfToken ne correspond pas');
+            console.log('xsrfToken ne correspond pas (refreshToken)');
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
             return res.status(config.erreurServer.ACCESS_REFUSED).json({ message: 'Bad xsrf token' });
           } else {
-            logger.error('xsrfToken ne correspond pas');
+            logger.error('xsrfToken ne correspond pas (refreshToken)');
             return res.status(config.erreurServer.ACCESS_REFUSED).json({ error: process.env.MSG_ERROR_PRODUCTION });
           }
         }

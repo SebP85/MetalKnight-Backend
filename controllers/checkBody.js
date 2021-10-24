@@ -593,6 +593,7 @@ exports.validParamAuth = function (req, res, next) {
             console.log("Données auth nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données auth nok");
+        
         res.status(config.erreurServer.BAD_IDENTIFICATION).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
 };
@@ -699,7 +700,7 @@ exports.validParamSetAnnonce = function (req, res, next){
     isNumber(req.body.nbreColocataire,0,20) && isNumber(req.body.nbreColocOccupants,0,20) && isEmail(req.body.mail) &&
     isTel(req.body.tel) && isTitreAnnonce(req.body.titreAnnonce) && isNumber(req.body.surface,0,500) &&
     isNumber(req.body.nbrePieces,0,30) && isClassEnergie(req.body.classEnergie) && isClassEnergie(req.body.ges) &&
-    isBool(req.body.masquerNumero) && isBool(req.body.refuseDemarcheCommercial) && isNumberDate(req.body.datePoster) &&
+    isBool(req.body.masquerNumero) && isBool(req.body.refuseDemarcheCommercial) /*&& isNumberDate(req.body.datePoster)*/ &&
     isBool(req.body.annonceActive) && isDescription(req.body.description)){
         if(process.env.DEVELOP === "true") console.log("Données setAnnonce ok");
         else logger.info("Données setAnnonce ok");

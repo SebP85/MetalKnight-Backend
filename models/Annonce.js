@@ -41,4 +41,4 @@ function arrayLimit(val) {
 
 annonceSchema.plugin(uniqueValidator);
 
-module.exports = mongoose.model('Coloc', annonceSchema);
+module.exports = mongoose.model('Annonce', annonceSchema);
