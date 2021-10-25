@@ -600,8 +600,7 @@ exports.getUrlAvatar = (req, res, next) => {
     const decodedToken = jwt.verify(accessToken, config.token.accessToken.secret, {
         algorithms: config.token.accessToken.algorithm
       });
-    //if(process.env.DEVELOP === "true")
-    console.log('decodedToken', decodedToken);
+    if(process.env.DEVELOP === "true") console.log('decodedToken', decodedToken);
 
     Coloc.findOne({ userId: decodedToken.sub })
     .then((coloc) => {//Pas de problème avec la BDD
