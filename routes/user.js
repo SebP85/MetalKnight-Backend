@@ -71,5 +71,6 @@ router.post('/getListeColocs', coloc.getListeColocs);
 
 //Gestion des annonces
 router.post('/addAnnonce', checkBody.validParamAuth, checkBody.validParamSetAnnonce, xssFilter.filterParamAuth, xssFilter.filterSetAnnonce, auth.normal, role.levelAuthorizeFree, annonce.addAnnonce);
+router.post('/addPhotoAnnonce');
 
 module.exports = router;//test

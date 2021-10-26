@@ -23,7 +23,8 @@ const storage = multer.diskStorage({
     const name = decodedToken.sub;
     const extension = MIME_TYPES[file.mimetype];
     callback(null, name + '_' + new Date().getTime() + '.' + extension);
-  }
+  },
+  limits: { fileSize: config.multer.maxSize },//1048576b => 10 Mb
 
   //Effacer si fichier existant (userId.png et userId.jpg)
 });

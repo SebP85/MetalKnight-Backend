@@ -9,6 +9,7 @@ const login = require('./login');
 const role = require('./role');
 const erreurServer = require('./erreur_server');
 const param = require('./param');
+const multer = require('./multer');
 
 const {resolve} = require('path');
 
@@ -30,4 +31,5 @@ module.exports = {
   role: role(env),
   erreurServer: erreurServer(env),
   param: param(env),
+  multer: multer(env),
 };

@@ -15,7 +15,7 @@ exports.getTokenCSRF = (req, res, next) => {//On envoie le token CSRF pour s'ass
 
     res.cookie('XSRF-TOKEN', token,
     {
-        maxAge: config.token.refreshToken.expiresIn,
+        //maxAge: config.token.refreshToken.expiresIn,
         //httpOnly: true,
         //signed: true,
         secure: true,
