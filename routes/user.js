@@ -31,7 +31,8 @@ const profile = require("../controllers/profile");
 const coloc = require("../controllers/coloc");
 const annonce = require("../controllers/annonce");
 
-const multer = require("../middleware/multerAvatar");
+const multerAvatar = require("../middleware/multerAvatar");
+const multerPhotosAnnonce = require("../middleware/multerPhotosAnnonce");
 const path = require('path');
 
 //Protection contre CSRF
@@ -66,11 +67,11 @@ router.post('/initZoneRecherche', checkBody.validParamAuth, xssFilter.filterInit
 
 //Gestion de l'avatar
 router.post('/getUrlAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, coloc.getUrlAvatar);
-router.post('/setAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, coloc.suppAvatar, multer, coloc.setAvatar);
+router.post('/setAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, coloc.suppAvatar, multerAvatar, coloc.setAvatar);
 router.post('/getListeColocs', coloc.getListeColocs);
 
 //Gestion des annonces
 router.post('/addAnnonce', checkBody.validParamAuth, checkBody.validParamSetAnnonce, xssFilter.filterParamAuth, xssFilter.filterSetAnnonce, auth.normal, role.levelAuthorizeFree, annonce.addAnnonce);
-router.post('/addPhotoAnnonce');
+router.post('/addPhotoAnnonce', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, multerPhotosAnnonce, annonce.addPhotoAnnonce);
 
 module.exports = router;//test

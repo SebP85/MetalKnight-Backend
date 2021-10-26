@@ -76,8 +76,8 @@ exports.addAnnonce = (req, res, next) => {//Role autorisé Free
               console.log("then annonce");
               res.status(201).json({ message: 'Création annonce ok !' });
             } else {
-                res.status(201).json({ message: process.env.MSG_OK_PRODUCTION });
-                logger.info("Création annonce ok");
+              res.status(201).json({ message: process.env.MSG_OK_PRODUCTION });
+              logger.info("Création annonce ok");
             }
 
             if(process.env.DEVELOP === "true") console.log('Création annonce enregistré !');
@@ -111,3 +111,20 @@ exports.addAnnonce = (req, res, next) => {//Role autorisé Free
     });
 
 };
+
+exports.addPhotoAnnonce = (req, res, next) => {//Role autorisé Free
+  if(process.env.DEVELOP === "true") console.log("fonction addPhotoAnnonce !");
+  else logger.info("Requête addPhotoAnnonce lancée !");
+
+  if(process.env.DEVELOP === "true") {
+    console.log("then addPhotoAnnonce");
+    res.status(201).json({ message: 'Création photo ok !' });
+  } else {
+    res.status(201).json({ message: process.env.MSG_OK_PRODUCTION });
+    logger.info("Création photo ok");
+  }
+
+  if(process.env.DEVELOP === "true") console.log('Création photo enregistré !');
+
+  next();
+}
