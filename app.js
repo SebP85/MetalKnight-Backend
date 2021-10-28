@@ -9,6 +9,9 @@ const winston = require('./log/winston');//enregistre les logs dans un fichier
 const { logger } = require('./log/winston');
 const csrf = require("csurf");
 const noCache = require('nocache');
+const Annonce = require('./models/Annonce');
+const moment = require('moment');
+const fs = require('fs');
 
 if(process.env.DEVELOP === "false") logger.info('API '+process.env.NOM_APP+' Lancée');
 
@@ -18,6 +21,8 @@ const userRoutes = require('./routes/user');
 
 const path = require('path');
 const { strict } = require('assert');
+
+var chatty = false;
 
 mongoose.Promise = global.Promise;
 mongoose.set("useCreateIndex", true);//ajout
@@ -101,5 +106,79 @@ app.use(function (req, res, next) {
   }
   next();
 });
+
+function refreshBDD() {
+  if(chatty) console.log('fonction refreshBDD');
+  //On supprime les annonces qui n'ont pas été validé depuis 3 jours
+
+  Annonce.find({ annonceValide: false })
+    .then((annonces) => {//Pas de problème avec la BDD
+      if(chatty) console.log("annonceValide false trouvé")
+      
+      if(annonces.length > 0) {//Si on a des annonces Valide = false
+        if(chatty) {
+          console.log(annonces)
+
+          console.log("m=", moment().toDate())
+          console.log("datePoster +3j", moment(annonces[0].datePoster).add(3, 'd'))
+          console.log(moment(moment().toDate()).isAfter(moment(annonces[0].datePoster).add(3, 'd')))
+        }
+
+        for (const annonce of annonces) {
+          if(moment(moment().toDate()).isAfter(moment(annonce.datePoster).add(3, 'd'))){
+            if(chatty) {
+              console.log("1 annonce à supprimer")
+              console.log("Photos de l'annonce supprimées")
+            }
+
+            for (const photo of annonce.photos) {
+              /*fs.unlink(`Images/Annnonces/${photo.split('/Images/Avatar/')[1]}`, () => {
+                coloc.avatar="";
+        
+                Coloc.updateOne({ userId: decodedToken.sub }, coloc)
+                  .then(() => {//sauvegarde faite
+                    if(process.env.DEVELOP === "true") console.log("updateOne ok");
+                    next();
+                  })
+                  .catch(error => {//pb avec la bdd coloc
+                    if(process.env.DEVELOP === "true") {
+                      console.log('erreur pour enregistrer le coloc updateOne');
+                      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+                      res.status(400).json({ error });
+                    } else {
+                      logger.error("Erreur MongoDB pour enregistrer coloc updateOne");
+                      console.log(process.env.MSG_ERROR_PRODUCTION);
+                      res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
+                    }
+                  });
+              });*/
+            }
+
+            Annonce.deleteOne({ _id: annonce._id })
+              .then(() => {
+                if(chatty) console.log("1 annonce supprimé")
+              })
+              .catch(error => {//Pb avec la BDD
+                if(process.env.DEVELOP === "true") {
+                  console.log("Erreur pour supprimer 1 annonce");
+                } else {
+                  logger.error("Erreur MongoDB pour supprimer 1 annonce");
+                }
+              });
+          }
+        }
+      }
+    })
+    .catch(error => {//Pb avec la BDD
+      if(process.env.DEVELOP === "true") {
+        console.log("Erreur pour vérifier les annonces non valide");
+      } else {
+        logger.error("Erreur MongoDB pour vérifier les annonces non valide");
+      }
+    });
+    
+}
+
+setInterval(refreshBDD, 86400000);//86400000=24h
 
 module.exports = app;

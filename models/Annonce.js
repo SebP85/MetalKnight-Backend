@@ -24,6 +24,7 @@ const annonceSchema = mongoose.Schema({
     refuseDemarcheCommercial: { type: Boolean, required: true },
     datePoster: { type: Date, default: moment() },//date:heure:minute:seconde de fin de suspension
     annonceActive: { type: Boolean, required: true },
+    annonceValide: { type: Boolean, default: false },
     //photos: { type: Array, maxItems: 10, default: [] },
     photos: {
         type: [{

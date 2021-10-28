@@ -71,6 +71,7 @@ router.post('/setAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth, a
 router.post('/getListeColocs', coloc.getListeColocs);
 
 //Gestion des annonces
+router.post('/getRefAnnonce', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, annonce.getRefAnnonce);
 router.post('/addAnnonce', checkBody.validParamAuth, checkBody.validParamSetAnnonce, xssFilter.filterParamAuth, xssFilter.filterSetAnnonce, auth.normal, role.levelAuthorizeFree, annonce.addAnnonce);
 router.post('/addPhotoAnnonce', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, multerPhotosAnnonce, annonce.addPhotoAnnonce);
 

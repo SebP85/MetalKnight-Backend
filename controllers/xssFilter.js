@@ -231,6 +231,7 @@ exports.filterSetAnnonce = function (req, res, next) {
     req.body.refuseDemarcheCommercial = xss(req.body.refuseDemarcheCommercial);
     req.body.datePoster = xss(req.body.datePoster);
     req.body.annonceActive = xss(req.body.annonceActive);
+    req.body.annonceValide = xss(req.body.annonceValide);
 
     next();
 };

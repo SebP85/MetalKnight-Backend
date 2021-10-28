@@ -65,6 +65,7 @@ exports.addAnnonce = (req, res, next) => {//Role autorisé Free
           masquerNumero: Boolean(req.body.masquerNumero),  
           refuseDemarcheCommercial: Boolean(req.body.refuseDemarcheCommercial),
           annonceActive: Boolean(req.body.annonceActive),
+          annonceValide: Boolean(req.body.annonceValide),
 
         });
         if(process.env.DEVELOP === "true") console.log("myAnnonce", myAnnonce);
@@ -116,6 +117,8 @@ exports.addPhotoAnnonce = (req, res, next) => {//Role autorisé Free
   if(process.env.DEVELOP === "true") console.log("fonction addPhotoAnnonce !");
   else logger.info("Requête addPhotoAnnonce lancée !");
 
+  const pathPhotoAnnonce = `${req.protocol}://${req.get('host')}/Images/Annonces/${req.file.filename}`;
+
   if(process.env.DEVELOP === "true") {
     console.log("then addPhotoAnnonce");
     res.status(201).json({ message: 'Création photo ok !' });
@@ -127,4 +130,8 @@ exports.addPhotoAnnonce = (req, res, next) => {//Role autorisé Free
   if(process.env.DEVELOP === "true") console.log('Création photo enregistré !');
 
   next();
-}
+};
+
+exports.getRefAnnonce = (req, res, next) => {
+
+};

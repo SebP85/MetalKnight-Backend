@@ -6,6 +6,7 @@
 
 //const { body, validationResult, oneOf } = require('express-validator');//valide les paramètres avec des fonctions préprogrammées
 const v8n = require('v8n');//valide les paramètres d'entrées et peutajouter des fonctions chainés
+const { isBoolean } = require('util');
 //voir https://imbrn.github.io/v8n/#what-s-v8n et https://github.com/imbrn/v8n/tree/master/src et https://imbrn.github.io/v8n/api/#testasync
 const chatty = false;
 
@@ -694,6 +695,7 @@ exports.validParamSetAnnonce = function (req, res, next){
         console.log('refuseDemarcheCommercial =', req.body.refuseDemarcheCommercial)
         console.log('datePoster =', req.body.datePoster)
         console.log('annonceActive =', req.body.annonceActive)
+        console.log('annonceValide =', req.body.annonceValide)
     }
     
     if(isLieu(req.body.lieu) && isNumber(req.body.loyerHC,0,9999) && isNumber(req.body.charges,0,999) && isType(req.body.type) &&
@@ -701,7 +703,7 @@ exports.validParamSetAnnonce = function (req, res, next){
     isTel(req.body.tel) && isTitreAnnonce(req.body.titreAnnonce) && isNumber(req.body.surface,0,500) &&
     isNumber(req.body.nbrePieces,0,30) && isClassEnergie(req.body.classEnergie) && isClassEnergie(req.body.ges) &&
     isBool(req.body.masquerNumero) && isBool(req.body.refuseDemarcheCommercial) /*&& isNumberDate(req.body.datePoster)*/ &&
-    isBool(req.body.annonceActive) && isDescription(req.body.description)){
+    isBool(req.body.annonceActive) && isDescription(req.body.description) && isBool(req.body.annonceValide)){
         if(process.env.DEVELOP === "true") console.log("Données setAnnonce ok");
         else logger.info("Données setAnnonce ok");
         next();
