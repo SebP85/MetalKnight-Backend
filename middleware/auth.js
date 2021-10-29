@@ -229,10 +229,10 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
         if(process.env.DEVELOP === "true") {
           console.log('refreshToken introuvable dans la BDD');
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-          return res.status(config.erreurServer.ACCESS_REFUSED).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+          return res.status(config.erreurServer.ACCESS_REFUSED);//page de connexion
         } else {
           logger.error('refreshToken introuvable dans la BDD');
-          return res.status(config.erreurServer.ACCESS_REFUSED).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+          return res.status(config.erreurServer.ACCESS_REFUSED);//page de connexion
         }
       } else {//user et refreshToken existent dans la BDD
         //On compare le refreshToken dans la BDD à celui dans la requête
@@ -300,10 +300,10 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
               console.log(error, error);      
               console.log("Pb BDD User");
               console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-              res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+              res.status(config.erreurServer.ERREUR_SERVER);
             } else {
               logger.error("Pb BDD User");
-              res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+              res.status(config.erreurServer.ERREUR_SERVER);
             }
           });
       }
@@ -313,10 +313,10 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
         console.log(error, error);      
         console.log("Pb BDD refreshToken");
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-        res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+        res.status(config.erreurServer.ERREUR_SERVER);
       } else {
         logger.error("Pb BDD refreshToken");
-        res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+        res.status(config.erreurServer.ERREUR_SERVER);
       }
     });
 
