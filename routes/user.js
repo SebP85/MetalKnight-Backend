@@ -71,8 +71,10 @@ router.post('/setAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth, a
 router.post('/getListeColocs', coloc.getListeColocs);
 
 //Gestion des annonces
-router.post('/getRefAnnonce', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, annonce.getRefAnnonce);
-router.post('/addAnnonce', checkBody.validParamAuth, checkBody.validParamSetAnnonce, xssFilter.filterParamAuth, xssFilter.filterSetAnnonce, auth.normal, role.levelAuthorizeFree, annonce.addAnnonce);
-router.post('/addPhotoAnnonce', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, multerPhotosAnnonce, annonce.addPhotoAnnonce);
+router.post('/addAnnonce', checkBody.validParamAuth, checkBody.validParamAddAnnonce, xssFilter.filterParamAuth, xssFilter.filterAddAnnonce, auth.normal, role.levelAuthorizeFree, annonce.addAnnonce);
+router.post('/updateAnnonce', checkBody.validParamAuth, checkBody.validParamUpdateAnnonce, xssFilter.filterParamAuth, xssFilter.filterUpdateAnnonce, auth.normal, role.levelAuthorizeFree, annonce.updateAnnonce);
+router.post('/addPhotoAnnonce', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, multerPhotosAnnonce, checkBody.validParamRef, xssFilter.filterParamRef, annonce.addPhotoAnnonce);
+router.post('/suppAnnonce', checkBody.validParamAuth, checkBody.validParamSuppAnnonce, xssFilter.filterParamAuth, xssFilter.filterSuppAnnonce, auth.normal, role.levelAuthorizeFree, annonce.suppAnnonce);
+router.post('/suppPhotoAnnonce', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, multerPhotosAnnonce, annonce.suppPhotoAnnonce);
 
 module.exports = router;//test

@@ -24,9 +24,9 @@ exports.getTokenCSRF = (req, res, next) => {//On envoie le token CSRF pour s'ass
     });
     res.locals.csrfToken = token;
     
-    if(config.param.develop)
+    /*if(config.param.develop)
         res.status(200).json({ message: "Token CSRF envoyé :", token });
-    else
+    else*/
         res.status(200).json({ message: process.env.MSG_OK_PRODUCTION });
     
     next();

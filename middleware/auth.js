@@ -18,12 +18,12 @@ exports.normal = (req, res, next) => {//Vérification des tokens
       if(process.env.DEVELOP === "true") {
         console.log('accessToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Missing token in cookie' });
+        res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Missing token in cookie' });
       } else {
         logger.error('accessToken manquant');
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        res.status(config.erreurServer.BAD_IDENTIFICATION).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
-      
+      next(false);
     }
     const accessToken = cookies.access_token;
 
@@ -31,11 +31,12 @@ exports.normal = (req, res, next) => {//Vérification des tokens
       if(process.env.DEVELOP === "true") {
         console.log('xsrfToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Missing XSRF token in headers' });
+        res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Missing XSRF token in headers' });
       } else {
         logger.error('xsrfToken manquant');
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        res.status(config.erreurServer.BAD_IDENTIFICATION).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
+      next(false);
     }
     const xsrfToken = headers['xsrftoken'];
 
@@ -51,11 +52,12 @@ exports.normal = (req, res, next) => {//Vérification des tokens
         if(process.env.DEVELOP === "true") {
           console.log('refreshToken introuvable dans la BDD');
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-          return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/expired");//page de connexion
+          res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/expired");//page de connexion
         } else {
           logger.error('refreshToken introuvable dans la BDD');
-          return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/expired");//page de connexion
+          res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/expired");//page de connexion
         }
+        next(false);
       } else {//user et refreshToken existent dans la BDD
         if(process.env.DEVELOP === "true") console.log("Date d'expiration refreshToken", moment(result.expiresAt));
         var dateExpireAccessTokenTheorique = new Date(result.expiresAt - config.token.refreshToken.expiresIn + config.token.accessToken.expiresIn);
@@ -69,11 +71,12 @@ exports.normal = (req, res, next) => {//Vérification des tokens
           if(process.env.DEVELOP === "true") {
             console.log('date expiration cookie incohérent');
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-            return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+            res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
           } else {
             logger.error('date expiration cookie incohérent');
-            return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+            res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
           }
+          next(false);
         }
 
         if(process.env.DEVELOP === "true") console.log('Expiration cookie identique');
@@ -88,11 +91,12 @@ exports.normal = (req, res, next) => {//Vérification des tokens
           if(process.env.DEVELOP === "true") {
             console.log('xsrfToken ne correspond pas (normal)');
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-            return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Bad xsrf token' });
+            res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Bad xsrf token' });
           } else {
             logger.error('xsrfToken ne correspond pas (normal)');
-            return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ error: process.env.MSG_ERROR_PRODUCTION });
+            res.status(config.erreurServer.BAD_IDENTIFICATION).json({ error: process.env.MSG_ERROR_PRODUCTION });
           }
+          next(false);
         }
         
         if(process.env.DEVELOP === "true") console.log('xsrfToken identique');
@@ -120,6 +124,7 @@ exports.normal = (req, res, next) => {//Vérification des tokens
               logger.error("Pb BDD User");
               res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
             }
+            next(false);
           });
       }
     })
@@ -133,6 +138,7 @@ exports.normal = (req, res, next) => {//Vérification des tokens
         logger.error("Pb BDD refreshToken");
         res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
       }
+      next(false);
     });
 
     
@@ -140,15 +146,11 @@ exports.normal = (req, res, next) => {//Vérification des tokens
   } catch {
     if(process.env.DEVELOP === "true") console.log("erreur authentification !")
     if(process.env.DEVELOP === "true")
-      res.status(config.erreurServer.BAD_IDENTIFICATION).json({
-        error: new Error('Invalid request!')
-        
-      });
+      res.status(config.erreurServer.BAD_IDENTIFICATION).json({error: new Error('Invalid request!')});
     else
-      res.status(config.erreurServer.BAD_IDENTIFICATION).json({
-        error: new Error(process.env.MSG_ERROR_PRODUCTION)
-        
-      });
+      res.status(config.erreurServer.BAD_IDENTIFICATION).json({error: new Error(process.env.MSG_ERROR_PRODUCTION)});
+    
+    next(false);
   }
 };
 
@@ -175,11 +177,12 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
       if(process.env.DEVELOP === "true") {
         console.log('refreshToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(config.erreurServer.ACCESS_REFUSED).json({ message: 'Missing token in cookie' });
+        res.status(config.erreurServer.ACCESS_REFUSED).json({ message: 'Missing token in cookie' });
       } else {
         logger.error('refreshToken manquant');
-        return res.status(config.erreurServer.ACCESS_REFUSED).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+        res.status(config.erreurServer.ACCESS_REFUSED).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
+      next(false);
     }
     const refreshToken = cookies.refresh_token;
 
@@ -187,11 +190,12 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
       if(process.env.DEVELOP === "true") {
         console.log('xsrfToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(config.erreurServer.ACCESS_REFUSED).json({ message: 'Missing XSRF token in headers' });
+        res.status(config.erreurServer.ACCESS_REFUSED).json({ message: 'Missing XSRF token in headers' });
       } else {
         logger.error('xsrfToken manquant');
-        return res.status(config.erreurServer.ACCESS_REFUSED).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+        res.status(config.erreurServer.ACCESS_REFUSED).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
+      next(false);
     }
     const xsrfToken = headers['xsrftoken'];
 
@@ -210,11 +214,12 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
       if(process.env.DEVELOP === "true") {
         console.log('xsrfToken ne correspond pas');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(config.erreurServer.ACCESS_REFUSED).json({ message: 'Bad xsrf token' });
+        res.status(config.erreurServer.ACCESS_REFUSED).json({ message: 'Bad xsrf token' });
       } else {
         logger.error('xsrfToken ne correspond pas');
-        return res.status(config.erreurServer.ACCESS_REFUSED).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        res.status(config.erreurServer.ACCESS_REFUSED).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
+      next(false);
     }*/
 
     const decodedToken = jwt.verify(refreshToken, config.token.refreshToken.secret, {
@@ -229,11 +234,12 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
         if(process.env.DEVELOP === "true") {
           console.log('refreshToken introuvable dans la BDD');
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-          return res.status(config.erreurServer.ACCESS_REFUSED);//page de connexion
+          res.status(config.erreurServer.ACCESS_REFUSED);//page de connexion
         } else {
           logger.error('refreshToken introuvable dans la BDD');
-          return res.status(config.erreurServer.ACCESS_REFUSED);//page de connexion
+          res.status(config.erreurServer.ACCESS_REFUSED);//page de connexion
         }
+        next(false);
       } else {//user et refreshToken existent dans la BDD
         //On compare le refreshToken dans la BDD à celui dans la requête
         if(process.env.DEVELOP === "true") console.log('result', result);
@@ -241,11 +247,12 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
           if(process.env.DEVELOP === "true") {
             console.log('refToken ne correspond pas');
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-            return res.status(config.erreurServer.ACCESS_REFUSED).json({ message: 'Bad refToken' });
+            res.status(config.erreurServer.ACCESS_REFUSED).json({ message: 'Bad refToken' });
           } else {
             logger.error('refToken ne correspond pas');
-            return res.status(config.erreurServer.ACCESS_REFUSED).json({ error: process.env.MSG_ERROR_PRODUCTION });
+            res.status(config.erreurServer.ACCESS_REFUSED).json({ error: process.env.MSG_ERROR_PRODUCTION });
           }
+          next(false);
         }
         
         if(process.env.DEVELOP === "true") console.log('refToken identique');
@@ -262,7 +269,8 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------'); 
           } else logger.info("Date d'expiration nok");
 
-          return res.status(config.erreurServer.ACCESS_REFUSED).json({ message: "Date d'expiration nok" });
+          res.status(config.erreurServer.ACCESS_REFUSED).json({ message: "Date d'expiration nok" });
+          next(false);
         }
 
         if(process.env.DEVELOP === "true") {
@@ -273,11 +281,12 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
           if(process.env.DEVELOP === "true") {
             console.log('xsrfToken ne correspond pas (refreshToken)');
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-            return res.status(config.erreurServer.ACCESS_REFUSED).json({ message: 'Bad xsrf token' });
+            res.status(config.erreurServer.ACCESS_REFUSED).json({ message: 'Bad xsrf token' });
           } else {
             logger.error('xsrfToken ne correspond pas (refreshToken)');
-            return res.status(config.erreurServer.ACCESS_REFUSED).json({ error: process.env.MSG_ERROR_PRODUCTION });
+            res.status(config.erreurServer.ACCESS_REFUSED).json({ error: process.env.MSG_ERROR_PRODUCTION });
           }
+          next(false);
         }
         
         if(process.env.DEVELOP === "true") console.log('xsrfToken identique');
@@ -305,6 +314,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
               logger.error("Pb BDD User");
               res.status(config.erreurServer.ERREUR_SERVER);
             }
+            next(false);
           });
       }
     })
@@ -318,6 +328,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
         logger.error("Pb BDD refreshToken");
         res.status(config.erreurServer.ERREUR_SERVER);
       }
+      next(false);
     });
 
     
@@ -332,8 +343,8 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
       logger.error("erreur authentification !", err);
       res.status(config.erreurServer.ACCESS_REFUSED).json({error: new Error(process.env.MSG_ERROR_PRODUCTION)});
     }
+    next(false);
   }
-
 };
 
 exports.mailNewPassword = function (req, res, next){//Vérification refreshToken, accessToken et xsrfToken
@@ -346,12 +357,12 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
       if(process.env.DEVELOP === "true") {
         console.log('accessToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Missing token in cookie' });
+        res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Missing token in cookie' });
       } else {
         logger.error('accessToken manquant');
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        res.status(config.erreurServer.BAD_IDENTIFICATION).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
-      
+      next(false);
     }
     const accessToken = cookies.access_token;
     
@@ -359,12 +370,12 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
       if(process.env.DEVELOP === "true") {
         console.log('refreshToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Missing token in cookie' });
+        res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Missing token in cookie' });
       } else {
         logger.error('refreshToken manquant');
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+        res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
-      
+      next(false);
     }
     const refreshToken = cookies.refresh_token;
 
@@ -372,11 +383,12 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
       if(process.env.DEVELOP === "true") {
         console.log('xsrfToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Missing XSRF token in headers' });
+        res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Missing XSRF token in headers' });
       } else {
         logger.error('xsrfToken manquant');
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+        res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
+      next(false);
     }
     const xsrfToken = headers['xsrftoken'];
 
@@ -396,11 +408,12 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
       if(process.env.DEVELOP === "true") {
         console.log('xsrfToken different');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'xsrfToken different' });
+        res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'xsrfToken different' });
       } else {
         logger.error('xsrfToken different');
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+        res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
+      next(false);
     }
 
     //refToken
@@ -409,11 +422,12 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
       if(process.env.DEVELOP === "true") {
         console.log('Token different');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Token different' });
+        res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Token different' });
       } else {
         logger.error('Token different');
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+        res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
+      next(false);
     }
 
     //Token expiré
@@ -441,11 +455,12 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
       if(process.env.DEVELOP === "true") {
         console.log('Token delai expireIn différent');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Token delai expireIn différent' });
+        res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Token delai expireIn différent' });
       } else {
         logger.error('Token delai expireIn différent');
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+        res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
+      next(false);
     }
     if(process.env.DEVELOP === "true") console.log("vérification delai expireIn ok");
 
@@ -454,11 +469,12 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
       if(process.env.DEVELOP === "true") {
         console.log('Token expiré');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Token expiré' });
+        res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Token expiré' });
       } else {
         logger.error('Token expiré');
-        return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+        res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
+      next(false);
     }
     if(process.env.DEVELOP === "true") console.log("cookie expiré ok");
 
@@ -469,11 +485,12 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         if(process.env.DEVELOP === "true") {
           console.log('user introuvable dans la BDD');
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-          return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+          res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
         } else {
           logger.error('user introuvable dans la BDD');
-          return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+          res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
         }
+        next(false);
       } else {
 
         //verif token dans la bdd Users
@@ -481,11 +498,12 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
           if(process.env.DEVELOP === "true") {
             console.log('Token non trouvé dans la BDD Users');
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-            return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Token non trouvé dans la BDD Users' });
+            res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'Token non trouvé dans la BDD Users' });
           } else {
             logger.error('Token non trouvé dans la BDD Users');
-            return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+            res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
           }
+          next(false);
         }
 
         //verif refreshToken dans la bdd Users
@@ -493,11 +511,12 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
           if(process.env.DEVELOP === "true") {
             console.log('refreshToken non trouvé dans la BDD Users');
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-            return res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'refreshToken non trouvé dans la BDD Users' });
+            res.status(config.erreurServer.BAD_IDENTIFICATION).json({ message: 'refreshToken non trouvé dans la BDD Users' });
           } else {
             logger.error('refreshToken non trouvé dans la BDD Users');
-            return res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+            res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
           }
+          next(false);
         }
 
         //ajout de l'email dans le body de la requête
@@ -516,6 +535,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         logger.error("Pb BDD Users");
         res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
       }
+      next(false);
     });
 
   }catch(err){
@@ -528,5 +548,6 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
       logger.error("erreur authentification !", err);
       res.status(config.erreurServer.BAD_IDENTIFICATION).json({error: new Error(process.env.MSG_ERROR_PRODUCTION)});
     }
+    next(false);
   }
 }

@@ -126,6 +126,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
               console.log(process.env.MSG_ERROR_PRODUCTION);
               res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
             }
+            next(false);
           });
       } else {
         if(process.env.DEVELOP === "true") console.log("id refreshToken non trouvé");
@@ -176,6 +177,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
               console.log(process.env.MSG_ERROR_PRODUCTION);
               res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
             }
+            next(false);
           });
       }
     })
@@ -189,6 +191,7 @@ function envoieToken(user, res, next) {//Permet d'envoyer les données de connex
         console.log(process.env.MSG_ERROR_PRODUCTION);
         res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
       }
+      next(false);
     });
   
 }
@@ -276,6 +279,7 @@ function envoieTokenMDP(user, res, next) {//Permet d'envoyer les données pour c
         console.log(process.env.MSG_ERROR_PRODUCTION);
         res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
       }
+      next(false);
     });
       
   
@@ -303,7 +307,8 @@ exports.verify = (req, res, next) => {//vérification que l'email existe et vali
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Email vérifié et non validé");
         
-        return res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+        res.status(config.erreurServer.BAD_REQUEST);
+        next(false);
       }
 
       if(user.userConfirmed) {
@@ -312,7 +317,8 @@ exports.verify = (req, res, next) => {//vérification que l'email existe et vali
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Email déjà vérifié");
 
-        return res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//Si déjà confirmé
+        res.status(config.erreurServer.BAD_REQUEST);
+        next(false);
       }
 
       user.userConfirmed = true;
@@ -354,7 +360,7 @@ exports.verify = (req, res, next) => {//vérification que l'email existe et vali
             logger.error("Erreur MongoDB pour valider l'Email");
             console.log(process.env.MSG_ERROR_PRODUCTION);
           }
-
+          next(false);
         });
     })
     .catch(error => {
@@ -366,6 +372,7 @@ exports.verify = (req, res, next) => {//vérification que l'email existe et vali
         logger.error("Erreur pour valider l'Email - recherche dans MongoDB impossible");
         console.log(process.env.MSG_ERROR_PRODUCTION);
       }
+      next(false);
     });
 };
 
@@ -391,6 +398,7 @@ exports.signup = (req, res, next) => {//Enregistrement du nouvel utilisateur
           logger.error("Utilisateur déjà existant !");
           res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
         }
+        next(false);
       } else {
         bcrypt.hash(req.body.password, 10)
           .then(hash => {
@@ -438,6 +446,7 @@ exports.signup = (req, res, next) => {//Enregistrement du nouvel utilisateur
                       logger.error("Erreur 400 d'enregistrement du nouvelle utilisateur", error.message);
                       res.status(config.erreurServer.BAD_REQUEST).json({ message: process.env.MSG_ERROR_PRODUCTION });
                     }
+                    next(false);
                   });
               else {
                 if(process.env.DEVELOP === "true") {
@@ -448,6 +457,7 @@ exports.signup = (req, res, next) => {//Enregistrement du nouvel utilisateur
                   logger.error("Erreur 500 problème avec l'envoie du mail");
                   res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
                 }
+                next(false);
               }
             })/*
               .then((t) => {
@@ -471,6 +481,7 @@ exports.signup = (req, res, next) => {//Enregistrement du nouvel utilisateur
               logger.error("Erreur 500 d'enregistrement du nouvelle utilisateur", error.message);
               res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
             }
+            next(false);
           });
       }
     })
@@ -479,6 +490,7 @@ exports.signup = (req, res, next) => {//Enregistrement du nouvel utilisateur
         res.status(config.erreurServer.ERREUR_SERVER).json({ error });
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
       } else res.status(config.erreurServer.ERREUR_SERVER).json({ error: process.env.MSG_ERROR_PRODUCTION });
+      next(false);
     });
 
   
@@ -499,32 +511,35 @@ exports.login = (req, res, next) => {//connexion
         if(process.env.DEVELOP === "true") {
           console.log("Utilisateur non trouvé !");
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-          return res.status(config.erreurServer.BAD_REQUEST).json({ error: 'Utilisateur non trouvé !' });
+          res.status(config.erreurServer.BAD_REQUEST).json({ error: 'Utilisateur non trouvé !' });
         } else {
           logger.error("Utilisateur non trouvé !");
-          return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+          res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
         }
+        next(false);
       } else {
         if(!user.userConfirmed){//utilisateur non validé
           if(process.env.DEVELOP === "true") {
             console.log("UserConfirmed", user.userConfirmed);
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-            return res.status(config.erreurServer.BAD_REQUEST).json({ error: 'Utilisateur pas encore confirmé dans la BDD !' });
+            res.status(config.erreurServer.BAD_REQUEST).json({ error: 'Utilisateur pas encore confirmé dans la BDD !' });
           } else {
             logger.error("Utilisateur pas encore confirmé dans la BDD");
-            return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+            res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
           }
+          next(false);
         } else {//si compte suspendu
           if(compteSuspendu(user)){
             if(process.env.DEVELOP === "true") {
               console.log("Compte suspendu");
               console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-              return res.status(config.erreurServer.BAD_REQUEST).json({ error: 'Compte suspendu' });
+              res.status(config.erreurServer.BAD_REQUEST).json({ error: 'Compte suspendu' });
             }
             else {
               logger.error("Compte suspendu");
-              return res.status(config.erreurServer.BAD_REQUEST).json({ error: "Compte suspendu" });
+              res.status(config.erreurServer.BAD_REQUEST).json({ error: "Compte suspendu" });
             }
+            next(false);
           } else {//si nombre de tentatives de connexion atteint
             if(user.tentativesConnexion >= config.login.MAX_CONNEXION){
               user.suspendu = moment().add(config.login.DELAI_AVANT_NOUVELLE_RECONNEXION, 's').toDate();
@@ -543,11 +558,12 @@ exports.login = (req, res, next) => {//connexion
                   if(process.env.DEVELOP === "true") {
                     console.log("nombre de tentatives de connexion max atteint");
                     console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-                    return res.status(config.erreurServer.BAD_REQUEST).json({ error: 'nombre de tentatives de connexion max atteint' });
+                    res.status(config.erreurServer.BAD_REQUEST).json({ error: 'nombre de tentatives de connexion max atteint' });
                   } else {
                     logger.error("nombre de tentatives de connexion max atteint");
-                    return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+                    res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
                   }
+                  next(false);
                 })
                 .catch(error => {
                   if(process.env.DEVELOP === "true") {
@@ -559,6 +575,7 @@ exports.login = (req, res, next) => {//connexion
                     logger.error("Erreur 500: majDateSuspendu impossible", error.message);
                     res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
                   }
+                  next(false);
                 });
               
             } else {//Tout est ok => connexion possible et envoie des tokens+cookies+...
@@ -585,22 +602,24 @@ exports.login = (req, res, next) => {//connexion
                         if(process.env.DEVELOP === "true") {
                           console.log('Mot de passe incorrect !');
                           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-                          return res.status(config.erreurServer.BAD_REQUEST).json({ error: 'Mot de passe incorrect !' });
+                          res.status(config.erreurServer.BAD_REQUEST).json({ error: 'Mot de passe incorrect !' });
                         } else {
                           logger.error('Mot de passe incorrect !');
-                          return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+                          res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
                         }
+                        next(false);
                       })
                       .catch(error => {
                         if(process.env.DEVELOP === "true") {
                           console.log("Erreur 500: addTentativeConnexion impossible");
                           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-                          return res.status(config.erreurServer.ERREUR_SERVER).json({ error });
+                          res.status(config.erreurServer.ERREUR_SERVER).json({ error });
                         } else {
                           console.log(process.env.MSG_ERROR_PRODUCTION);
                           logger.error("Erreur 500: addTentativeConnexion impossible", error.message);
-                          return res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
+                          res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
                         }
+                        next(false);
                       });
                   } else {
                     //Initialisation du nombre de tentatives de connexion
@@ -621,12 +640,13 @@ exports.login = (req, res, next) => {//connexion
                         if(process.env.DEVELOP === "true") {
                           console.log("Erreur 500: initNbreTentativeConnexion initialisation impossible");
                           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-                          return res.status(config.erreurServer.ERREUR_SERVER).json({ error });
+                          res.status(config.erreurServer.ERREUR_SERVER).json({ error });
                         } else {
                           console.log(process.env.MSG_ERROR_PRODUCTION);
                           logger.error("Erreur 500: initNbreTentativeConnexion initialisation impossible", error.message);
-                          return res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
+                          res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
                         }
+                        next(false);
                       });
                   }
                 })
@@ -634,12 +654,13 @@ exports.login = (req, res, next) => {//connexion
                   if(process.env.DEVELOP === "true") {
                     console.log("Problème avec Bcrypt");
                     console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-                    return res.status(config.erreurServer.ERREUR_SERVER).json({ error });
+                    res.status(config.erreurServer.ERREUR_SERVER).json({ error });
                   } else {
                     console.log(process.env.MSG_ERROR_PRODUCTION);
                     logger.error("Erreur 500: Problème avec Bcrypt", error.message);
-                    return res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
+                    res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
                   }
+                  next(false);
                 });
             }
           }
@@ -650,11 +671,12 @@ exports.login = (req, res, next) => {//connexion
       if(process.env.DEVELOP === "true") {        
         console.log("Pb BDD users");
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-        return res.status(config.erreurServer.ERREUR_SERVER).json({ error });
+        res.status(config.erreurServer.ERREUR_SERVER).json({ error });
       } else {
         logger.error("Pb BDD users");
-        return res.status(config.erreurServer.ERREUR_SERVER).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        res.status(config.erreurServer.ERREUR_SERVER).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
+      next(false);
     });
 };
 
@@ -684,6 +706,7 @@ exports.logout = (req, res, next) => {//Déconnexion
         logger.error("Pb BDD refreshToken pour supprimer");
         res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
       }
+      next(false);
     });
 
   //côté client, on supprime xsrfToken et les cookies
@@ -713,6 +736,7 @@ exports.mailNewPassword = (req, res, next) => {//envoie un mail pour MAJ le MDP
           logger.error("Email non trouvé");
           res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
         }
+        next(false);
       } else {//email trouvé
         //vérification que l'utilisateur est activé et que le compte n'est pas suspendu
         if(user.userConfirmed && !compteSuspendu(user)) {
@@ -755,6 +779,7 @@ exports.mailNewPassword = (req, res, next) => {//envoie un mail pour MAJ le MDP
                     logger.error("Erreur 500 problème avec l'envoie du mail");
                     res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
                   }
+                  next(false);
                 }
               });
             })
@@ -767,6 +792,7 @@ exports.mailNewPassword = (req, res, next) => {//envoie un mail pour MAJ le MDP
                 logger.error("Erreur 500 problème avec l'envoie du mail", error);
                 res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
               }
+              next(false);
             });
 
         
@@ -779,6 +805,7 @@ exports.mailNewPassword = (req, res, next) => {//envoie un mail pour MAJ le MDP
             logger.error("Compte suspendu ou pas encore activé");
             res.status(config.erreurServer.BAD_REQUEST).json({ message: process.env.MSG_ERROR_PRODUCTION });
           }
+          next(false);
         }
         
       }
@@ -792,6 +819,7 @@ exports.mailNewPassword = (req, res, next) => {//envoie un mail pour MAJ le MDP
         logger.error("Pb BDD users");
         res.status(config.erreurServer.ERREUR_SERVER).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
+      next(false);
     });
 
 };
@@ -823,37 +851,41 @@ exports.verifMailNewPassword = (req, res, next) => {//Vérif mail et token avant
           logger.error("Utilisateur non trouvé !");
           res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
         }
+        next(false);
       } else {
         if(!user.userConfirmed){//utilisateur non validé
           if(process.env.DEVELOP === "true") {
             console.log("UserConfirmed", user.userConfirmed);
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-            return res.status(config.erreurServer.BAD_REQUEST).json({ error: 'Utilisateur pas encore confirmé dans la BDD !' });
+            res.status(config.erreurServer.BAD_REQUEST).json({ error: 'Utilisateur pas encore confirmé dans la BDD !' });
           } else {
             logger.error("Utilisateur pas encore confirmé dans la BDD");
-            return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+            res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
           }
+          next(false);
         } else {//si compte suspendu
           if(compteSuspendu(user)){
             if(process.env.DEVELOP === "true") {
               console.log("Compte suspendu");
               console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-              return res.status(config.erreurServer.BAD_REQUEST).json({ error: 'Compte suspendu' });
+              res.status(config.erreurServer.BAD_REQUEST).json({ error: 'Compte suspendu' });
             }
             else {
               logger.error("Compte suspendu");
-              return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+              res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
             }
+            next(false);
           } else {//si nombre de tentatives de connexion atteint
             if(user.tentativesConnexion >= config.login.MAX_CONNEXION){
               if(process.env.DEVELOP === "true") {
                 console.log("nombre de tentatives de connexion max atteint");
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-                return res.status(config.erreurServer.BAD_REQUEST).json({ error: 'nombre de tentatives de connexion max atteint' });
+                res.status(config.erreurServer.BAD_REQUEST).json({ error: 'nombre de tentatives de connexion max atteint' });
               } else {
                 logger.error("nombre de tentatives de connexion max atteint");
-                return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+                res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
               }
+              next(false);
             } else {
               if(process.env.DEVELOP === "true") {
                 console.log("Mise à jour du mot de passe autorisé");
@@ -878,6 +910,7 @@ exports.verifMailNewPassword = (req, res, next) => {//Vérif mail et token avant
         logger.error("Pb BDD users");
         res.status(config.erreurServer.ERREUR_SERVER).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
+      next(false);
     });
 };
 
@@ -894,12 +927,12 @@ exports.UpdateMailNewPassword = (req, res, next) => {//Mise à jour du mot de pa
     if(process.env.DEVELOP === "true") {
       console.log('accessToken manquant');
       console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-      return res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
+      res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
     } else {
       logger.error('accessToken manquant');
-      return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+      res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
-    
+    next(false);
   }
   const accessToken = cookies.access_token;
 
@@ -943,6 +976,7 @@ exports.UpdateMailNewPassword = (req, res, next) => {//Mise à jour du mot de pa
                 logger.error("Erreur 400 MAJ MDP user nok", error.message);
                 res.status(config.erreurServer.BAD_REQUEST).json({ message: process.env.MSG_ERROR_PRODUCTION });
               }
+              next(false);
             });
         } else {
           if(process.env.DEVELOP === "true") {
@@ -953,6 +987,7 @@ exports.UpdateMailNewPassword = (req, res, next) => {//Mise à jour du mot de pa
             logger.error("Erreur 500 problème avec l'envoie du mail");
             res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
           }
+          next(false);
         }
       });
       
@@ -966,6 +1001,7 @@ exports.UpdateMailNewPassword = (req, res, next) => {//Mise à jour du mot de pa
         logger.error("Erreur 500 d'enregistrement du nouvelle utilisateur", error.message);
         res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
       }
+      next(false);
     });
 };
 
@@ -984,12 +1020,12 @@ exports.newPassword = (req, res, next) => {//Mise à jour du mot de passe via le
     if(process.env.DEVELOP === "true") {
       console.log('accessToken manquant');
       console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-      return res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
+      res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
     } else {
       logger.error('accessToken manquant');
-      return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+      res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
-    
+    next(false);
   }
   const accessToken = cookies.access_token;
 
@@ -1019,19 +1055,21 @@ exports.newPassword = (req, res, next) => {//Mise à jour du mot de passe via le
               logger.error('Mot de passe incorrect !');
             }
 
-            return res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Mot de passe incorrect !' });
+            res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Mot de passe incorrect !' });
+            next(false);
           }
         })
         .catch(error => {
           if(process.env.DEVELOP === "true") {
             console.log("Problème avec Bcrypt");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-            return res.status(config.erreurServer.ERREUR_SERVER).json({ error });
+            res.status(config.erreurServer.ERREUR_SERVER).json({ error });
           } else {
             console.log(process.env.MSG_ERROR_PRODUCTION);
             logger.error("Erreur 500: Problème avec Bcrypt", error.message);
-            return res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
+            res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
           }
+          next(false);
         });
 
       bcrypt.hash(req.body.newPassword, 10)
@@ -1065,6 +1103,7 @@ exports.newPassword = (req, res, next) => {//Mise à jour du mot de passe via le
                     logger.error("Erreur 400 MAJ MDP user nok", error.message);
                     res.status(config.erreurServer.BAD_REQUEST).json({ message: process.env.MSG_ERROR_PRODUCTION });
                   }
+                  next(false);
                 });
             } else {
               if(process.env.DEVELOP === "true") {
@@ -1075,6 +1114,7 @@ exports.newPassword = (req, res, next) => {//Mise à jour du mot de passe via le
                 logger.error("Erreur 500 problème avec l'envoie du mail");
                 res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
               }
+              next(false);
             }
           });
           
@@ -1088,6 +1128,7 @@ exports.newPassword = (req, res, next) => {//Mise à jour du mot de passe via le
             logger.error("Erreur 500 pour crypter le mdp", error.message);
             res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
           }
+          next(false);
         });
     })
     .catch(error => {
@@ -1099,6 +1140,7 @@ exports.newPassword = (req, res, next) => {//Mise à jour du mot de passe via le
         logger.error("Erreur 500 problème avec BDD Users", error.message);
         res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
       }
+      next(false);
     });
 };
 
@@ -1110,11 +1152,12 @@ exports.verifyRecaptcha = (req, res, next) => {//On vérifie le token recaptcha
     if(process.env.DEVELOP === "true") {
       console.log('erreur 400, token recaptcha manquant');
       console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-      return res.status(config.erreurServer.BAD_REQUEST).json({message: "recaptchaToken is required"});
+      res.status(config.erreurServer.BAD_REQUEST).json({message: "recaptchaToken is required"});
     } else {
       logger.error("erreur 400, token recaptcha manquant");
       res.status(config.erreurServer.BAD_REQUEST).json({ message: process.env.MSG_ERROR_PRODUCTION });
     }
+    next(false);
   }
 
   /*const verifyCaptchaOptions = {
@@ -1139,11 +1182,12 @@ exports.verifyRecaptcha = (req, res, next) => {//On vérifie le token recaptcha
           console.log('res', response.data.success)
           console.log('erreur 400, token recaptcha mauvais');
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-          return res.status(config.erreurServer.BAD_REQUEST).json({message: "recaptchaToken n'est pas le bon"});
+          res.status(config.erreurServer.BAD_REQUEST).json({message: "recaptchaToken n'est pas le bon"});
         } else {
           logger.error("erreur 400, token recaptcha mauvais");
-        }
           res.status(config.erreurServer.BAD_REQUEST).json({ message: process.env.MSG_ERROR_PRODUCTION });
+        }
+        next(false);
       }
     })
     .catch((err) => {
@@ -1154,6 +1198,6 @@ exports.verifyRecaptcha = (req, res, next) => {//On vérifie le token recaptcha
         logger.error("Erreur 500 problème server recaptcha", err.message);
       }
       res.status(config.erreurServer.ERREUR_SERVER).json({ message: process.env.MSG_ERROR_PRODUCTION });
+      next(false);
     })
-
 };

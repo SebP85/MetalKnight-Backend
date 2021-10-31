@@ -26,6 +26,7 @@ var chatty = false;
 
 mongoose.Promise = global.Promise;
 mongoose.set("useCreateIndex", true);//ajout
+mongoose.set('useFindAndModify', false);
 mongoose.connect(config.db.database,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
@@ -95,6 +96,7 @@ app.use(function (req, res, next) {
 });
 
 app.use('/Images/Avatar', express.static(path.join(__dirname, 'Images/Avatar')));//accès au dossiers images
+app.use('/Images/Annonces', express.static(path.join(__dirname, 'Images/Annonces')));//accès au dossiers images
 
 app.use('/api'+config.email.NOM_APP, userRoutes);
 
@@ -132,26 +134,12 @@ function refreshBDD() {
             }
 
             for (const photo of annonce.photos) {
-              /*fs.unlink(`Images/Annnonces/${photo.split('/Images/Avatar/')[1]}`, () => {
-                coloc.avatar="";
-        
-                Coloc.updateOne({ userId: decodedToken.sub }, coloc)
-                  .then(() => {//sauvegarde faite
-                    if(process.env.DEVELOP === "true") console.log("updateOne ok");
-                    next();
-                  })
-                  .catch(error => {//pb avec la bdd coloc
-                    if(process.env.DEVELOP === "true") {
-                      console.log('erreur pour enregistrer le coloc updateOne');
-                      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-                      res.status(400).json({ error });
-                    } else {
-                      logger.error("Erreur MongoDB pour enregistrer coloc updateOne");
-                      console.log(process.env.MSG_ERROR_PRODUCTION);
-                      res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
-                    }
-                  });
-              });*/
+              fs.unlink(`Images/Annonces/${photo.split('/Images/Annonces/')[1]}`, () => {
+                if(chatty){
+                  console.log('link', photo)
+                  console.log(`Images/Annonces/${photo.split('/Images/Annonces/')[1]}`)
+                }
+              })
             }
 
             Annonce.deleteOne({ _id: annonce._id })

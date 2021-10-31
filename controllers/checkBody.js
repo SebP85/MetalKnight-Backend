@@ -208,7 +208,7 @@ function isLieu(val){
         .string()
         .not.null()
         .minLength(2)
-        .pattern(/^[-a-zA-Zéêèàù'ùëäâ]+$/)//autorisé
+        .pattern(/^[-a-zA-Zéêèàù'ùëäâ ]+$/)//autorisé
         .pattern(/^[^0-9.;,?:!§%*µ$£ø^¨"~&{()}|_`@=+<>]+$/)//interdit
         .test(val);
 
@@ -338,7 +338,7 @@ function isTitreAnnonce(val){
         .string()
         .not.null()
         .maxLength(255)
-        .pattern(/^[-a-z0-9A-Zéêèàù'ùëäâ?! ]+$/)//autorisé
+        .pattern(/^[-a-z0-9A-Zéêèàù'ùëäâ?!° ]+$/)//autorisé
         .pattern(/^[^.;,:§%*µ$£ø^¨"~&{()}|_`@=+<>]+$/)//interdit
         .test(val);
 
@@ -362,6 +362,21 @@ function isClassEnergie(val){
     return v;
 }
 
+function isRef(val){
+    var v = v8n()
+        .string()
+        .not.null()
+        .length(24)
+        .pattern(/^[a-z0-9]+$/)//interdit
+        .test(val);
+
+    if(chatty)
+    console.log("Ref", val);
+    if(!val && process.env.DEVELOP === "false") logger.error("Ref =>", val);
+
+    return v;
+}
+
 exports.validParamRegister = function (req, res, next){
     if(process.env.DEVELOP === "true") console.log("checkBody");
     else logger.info("Vérification des données d'entrées");
@@ -379,6 +394,7 @@ exports.validParamRegister = function (req, res, next){
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
     }
 };
 
@@ -404,6 +420,7 @@ exports.validParamVerify = function (req, res, next){
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
     }
 };
 
@@ -425,6 +442,7 @@ exports.validParamLogin = function (req, res, next){
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
     }
 };
 
@@ -447,6 +465,7 @@ exports.validParamLogout = function (req, res, next){
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
     }
 };
 
@@ -468,6 +487,7 @@ exports.validParamUpdateToken = function (req, res, next){
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
         res.status(config.erreurServer.ACCESS_REFUSED).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
     }
 };
 
@@ -486,6 +506,7 @@ exports.validParamEmailNewMDP = function (req, res, next){
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
     }
 };
 
@@ -512,6 +533,7 @@ exports.validParamVerifMailNewMDP = function (req, res, next){
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
     }
 };
 
@@ -537,6 +559,7 @@ exports.validParamUpdateMailNewMDP = function (req, res, next){
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
     }
 };
 
@@ -558,6 +581,7 @@ exports.validParamMailNewMDP = function (req, res, next){
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
     }
 };
 
@@ -579,6 +603,7 @@ exports.validParamGetProfile = function (req, res, next){
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
     }
 };
 
@@ -596,6 +621,7 @@ exports.validParamAuth = function (req, res, next) {
         } else logger.error("Données auth nok");
         
         res.status(config.erreurServer.BAD_IDENTIFICATION).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
     }
 };
 
@@ -610,6 +636,7 @@ exports.validParamAuthRefresh = function (req, res, next) {
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données auth via refreshToken nok");
         res.status(config.erreurServer.ACCESS_REFUSED).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
     }
 };
 
@@ -624,6 +651,7 @@ exports.validParamRecaptcha = function (req, res, next) {
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données recaptcha nok");
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
     }
 };
 
@@ -650,6 +678,7 @@ exports.validParamSetZoneRecherche = function (req, res, next) {
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données setZoneRecherche nok");
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
     }
 };
 
@@ -671,10 +700,11 @@ exports.validParamGetZoneRecherche = function (req, res, next){
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données d'entrées nok");
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
     }
 };
 
-exports.validParamSetAnnonce = function (req, res, next){
+exports.validParamAddAnnonce = function (req, res, next){
     if(chatty) {
         console.log('photos =', req.body.photos)
         console.log('lieu =', req.body.lieu)
@@ -704,15 +734,100 @@ exports.validParamSetAnnonce = function (req, res, next){
     isNumber(req.body.nbrePieces,0,30) && isClassEnergie(req.body.classEnergie) && isClassEnergie(req.body.ges) &&
     isBool(req.body.masquerNumero) && isBool(req.body.refuseDemarcheCommercial) /*&& isNumberDate(req.body.datePoster)*/ &&
     isBool(req.body.annonceActive) && isDescription(req.body.description) && isBool(req.body.annonceValide)){
-        if(process.env.DEVELOP === "true") console.log("Données setAnnonce ok");
-        else logger.info("Données setAnnonce ok");
+        if(process.env.DEVELOP === "true") console.log("Données addAnnonce ok");
+        else logger.info("Données addAnnonce ok");
         next();
     } else {
         if(process.env.DEVELOP === "true") {
-            console.log("Données setAnnonce nok");
+            console.log("Données addAnnonce nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-        } else logger.error("Données setAnnonce nok");
+        } else logger.error("Données addAnnonce nok");
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
+    }
+};
+
+exports.validParamUpdateAnnonce = function (req, res, next){
+    if(chatty) {
+        console.log('ref =', req.body.ref)
+        console.log('photos =', req.body.photos)
+        console.log('lieu =', req.body.lieu)
+        console.log('loyerHC =', req.body.loyerHC)
+        console.log('charges =', req.body.charges)
+        console.log('type =', req.body.type)
+        console.log('description =', req.body.description)
+        console.log('nbreColocataire =', req.body.nbreColocataire)
+        console.log('nbreColocOccupants =', req.body.nbreColocOccupants)
+        console.log('mail =', req.body.mail)
+        console.log('tel =', req.body.tel)
+        console.log('titre annonce =', req.body.titreAnnonce)
+        console.log('surface =', req.body.surface)
+        console.log('Nbre pièces =', req.body.nbrePieces)
+        console.log('Classe Energie =', req.body.classEnergie)
+        console.log('ges =', req.body.ges)
+        console.log('masquerNumero =', req.body.masquerNumero)
+        console.log('refuseDemarcheCommercial =', req.body.refuseDemarcheCommercial)
+        console.log('datePoster =', req.body.datePoster)
+        console.log('annonceActive =', req.body.annonceActive)
+        console.log('annonceValide =', req.body.annonceValide)
+        console.log('datePoster =', req.body.datePoster)
+    }
+    
+    if(isRef(req.body.ref) && isLieu(req.body.lieu) && isNumber(req.body.loyerHC,0,9999) && isNumber(req.body.charges,0,999) && isType(req.body.type) &&
+    isNumber(req.body.nbreColocataire,0,20) && isNumber(req.body.nbreColocOccupants,0,20) && isEmail(req.body.mail) &&
+    isTel(req.body.tel) && isTitreAnnonce(req.body.titreAnnonce) && isNumber(req.body.surface,0,500) &&
+    isNumber(req.body.nbrePieces,0,30) && isClassEnergie(req.body.classEnergie) && isClassEnergie(req.body.ges) &&
+    isBool(req.body.masquerNumero) && isBool(req.body.refuseDemarcheCommercial) /*&& isNumberDate(req.body.datePoster)*/ &&
+    isBool(req.body.annonceActive) && isDescription(req.body.description) && isBool(req.body.annonceValide)){
+        if(process.env.DEVELOP === "true") console.log("Données updateAnnonce ok");
+        else logger.info("Données updateAnnonce ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données updateAnnonce nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données updateAnnonce nok");
+        res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
+    }
+};
+
+exports.validParamSuppAnnonce = function (req, res, next){
+    if(chatty) {
+        console.log('ref =', req.body.ref)
+    }
+    
+    if(isRef(req.body.ref)){
+        if(process.env.DEVELOP === "true") console.log("Données suppAnnonce ok");
+        else logger.info("Données suppAnnonce ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données suppAnnonce nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données suppAnnonce nok");
+        res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
+    }
+};
+
+exports.validParamRef = function (req, res, next){
+
+    if(chatty) {
+        console.log('ref =', req.body)
+    }
+    
+    if(isRef(req.body.ref)){
+        if(process.env.DEVELOP === "true") console.log("Données validParamRef ok");
+        else logger.info("Données validParamRef ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données validParamRef nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données validParamRef nok");
+        res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
     }
 };
 

@@ -20,12 +20,12 @@ exports.setZoneRecherche = (req, res, next) => {//Role autorisé Free
       if(process.env.DEVELOP === "true") {
         console.log('accessToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
+        res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
       } else {
         logger.error('accessToken manquant');
-        return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
-      
+      next(false);
     }
     const accessToken = cookies.access_token;
 
@@ -40,11 +40,12 @@ exports.setZoneRecherche = (req, res, next) => {//Role autorisé Free
             if(process.env.DEVELOP === "true") {
                 console.log('User introuvable dans la BDD');
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-                return res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+                res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
             } else {
                 logger.error('User introuvable dans la BDD');
-                return res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+                res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
             }
+            next(false);
           } else {
             //console.log("user id", user.id);
             //On cherche dans la base de donnée Coloc
@@ -93,6 +94,7 @@ exports.setZoneRecherche = (req, res, next) => {//Role autorisé Free
                       console.log(process.env.MSG_ERROR_PRODUCTION);
                       res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
                     }
+                    next(false);
                   });
                 
               
@@ -144,6 +146,7 @@ exports.setZoneRecherche = (req, res, next) => {//Role autorisé Free
                     console.log(process.env.MSG_ERROR_PRODUCTION);
                     res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
                   }
+                  next(false);
                 });
               }
             })
@@ -152,11 +155,12 @@ exports.setZoneRecherche = (req, res, next) => {//Role autorisé Free
                   console.log(error, error);      
                   console.log("Pb BDD Coloc");
                   console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-                  res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+                  res.status(config.erreurServer.ERREUR_SERVER);
               } else {
                   logger.error("Pb BDD Coloc");
-                  res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+                  res.status(config.erreurServer.ERREUR_SERVER);
               }
+              next(false);
             });
           }
     })
@@ -165,11 +169,12 @@ exports.setZoneRecherche = (req, res, next) => {//Role autorisé Free
             console.log(error, error);      
             console.log("Pb BDD Users");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-            res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+            res.status(config.erreurServer.ERREUR_SERVER);
         } else {
             logger.error("Pb BDD Users");
-            res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+            res.status(config.erreurServer.ERREUR_SERVER);
         }
+        next(false);
     });
 };
 
@@ -183,12 +188,12 @@ exports.getZoneRecherche = (req, res, next) => {//Role autorisé Free
       if(process.env.DEVELOP === "true") {
         console.log('accessToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
+        res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
       } else {
         logger.error('accessToken manquant');
-        return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
-      
+      next(false);
     }
     const accessToken = cookies.access_token;
 
@@ -203,11 +208,12 @@ exports.getZoneRecherche = (req, res, next) => {//Role autorisé Free
             if(process.env.DEVELOP === "true") {
                 console.log('User introuvable dans la BDD');
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-                return res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+                res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
             } else {
                 logger.error('User introuvable dans la BDD');
-                return res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+                res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
             }
+            next(false);
           } else {
             
             /////////
@@ -218,12 +224,12 @@ exports.getZoneRecherche = (req, res, next) => {//Role autorisé Free
                 if(process.env.DEVELOP === "true") {
                   console.log('id coloc introuvable dans la BDD');
                   console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-                  return res.status(200).json({ message: 'id coloc introuvable dans la BDD' });
+                  res.status(200).json({ message: 'id coloc introuvable dans la BDD' });
                 } else {
-                    logger.error('id coloc introuvable dans la BDD');
-                    return res.status(200).json({ error: process.env.MSG_ERROR_PRODUCTION });
+                  logger.error('id coloc introuvable dans la BDD');
+                  res.status(200).json({ error: process.env.MSG_ERROR_PRODUCTION });
                 }
-
+                next(false);
               } else {
                 res.status(200).json({
                   lieu: resultColoc.lieu,
@@ -255,11 +261,12 @@ exports.getZoneRecherche = (req, res, next) => {//Role autorisé Free
                   console.log(error, error);      
                   console.log("Pb BDD Coloc");
                   console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-                  res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+                  res.status(config.erreurServer.ERREUR_SERVER);
               } else {
                   logger.error("Pb BDD Coloc");
-                  res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+                  res.status(config.erreurServer.ERREUR_SERVER);
               }
+              next(false);
             });
           }
     })
@@ -268,11 +275,12 @@ exports.getZoneRecherche = (req, res, next) => {//Role autorisé Free
             console.log(error, error);      
             console.log("Pb BDD Users");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-            res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+            res.status(config.erreurServer.ERREUR_SERVER);
         } else {
             logger.error("Pb BDD Users");
-            res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+            res.status(config.erreurServer.ERREUR_SERVER);
         }
+        next(false);
     });
 };
 
@@ -288,12 +296,12 @@ exports.initZoneRecherche = (req, res, next) => {//Role autorisé Free
     if(process.env.DEVELOP === "true") {
       console.log('accessToken manquant');
       console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-      return res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
+      res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
     } else {
       logger.error('accessToken manquant');
-      return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+      res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
-    
+    next(false);
   }
   const accessToken = cookies.access_token;
 
@@ -308,11 +316,12 @@ exports.initZoneRecherche = (req, res, next) => {//Role autorisé Free
           if(process.env.DEVELOP === "true") {
               console.log('User introuvable dans la BDD');
               console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-              return res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+              res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
           } else {
               logger.error('User introuvable dans la BDD');
-              return res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+              res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
           }
+          next(false);
         } else {
           //console.log("user id", user.id);
           //On cherche dans la base de donnée Coloc
@@ -329,7 +338,7 @@ exports.initZoneRecherche = (req, res, next) => {//Role autorisé Free
                 logger.info("id coloc non trouvé");
               }
   
-              next();
+              next(false);
             
             } else {//Coloc trouvé => init des données
             if(process.env.DEVELOP === "true") {
@@ -379,6 +388,7 @@ exports.initZoneRecherche = (req, res, next) => {//Role autorisé Free
                   console.log(process.env.MSG_ERROR_PRODUCTION);
                   res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
                 }
+                next(false);
               });
             }
           })
@@ -387,11 +397,12 @@ exports.initZoneRecherche = (req, res, next) => {//Role autorisé Free
                 console.log(error, error);      
                 console.log("Pb BDD Coloc");
                 console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-                res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+                res.status(config.erreurServer.ERREUR_SERVER);
             } else {
                 logger.error("Pb BDD Coloc");
-                res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+                res.status(config.erreurServer.ERREUR_SERVER);
             }
+            next(false);
           });
         }
   })
@@ -400,11 +411,12 @@ exports.initZoneRecherche = (req, res, next) => {//Role autorisé Free
           console.log(error, error);      
           console.log("Pb BDD Users");
           console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-          res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+          res.status(config.erreurServer.ERREUR_SERVER);
       } else {
           logger.error("Pb BDD Users");
-          res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+          res.status(config.erreurServer.ERREUR_SERVER);
       }
+      next(false);
   });
 };
 
@@ -464,6 +476,7 @@ exports.setAvatar = (req, res, next) => {//On vérifie le token recaptcha
             console.log(process.env.MSG_ERROR_PRODUCTION);
             res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
           }
+          next(false);
         });
       
     
@@ -516,6 +529,7 @@ exports.setAvatar = (req, res, next) => {//On vérifie le token recaptcha
           console.log(process.env.MSG_ERROR_PRODUCTION);
           res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
         }
+        next(false);
       });
     }
   })
@@ -526,9 +540,10 @@ exports.setAvatar = (req, res, next) => {//On vérifie le token recaptcha
       console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
       res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
     } else {
-        logger.error("Pb BDD Coloc");
-        res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
+      logger.error("Pb BDD Coloc");
+      res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
     }
+    next(false);
   });
 }
 
@@ -563,6 +578,7 @@ exports.suppAvatar = (req, res, next) => {//On vérifie le token recaptcha
               console.log(process.env.MSG_ERROR_PRODUCTION);
               res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
             }
+            next(false);
           });
       });
     })
@@ -574,7 +590,7 @@ exports.suppAvatar = (req, res, next) => {//On vérifie le token recaptcha
       } else {
           logger.error("Pb BDD Coloc");
       }
-      next();
+      next();//On passe à la suite car il est possible que le coloc ne soit pas encore créé
     });
 }
 
@@ -588,12 +604,12 @@ exports.getUrlAvatar = (req, res, next) => {
       if(process.env.DEVELOP === "true") {
         console.log('accessToken manquant');
         console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
-        return res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
+        res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
       } else {
         logger.error('accessToken manquant');
-        return res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
-      
+      next(false);
     }
     const accessToken = cookies.access_token;
 
@@ -638,6 +654,7 @@ exports.getUrlAvatar = (req, res, next) => {
         console.log(process.env.MSG_ERROR_PRODUCTION);
         res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
       }
+      next(false);
     });
 }
 
@@ -712,5 +729,6 @@ exports.getListeColocs = async (req, res, next) => {
       console.log(process.env.MSG_ERROR_PRODUCTION);
       res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
     }
+    next(false);
   });
 }
