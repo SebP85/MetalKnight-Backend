@@ -281,3 +281,12 @@ exports.filterParamRef = function (req, res, next) {
 
     next();
 };
+
+exports.filterParamSuppOnePhoto = function (req, res, next) {
+    if(process.env.DEVELOP === "true") console.log("fonction xss");
+    else logger.info('Traitement contre XSS attack');
+
+    req.body.urlPhoto = xss(req.body.urlPhoto);
+
+    next();
+};

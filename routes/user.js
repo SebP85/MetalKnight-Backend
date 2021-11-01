@@ -75,6 +75,6 @@ router.post('/addAnnonce', checkBody.validParamAuth, checkBody.validParamAddAnno
 router.post('/updateAnnonce', checkBody.validParamAuth, checkBody.validParamUpdateAnnonce, xssFilter.filterParamAuth, xssFilter.filterUpdateAnnonce, auth.normal, role.levelAuthorizeFree, annonce.updateAnnonce);
 router.post('/addPhotoAnnonce', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, multerPhotosAnnonce, checkBody.validParamRef, xssFilter.filterParamRef, annonce.addPhotoAnnonce);
 router.post('/suppAnnonce', checkBody.validParamAuth, checkBody.validParamSuppAnnonce, xssFilter.filterParamAuth, xssFilter.filterSuppAnnonce, auth.normal, role.levelAuthorizeFree, annonce.suppAnnonce);
-router.post('/suppPhotoAnnonce', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, multerPhotosAnnonce, annonce.suppPhotoAnnonce);
+router.post('/suppOnePhotoAnnonce', checkBody.validParamAuth, xssFilter.filterParamAuth, checkBody.validParamSuppOnePhoto, xssFilter.filterParamSuppOnePhoto, auth.normal, role.levelAuthorizeFree, annonce.suppOnePhotoAnnonce);
 
 module.exports = router;//test

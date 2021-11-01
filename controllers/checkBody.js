@@ -377,6 +377,22 @@ function isRef(val){
     return v;
 }
 
+function isUrlAnnonces(val){
+    var v = v8n()
+        .string()
+        .not.null()
+        .first("h")
+        .includes("https://")
+        .includes("/Images/Annonces/")
+        .pattern(/[a-z0-9A-Z_.:\/]+$/)//autorisé
+        .test(val);
+
+    if(chatty) console.log("UrlAnnonces", val);
+    if(!val && process.env.DEVELOP === "false") logger.error("UrlAnnonces =>", val);
+
+    return v;
+}
+
 exports.validParamRegister = function (req, res, next){
     if(process.env.DEVELOP === "true") console.log("checkBody");
     else logger.info("Vérification des données d'entrées");
@@ -826,6 +842,26 @@ exports.validParamRef = function (req, res, next){
             console.log("Données validParamRef nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données validParamRef nok");
+        res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
+    }
+};
+
+exports.validParamSuppOnePhoto = function (req, res, next){
+
+    if(chatty) {
+        console.log('index photo =', req.body.urlPhoto)
+    }
+    
+    if(isUrlAnnonces(req.body.urlPhoto)){
+        if(process.env.DEVELOP === "true") console.log("Données validParamSuppOnePhoto ok");
+        else logger.info("Données validParamSuppOnePhoto ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données validParamSuppOnePhoto nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données validParamSuppOnePhoto nok");
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
         next(false);
     }

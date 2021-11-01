@@ -404,6 +404,38 @@ exports.updateAnnonce = (req, res, next) => {
   });
 };
 
-exports.suppPhotoAnnonce = (req, res, next) => {
+exports.suppOnePhotoAnnonce = (req, res, next) => {
+  if(process.env.DEVELOP === "true") console.log("fonction suppOnePhotoAnnonce !");
+  else logger.info("Requête suppOnePhotoAnnonce lancée !");
 
+  fs.unlink(`Images/Annonces/${req.body.urlPhoto.split('/Images/Annonces/')[1]}`, (resp) => {
+    if(chatty){
+      console.log('urlPhoto', req.body.urlPhoto)
+      console.log(`Images/Annonces/${req.body.urlPhoto.split('/Images/Annonces/')[1]}`)
+    }
+
+    if(resp===null){
+      if(process.env.DEVELOP === "true") {
+        console.log("then annonce");
+        res.status(200).json({ message: 'Suppression annonce ok !' });
+      } else {
+        res.status(200).json({ message: process.env.MSG_OK_PRODUCTION });
+        logger.info("Suppression annonce ok");
+      }
+
+      if(process.env.DEVELOP === "true") console.log('Suppression annonce ok !');
+      next();
+    } else {
+      if(process.env.DEVELOP === "true") {  
+        console.log(error, error);      
+        console.log("Pb suppOnePhotoAnnonce");
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        res.status(config.erreurServer.ERREUR_SERVER);
+      } else {
+        logger.error("Pb suppOnePhotoAnnonce");
+        res.status(config.erreurServer.ERREUR_SERVER);
+      }
+      next(false);
+    }
+  });
 };
