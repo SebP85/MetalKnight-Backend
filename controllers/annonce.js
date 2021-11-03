@@ -67,7 +67,40 @@ exports.addAnnonce = (req, res, next) => {//Role autorisé Free
           refuseDemarcheCommercial: Boolean(req.body.refuseDemarcheCommercial),
           annonceActive: Boolean(req.body.annonceActive),
           annonceValide: Boolean(req.body.annonceValide),
-
+          meuble: Boolean(req.body.meuble),
+          
+          laveVaisselle: Boolean(req.body.laveVaisselle),
+          wifi: Boolean(req.body.wifi),
+          cuisineEquipe: Boolean(req.body.cuisineEquipe),
+          television: Boolean(req.body.television),
+          laveLinge: Boolean(req.body.laveLinge),
+          chemine: Boolean(req.body.chemine),
+          radElec: Boolean(req.body.radElec),
+          chGaz: Boolean(req.body.chGaz),
+          poele: Boolean(req.body.poele),
+          detecFumee: Boolean(req.body.detecFumee),
+          baignoire: Boolean(req.body.baignoire),
+          sdbPriv: Boolean(req.body.sdbPriv),
+          secheCheveux: Boolean(req.body.secheCheveux),
+          linge: Boolean(req.body.linge),
+          couvEtUstensiles: Boolean(req.body.couvEtUstensiles),
+          ferRepasser: Boolean(req.body.ferRepasser),
+          tancarville: Boolean(req.body.tancarville),
+          dressing: Boolean(req.body.dressing),
+          verrouCh: Boolean(req.body.verrouCh),
+          refri: Boolean(req.body.refri),
+          fourMicro: Boolean(req.body.fourMicro),
+          equipCuisine: Boolean(req.body.equipCuisine),
+          congelo: Boolean(req.body.congelo),
+          four: Boolean(req.body.four),
+          cafetiere: Boolean(req.body.cafetiere),
+          barbecue: Boolean(req.body.barbecue),
+          mobilierExt: Boolean(req.body.mobilierExt),
+          camExt: Boolean(req.body.camExt),
+          femmeDeMenage: Boolean(req.body.femmeDeMenage),
+          gardien: Boolean(req.body.gardien),
+          rangements: Boolean(req.body.rangements),
+          bureau: Boolean(req.body.bureau),
         });
         if(process.env.DEVELOP === "true") console.log("myAnnonce", myAnnonce);
         
@@ -348,6 +381,41 @@ exports.updateAnnonce = (req, res, next) => {
   req.body.annonceValide=Boolean(req.body.annonceValide);
   req.body.masquerNumero=Boolean(req.body.masquerNumero);
   req.body.refuseDemarcheCommercial=Boolean(req.body.refuseDemarcheCommercial);
+  req.body.meuble=Boolean(req.body.meuble);
+
+  req.body.laveVaisselle=Boolean(req.body.laveVaisselle);
+  req.body.wifi=Boolean(req.body.wifi);
+  req.body.cuisineEquipe=Boolean(req.body.cuisineEquipe);
+  req.body.television=Boolean(req.body.television);
+  req.body.laveLinge=Boolean(req.body.laveLinge);
+  req.body.chemine=Boolean(req.body.chemine);
+  req.body.radElec=Boolean(req.body.radElec);
+  req.body.chGaz=Boolean(req.body.chGaz);
+  req.body.poele=Boolean(req.body.poele);
+  req.body.detecFumee=Boolean(req.body.detecFumee);
+  req.body.baignoire=Boolean(req.body.baignoire);
+  req.body.sdbPriv=Boolean(req.body.sdbPriv);
+  req.body.secheCheveux=Boolean(req.body.secheCheveux);
+  req.body.linge=Boolean(req.body.linge);
+  req.body.couvEtUstensiles=Boolean(req.body.couvEtUstensiles);
+  req.body.ferRepasser=Boolean(req.body.ferRepasser);
+  req.body.tancarville=Boolean(req.body.tancarville);
+  req.body.dressing=Boolean(req.body.dressing);
+  req.body.verrouCh=Boolean(req.body.verrouCh);
+  req.body.refri=Boolean(req.body.refri);
+  req.body.fourMicro=Boolean(req.body.fourMicro);
+  req.body.equipCuisine=Boolean(req.body.equipCuisine);
+  req.body.congelo=Boolean(req.body.congelo);
+  req.body.four=Boolean(req.body.four);
+  req.body.cafetiere=Boolean(req.body.cafetiere);
+  req.body.barbecue=Boolean(req.body.barbecue);
+  req.body.mobilierExt=Boolean(req.body.mobilierExt);
+  req.body.camExt=Boolean(req.body.camExt);
+  req.body.femmeDeMenage=Boolean(req.body.femmeDeMenage);
+  req.body.gardien=Boolean(req.body.gardien);
+  req.body.rangements=Boolean(req.body.rangements);
+  req.body.bureau=Boolean(req.body.bureau);
+
   const refAnnonce = req.body.ref;
   delete req.body.ref;
   delete req.body.role;
@@ -417,13 +485,13 @@ exports.suppOnePhotoAnnonce = (req, res, next) => {
     if(resp===null){
       if(process.env.DEVELOP === "true") {
         console.log("then annonce");
-        res.status(200).json({ message: 'Suppression annonce ok !' });
+        res.status(200).json({ message: "Suppression une photo de l'annonce ok !" });
       } else {
         res.status(200).json({ message: process.env.MSG_OK_PRODUCTION });
-        logger.info("Suppression annonce ok");
+        logger.info("Suppression une photo de l'annonce ok !");
       }
 
-      if(process.env.DEVELOP === "true") console.log('Suppression annonce ok !');
+      if(process.env.DEVELOP === "true") console.log("Suppression une photo de l'annonce ok !");
       next();
     } else {
       if(process.env.DEVELOP === "true") {  
@@ -439,3 +507,207 @@ exports.suppOnePhotoAnnonce = (req, res, next) => {
     }
   });
 };
+
+exports.getAnnonces = (req, res, next) => {
+  if(process.env.DEVELOP === "true") console.log("fonction getAnnonces !");
+  else logger.info("Requête getAnnonces lancée !");
+
+  Annonce.find({annonceActive: true, annonceValide: true}, {_id: 0, photos: 1, titreAnnonce: 2, loyerHC: 3, charges: 4, lieu: 5, datePoster: 6 })
+  .then((annonces) => {
+    if(process.env.DEVELOP === "true") {
+      console.log("then getAnnonces");
+      res.status(200).json({ message: 'Informations annonces transmisent !', annoncesSimple: annonces });
+    } else {
+      res.status(200).json({ message: process.env.MSG_OK_PRODUCTION, annoncesSimple: annonces });
+      logger.info("Informations annonces transmisent !");
+    }
+    if(process.env.DEVELOP === "true") console.log('Informations annonces transmisent !');
+    next();
+  })
+  .catch(error => {
+    if(process.env.DEVELOP === "true") {  
+      console.log(error, error);      
+      console.log("Pb BDD Annonces getAnnonces");
+      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+      res.status(config.erreurServer.ERREUR_SERVER);
+    } else {
+      logger.error("Pb BDD Annonces getAnnonces");
+      res.status(config.erreurServer.ERREUR_SERVER);
+    }
+    next(false);
+  });
+}
+
+exports.getMesAnnonces = (req, res, next) => {
+  if(process.env.DEVELOP === "true") console.log("fonction getMesAnnonces !");
+  else logger.info("Requête getMesAnnonces lancée !");
+
+  const { cookies } = req;
+  
+  if (!cookies || !cookies.access_token) {//cookie présent ?
+    if(process.env.DEVELOP === "true") {
+      console.log('accessToken manquant');
+      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
+      res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
+    } else {
+      logger.error('accessToken manquant');
+      res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+    }
+    next(false);
+  }
+  const accessToken = cookies.access_token;
+
+  const decodedToken = jwt.verify(accessToken, config.token.accessToken.secret, {
+      algorithms: config.token.accessToken.algorithm
+    });
+  if(process.env.DEVELOP === "true") console.log('decodedToken', decodedToken);
+
+
+  User.findOne({ _id: decodedToken.sub })
+    .then((user) => {//Pas de problème avec la BDD
+      if(!user) {
+        if(process.env.DEVELOP === "true") {
+            console.log('User introuvable dans la BDD');
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
+            res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+        } else {
+            logger.error('User introuvable dans la BDD');
+            res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+        }
+        next(false);
+      } else {//on envoie les informations des annonces de l'utilisateur
+
+        Annonce.find({userId: decodedToken.sub }, { _id: 0, photos: 1, titreAnnonce: 2, loyerHC: 3, charges: 4, lieu: 5, datePoster: 6, _id: 7 })
+        .then((annonces) => {
+          if(process.env.DEVELOP === "true") {
+            console.log("then getMesAnnonces");
+            res.status(200).json({ message: 'Informations mes annonces transmisent !', mesAnnoncesSimple: annonces });
+          } else {
+            res.status(200).json({ message: process.env.MSG_OK_PRODUCTION, mesAnnoncesSimple: annonces });
+            logger.info("Informations mes annonces transmisent !");
+          }
+          if(process.env.DEVELOP === "true") console.log('Informations mes annonces transmisent !');
+          next();
+        })
+        .catch(error => {
+          if(process.env.DEVELOP === "true") {  
+            console.log(error, error);      
+            console.log("Pb BDD Annonces getMesAnnonces");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+            res.status(config.erreurServer.ERREUR_SERVER);
+          } else {
+            logger.error("Pb BDD Annonces getMesAnnonces");
+            res.status(config.erreurServer.ERREUR_SERVER);
+          }
+          next(false);
+        });
+      }
+    })
+    .catch(error => {
+      if(process.env.DEVELOP === "true") {  
+        console.log(error, error);      
+        console.log("Pb BDD Users");
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        res.status(config.erreurServer.ERREUR_SERVER);
+      } else {
+        logger.error("Pb BDD Users");
+        res.status(config.erreurServer.ERREUR_SERVER);
+      }
+      next(false);
+    });
+}
+
+exports.getOneAnnonce = (req, res, next) => {
+  if(process.env.DEVELOP === "true") console.log("fonction getOneAnnonce !");
+  else logger.info("Requête getOneAnnonce lancée !");
+
+  const { cookies } = req;
+
+  if (!cookies || !cookies.access_token) {//cookie présent ?
+    if(process.env.DEVELOP === "true") {
+      console.log('accessToken manquant');
+      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
+      res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
+    } else {
+      logger.error('accessToken manquant');
+      res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+    }
+    next(false);
+  }
+  const accessToken = cookies.access_token;
+
+  const decodedToken = jwt.verify(accessToken, config.token.accessToken.secret, {
+      algorithms: config.token.accessToken.algorithm
+    });
+  if(process.env.DEVELOP === "true") console.log('decodedToken', decodedToken);
+
+  User.findOne({ _id: decodedToken.sub })
+    .then((user) => {//Pas de problème avec la BDD
+      if(!user) {
+        if(process.env.DEVELOP === "true") {
+            console.log('User introuvable dans la BDD');
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
+            res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+        } else {
+            logger.error('User introuvable dans la BDD');
+            res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
+        }
+        next(false);
+      } else {//on sauvegarde la nouvelle annonce
+
+        Annonce.findOne({ _id: req.body.ref }, { userId: 0, _id: 0 })//0 supp le champ dans la réponse
+          .then((annonce) => {
+            
+            if(!annonce){
+              if(process.env.DEVELOP === "true") {
+                console.log('Annonce introuvable dans la BDD');
+                console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
+                res.status(config.erreurServer.BAD_REQUEST);
+              } else {
+                logger.error('Ref introuvable dans la BDD');
+                res.status(config.erreurServer.BAD_REQUEST);
+              }
+
+              next(false);
+            } else {
+              //console.log('annonce', annonce);
+
+              if(process.env.DEVELOP === "true") {
+                console.log("then getOneAnnonce");
+                res.status(200).json({ message: 'Informations one annonce transmisent !', annonce });
+              } else {
+                res.status(200).json({ message: process.env.MSG_OK_PRODUCTION, annonce });
+                logger.info("Informations one annonce transmisent !");
+              }
+            
+              if(process.env.DEVELOP === "true") console.log('Informations one annonce transmisent !');
+              next();
+            }
+          })
+          .catch(error => {
+            if(process.env.DEVELOP === "true") {  
+              console.log(error, error);      
+              console.log("Pb BDD Annonces suppPhotoBDD");
+              console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+              res.status(config.erreurServer.ERREUR_SERVER);
+            } else {
+              logger.error("Pb BDD Annonces suppPhotoBDD");
+              res.status(config.erreurServer.ERREUR_SERVER);
+            }
+            next(false);
+          });
+      }
+    })
+    .catch(error => {
+      if(process.env.DEVELOP === "true") {  
+        console.log(error, error);      
+        console.log("Pb BDD Users");
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        res.status(config.erreurServer.ERREUR_SERVER);
+      } else {
+        logger.error("Pb BDD Users");
+        res.status(config.erreurServer.ERREUR_SERVER);
+      }
+      next(false);
+    });
+}

@@ -742,6 +742,40 @@ exports.validParamAddAnnonce = function (req, res, next){
         console.log('datePoster =', req.body.datePoster)
         console.log('annonceActive =', req.body.annonceActive)
         console.log('annonceValide =', req.body.annonceValide)
+        console.log('meuble =', req.body.meuble)
+
+        console.log('laveVaisselle =', req.body.laveVaisselle)
+        console.log('wifi =', req.body.wifi)
+        console.log('cuisineEquipe =', req.body.cuisineEquipe)
+        console.log('television =', req.body.television)
+        console.log('laveLinge =', req.body.laveLinge)
+        console.log('chemine =', req.body.chemine)
+        console.log('radElec =', req.body.radElec)
+        console.log('chGaz =', req.body.chGaz)
+        console.log('poele =', req.body.poele)
+        console.log('detecFumee =', req.body.detecFumee)
+        console.log('baignoire =', req.body.baignoire)
+        console.log('sdbPriv =', req.body.sdbPriv)
+        console.log('secheCheveux =', req.body.secheCheveux)
+        console.log('linge =', req.body.linge)
+        console.log('couvEtUstensiles =', req.body.couvEtUstensiles)
+        console.log('ferRepasser =', req.body.ferRepasser)
+        console.log('tancarville =', req.body.tancarville)
+        console.log('dressing =', req.body.dressing)
+        console.log('verrouCh =', req.body.verrouCh)
+        console.log('refri =', req.body.refri)
+        console.log('fourMicro =', req.body.fourMicro)
+        console.log('equipCuisine =', req.body.equipCuisine)
+        console.log('congelo =', req.body.congelo)
+        console.log('four =', req.body.four)
+        console.log('cafetiere =', req.body.cafetiere)
+        console.log('barbecue =', req.body.barbecue)
+        console.log('mobilierExt =', req.body.mobilierExt)
+        console.log('camExt =', req.body.camExt)
+        console.log('femmeDeMenage =', req.body.femmeDeMenage)
+        console.log('gardien =', req.body.gardien)
+        console.log('rangements =', req.body.rangements)
+        console.log('bureau =', req.body.bureau)
     }
     
     if(isLieu(req.body.lieu) && isNumber(req.body.loyerHC,0,9999) && isNumber(req.body.charges,0,999) && isType(req.body.type) &&
@@ -749,7 +783,16 @@ exports.validParamAddAnnonce = function (req, res, next){
     isTel(req.body.tel) && isTitreAnnonce(req.body.titreAnnonce) && isNumber(req.body.surface,0,500) &&
     isNumber(req.body.nbrePieces,0,30) && isClassEnergie(req.body.classEnergie) && isClassEnergie(req.body.ges) &&
     isBool(req.body.masquerNumero) && isBool(req.body.refuseDemarcheCommercial) /*&& isNumberDate(req.body.datePoster)*/ &&
-    isBool(req.body.annonceActive) && isDescription(req.body.description) && isBool(req.body.annonceValide)){
+    isBool(req.body.annonceActive) && isDescription(req.body.description) && isBool(req.body.annonceValide) &&
+    isBool(req.body.meuble) && isBool(req.body.laveVaisselle) && isBool(req.body.wifi) && 
+    isBool(req.body.cuisineEquipe) && isBool(req.body.television) && isBool(req.body.laveLinge) && isBool(req.body.chemine) && 
+    isBool(req.body.radElec) && isBool(req.body.chGaz) && isBool(req.body.poele) && isBool(req.body.detecFumee) && 
+    isBool(req.body.baignoire) && isBool(req.body.sdbPriv) && isBool(req.body.secheCheveux) && isBool(req.body.linge) && 
+    isBool(req.body.couvEtUstensiles) && isBool(req.body.tancarville) && isBool(req.body.dressing) && isBool(req.body.verrouCh) && 
+    isBool(req.body.refri) && isBool(req.body.fourMicro) && isBool(req.body.equipCuisine) && isBool(req.body.congelo) && 
+    isBool(req.body.four) && isBool(req.body.cafetiere) && isBool(req.body.barbecue) && isBool(req.body.mobilierExt) && isBool(req.body.camExt) && 
+    isBool(req.body.femmeDeMenage) && isBool(req.body.gardien) && isBool(req.body.rangements) && isBool(req.body.bureau) &&
+    isBool(req.body.ferRepasser)){
         if(process.env.DEVELOP === "true") console.log("Données addAnnonce ok");
         else logger.info("Données addAnnonce ok");
         next();
@@ -787,6 +830,40 @@ exports.validParamUpdateAnnonce = function (req, res, next){
         console.log('annonceActive =', req.body.annonceActive)
         console.log('annonceValide =', req.body.annonceValide)
         console.log('datePoster =', req.body.datePoster)
+        console.log('meublé ?', req.body.meuble);
+
+        console.log('laveVaisselle =', req.body.laveVaisselle)
+        console.log('wifi =', req.body.wifi)
+        console.log('cuisineEquipe =', req.body.cuisineEquipe)
+        console.log('television =', req.body.television)
+        console.log('laveLinge =', req.body.laveLinge)
+        console.log('chemine =', req.body.chemine)
+        console.log('radElec =', req.body.radElec)
+        console.log('chGaz =', req.body.chGaz)
+        console.log('poele =', req.body.poele)
+        console.log('detecFumee =', req.body.detecFumee)
+        console.log('baignoire =', req.body.baignoire)
+        console.log('sdbPriv =', req.body.sdbPriv)
+        console.log('secheCheveux =', req.body.secheCheveux)
+        console.log('linge =', req.body.linge)
+        console.log('couvEtUstensiles =', req.body.couvEtUstensiles)
+        console;log('ferRepasser =', req.body.ferRepasser)
+        console.log('tancarville =', req.body.tancarville)
+        console.log('dressing =', req.body.dressing)
+        console.log('verrouCh =', req.body.verrouCh)
+        console.log('refri =', req.body.refri)
+        console.log('fourMicro =', req.body.fourMicro)
+        console.log('equipCuisine =', req.body.equipCuisine)
+        console.log('congelo =', req.body.congelo)
+        console.log('four =', req.body.four)
+        console.log('cafetiere =', req.body.cafetiere)
+        console.log('barbecue =', req.body.barbecue)
+        console.log('mobilierExt =', req.body.mobilierExt)
+        console.log('camExt =', req.body.camExt)
+        console.log('femmeDeMenage =', req.body.femmeDeMenage)
+        console.log('gardien =', req.body.gardien)
+        console.log('rangements =', req.body.rangements)
+        console.log('bureau =', req.body.bureau)
     }
     
     if(isRef(req.body.ref) && isLieu(req.body.lieu) && isNumber(req.body.loyerHC,0,9999) && isNumber(req.body.charges,0,999) && isType(req.body.type) &&
@@ -794,7 +871,16 @@ exports.validParamUpdateAnnonce = function (req, res, next){
     isTel(req.body.tel) && isTitreAnnonce(req.body.titreAnnonce) && isNumber(req.body.surface,0,500) &&
     isNumber(req.body.nbrePieces,0,30) && isClassEnergie(req.body.classEnergie) && isClassEnergie(req.body.ges) &&
     isBool(req.body.masquerNumero) && isBool(req.body.refuseDemarcheCommercial) /*&& isNumberDate(req.body.datePoster)*/ &&
-    isBool(req.body.annonceActive) && isDescription(req.body.description) && isBool(req.body.annonceValide)){
+    isBool(req.body.annonceActive) && isDescription(req.body.description) && isBool(req.body.annonceValide) &&
+    isBool(req.body.meuble) && isBool(req.body.laveVaisselle) && isBool(req.body.wifi) && 
+    isBool(req.body.cuisineEquipe) && isBool(req.body.television) && isBool(req.body.laveLinge) && isBool(req.body.chemine) && 
+    isBool(req.body.radElec) && isBool(req.body.chGaz) && isBool(req.body.poele) && isBool(req.body.detecFumee) && 
+    isBool(req.body.baignoire) && isBool(req.body.sdbPriv) && isBool(req.body.secheCheveux) && isBool(req.body.linge) && 
+    isBool(req.body.couvEtUstensiles) && isBool(req.body.tancarville) && isBool(req.body.dressing) && isBool(req.body.verrouCh) && 
+    isBool(req.body.refri) && isBool(req.body.fourMicro) && isBool(req.body.equipCuisine) && isBool(req.body.congelo) && 
+    isBool(req.body.four) && isBool(req.body.cafetiere) && isBool(req.body.barbecue) && isBool(req.body.mobilierExt) && isBool(req.body.camExt) && 
+    isBool(req.body.femmeDeMenage) && isBool(req.body.gardien) && isBool(req.body.rangements) && isBool(req.body.bureau) &&
+    isBool(req.body.ferRepasser)){
         if(process.env.DEVELOP === "true") console.log("Données updateAnnonce ok");
         else logger.info("Données updateAnnonce ok");
         next();
