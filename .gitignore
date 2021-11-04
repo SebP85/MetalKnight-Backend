@@ -6,7 +6,8 @@ node_modules
 certificate
 
 # local images
-images
+Images
+Documents
 
 # requêtes
 request.rest
