@@ -18,7 +18,7 @@ exports.levelAuthorizeFree = (req, res, next) => {//Role autorisé Free
         logger.error('accessToken manquant');
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
-      next(false);
+      //next(false);
     }
     const accessToken = cookies.access_token;
 
@@ -39,7 +39,7 @@ exports.levelAuthorizeFree = (req, res, next) => {//Role autorisé Free
             logger.error('user introuvable dans la BDD');
             res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
         }
-        next(false);
+        //next(false);
       } else {
           if((result.role === config.role.roleFree) || (result.role === config.role.roleAmateur) ||
             (result.role === config.role.roleExpert) || (result.role === config.role.roleAdmin)){
@@ -54,7 +54,7 @@ exports.levelAuthorizeFree = (req, res, next) => {//Role autorisé Free
                 logger.error('droit du role interdit');
                 res.status(config.erreurServer.BAD_REQUEST);
             }
-            next(false);
+            //next(false);
           }
       }
     })
@@ -68,7 +68,7 @@ exports.levelAuthorizeFree = (req, res, next) => {//Role autorisé Free
             logger.error("Pb BDD Users");
             res.status(config.erreurServer.ERREUR_SERVER).redirect("http://localhost:8080/login");
         }
-        next(false);
+        //next(false);
     });
 
 };
@@ -91,7 +91,7 @@ exports.levelAuthorizeAmateur = (req, res, next) => {//Role autorisé Amateur
         logger.error('accessToken manquant');
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
-      next(false);
+      //next(false);
     }
     const accessToken = cookies.access_token;
 
@@ -112,7 +112,7 @@ exports.levelAuthorizeAmateur = (req, res, next) => {//Role autorisé Amateur
             logger.error('user introuvable dans la BDD');
             res.status(config.erreurServer.BAD_REQUEST).redirect("http://localhost:8080/login");//page de connexion
         }
-        next(false);
+        //next(false);
       } else {
           if((result.role === config.role.roleAmateur) ||
             (result.role === config.role.roleExpert) || (result.role === config.role.roleAdmin)){
@@ -127,7 +127,7 @@ exports.levelAuthorizeAmateur = (req, res, next) => {//Role autorisé Amateur
                 logger.error('droit du role interdit');
                 res.status(config.erreurServer.BAD_REQUEST);
             }
-            next(false);
+            //next(false);
           }
       }
     })
@@ -141,7 +141,7 @@ exports.levelAuthorizeAmateur = (req, res, next) => {//Role autorisé Amateur
             logger.error("Pb BDD Users");
             res.status(config.erreurServer.ERREUR_SERVER);
         }
-        next(false);
+        //next(false);
     });
 
 };
@@ -164,7 +164,7 @@ exports.levelAuthorizeExpert = (req, res, next) => {//Role autorisé Expert
         logger.error('accessToken manquant');
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
-      next(false);
+      //next(false);
     }
     const accessToken = cookies.access_token;
 
@@ -185,7 +185,7 @@ exports.levelAuthorizeExpert = (req, res, next) => {//Role autorisé Expert
             logger.error('user introuvable dans la BDD');
             res.status(config.erreurServer.BAD_REQUEST);
         }
-        next(false);
+        //next(false);
       } else {
           if((result.role === config.role.roleExpert) || (result.role === config.role.roleAdmin)){
             req.body.role = result.role;
@@ -199,7 +199,7 @@ exports.levelAuthorizeExpert = (req, res, next) => {//Role autorisé Expert
                 logger.error('droit du role interdit');
                 res.status(config.erreurServer.BAD_REQUEST);
             }
-            next(false);
+            //next(false);
           }
       }
     })
@@ -213,7 +213,7 @@ exports.levelAuthorizeExpert = (req, res, next) => {//Role autorisé Expert
             logger.error("Pb BDD Users");
             res.status(config.erreurServer.ERREUR_SERVER);
         }
-        next(false);
+        //next(false);
     });
 };
 
@@ -235,7 +235,7 @@ exports.levelAuthorizeAdmin = (req, res, next) => {//Role autorisé Admin
         logger.error('accessToken manquant');
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
-      next(false);
+      //next(false);
     }
     const accessToken = cookies.access_token;
 
@@ -256,7 +256,7 @@ exports.levelAuthorizeAdmin = (req, res, next) => {//Role autorisé Admin
             logger.error('user introuvable dans la BDD');
             res.status(config.erreurServer.BAD_REQUEST);
         }
-        next(false);
+        //next(false);
       } else {
         if((result.role === config.role.roleAdmin)){
           req.body.role = result.role;
@@ -270,7 +270,7 @@ exports.levelAuthorizeAdmin = (req, res, next) => {//Role autorisé Admin
               logger.error('droit du role interdit');
               res.status(config.erreurServer.BAD_REQUEST);
           }
-          next(false);
+          //next(false);
         }
       }
     })
@@ -284,6 +284,6 @@ exports.levelAuthorizeAdmin = (req, res, next) => {//Role autorisé Admin
             logger.error("Pb BDD Users");
             res.status(config.erreurServer.ERREUR_SERVER).redirect("http://localhost:8080/login");
         }
-        next(false);
+        //next(false);
     });
 };

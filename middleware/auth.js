@@ -23,7 +23,7 @@ exports.normal = (req, res, next) => {//Vérification des tokens
         logger.error('accessToken manquant');
         res.status(config.erreurServer.BAD_IDENTIFICATION).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
-      next(false);
+      //next(false);
     }
     const accessToken = cookies.access_token;
 
@@ -36,7 +36,7 @@ exports.normal = (req, res, next) => {//Vérification des tokens
         logger.error('xsrfToken manquant');
         res.status(config.erreurServer.BAD_IDENTIFICATION).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
-      next(false);
+      //next(false);
     }
     const xsrfToken = headers['xsrftoken'];
 
@@ -57,7 +57,7 @@ exports.normal = (req, res, next) => {//Vérification des tokens
           logger.error('refreshToken introuvable dans la BDD');
           res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/expired");//page de connexion
         }
-        next(false);
+        //next(false);
       } else {//user et refreshToken existent dans la BDD
         if(process.env.DEVELOP === "true") console.log("Date d'expiration refreshToken", moment(result.expiresAt));
         var dateExpireAccessTokenTheorique = new Date(result.expiresAt - config.token.refreshToken.expiresIn + config.token.accessToken.expiresIn);
@@ -76,7 +76,7 @@ exports.normal = (req, res, next) => {//Vérification des tokens
             logger.error('date expiration cookie incohérent');
             res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
           }
-          next(false);
+          //next(false);
         }
 
         if(process.env.DEVELOP === "true") console.log('Expiration cookie identique');
@@ -96,7 +96,7 @@ exports.normal = (req, res, next) => {//Vérification des tokens
             logger.error('xsrfToken ne correspond pas (normal)');
             res.status(config.erreurServer.BAD_IDENTIFICATION).json({ error: process.env.MSG_ERROR_PRODUCTION });
           }
-          next(false);
+          //next(false);
         }
         
         if(process.env.DEVELOP === "true") console.log('xsrfToken identique');
@@ -124,7 +124,7 @@ exports.normal = (req, res, next) => {//Vérification des tokens
               logger.error("Pb BDD User");
               res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
             }
-            next(false);
+            //next(false);
           });
       }
     })
@@ -138,7 +138,7 @@ exports.normal = (req, res, next) => {//Vérification des tokens
         logger.error("Pb BDD refreshToken");
         res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
       }
-      next(false);
+      //next(false);
     });
 
     
@@ -150,7 +150,7 @@ exports.normal = (req, res, next) => {//Vérification des tokens
     else
       res.status(config.erreurServer.BAD_IDENTIFICATION).json({error: new Error(process.env.MSG_ERROR_PRODUCTION)});
     
-    next(false);
+    //next(false);
   }
 };
 
@@ -182,7 +182,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
         logger.error('refreshToken manquant');
         res.status(config.erreurServer.ACCESS_REFUSED).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
-      next(false);
+      //next(false);
     }
     const refreshToken = cookies.refresh_token;
 
@@ -195,7 +195,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
         logger.error('xsrfToken manquant');
         res.status(config.erreurServer.ACCESS_REFUSED).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
-      next(false);
+      //next(false);
     }
     const xsrfToken = headers['xsrftoken'];
 
@@ -219,7 +219,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
         logger.error('xsrfToken ne correspond pas');
         res.status(config.erreurServer.ACCESS_REFUSED).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
-      next(false);
+      //next(false);
     }*/
 
     const decodedToken = jwt.verify(refreshToken, config.token.refreshToken.secret, {
@@ -239,7 +239,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
           logger.error('refreshToken introuvable dans la BDD');
           res.status(config.erreurServer.ACCESS_REFUSED);//page de connexion
         }
-        next(false);
+        //next(false);
       } else {//user et refreshToken existent dans la BDD
         //On compare le refreshToken dans la BDD à celui dans la requête
         if(process.env.DEVELOP === "true") console.log('result', result);
@@ -252,7 +252,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
             logger.error('refToken ne correspond pas');
             res.status(config.erreurServer.ACCESS_REFUSED).json({ error: process.env.MSG_ERROR_PRODUCTION });
           }
-          next(false);
+          //next(false);
         }
         
         if(process.env.DEVELOP === "true") console.log('refToken identique');
@@ -270,7 +270,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
           } else logger.info("Date d'expiration nok");
 
           res.status(config.erreurServer.ACCESS_REFUSED).json({ message: "Date d'expiration nok" });
-          next(false);
+          //next(false);
         }
 
         if(process.env.DEVELOP === "true") {
@@ -286,7 +286,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
             logger.error('xsrfToken ne correspond pas (refreshToken)');
             res.status(config.erreurServer.ACCESS_REFUSED).json({ error: process.env.MSG_ERROR_PRODUCTION });
           }
-          next(false);
+          //next(false);
         }
         
         if(process.env.DEVELOP === "true") console.log('xsrfToken identique');
@@ -314,7 +314,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
               logger.error("Pb BDD User");
               res.status(config.erreurServer.ERREUR_SERVER);
             }
-            next(false);
+            //next(false);
           });
       }
     })
@@ -328,7 +328,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
         logger.error("Pb BDD refreshToken");
         res.status(config.erreurServer.ERREUR_SERVER);
       }
-      next(false);
+      //next(false);
     });
 
     
@@ -343,7 +343,7 @@ exports.refreshToken = function (req, res, next){//MAJ refreshToken, accessToken
       logger.error("erreur authentification !", err);
       res.status(config.erreurServer.ACCESS_REFUSED).json({error: new Error(process.env.MSG_ERROR_PRODUCTION)});
     }
-    next(false);
+    //next(false);
   }
 };
 
@@ -362,7 +362,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         logger.error('accessToken manquant');
         res.status(config.erreurServer.BAD_IDENTIFICATION).json({ error: process.env.MSG_ERROR_PRODUCTION });
       }
-      next(false);
+      //next(false);
     }
     const accessToken = cookies.access_token;
     
@@ -375,7 +375,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         logger.error('refreshToken manquant');
         res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
-      next(false);
+      //next(false);
     }
     const refreshToken = cookies.refresh_token;
 
@@ -388,7 +388,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         logger.error('xsrfToken manquant');
         res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
-      next(false);
+      //next(false);
     }
     const xsrfToken = headers['xsrftoken'];
 
@@ -413,7 +413,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         logger.error('xsrfToken different');
         res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
-      next(false);
+      //next(false);
     }
 
     //refToken
@@ -427,7 +427,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         logger.error('Token different');
         res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
-      next(false);
+      //next(false);
     }
 
     //Token expiré
@@ -460,7 +460,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         logger.error('Token delai expireIn différent');
         res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
-      next(false);
+      //next(false);
     }
     if(process.env.DEVELOP === "true") console.log("vérification delai expireIn ok");
 
@@ -474,7 +474,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         logger.error('Token expiré');
         res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
       }
-      next(false);
+      //next(false);
     }
     if(process.env.DEVELOP === "true") console.log("cookie expiré ok");
 
@@ -490,7 +490,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
           logger.error('user introuvable dans la BDD');
           res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
         }
-        next(false);
+        //next(false);
       } else {
 
         //verif token dans la bdd Users
@@ -503,7 +503,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
             logger.error('Token non trouvé dans la BDD Users');
             res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
           }
-          next(false);
+          //next(false);
         }
 
         //verif refreshToken dans la bdd Users
@@ -516,7 +516,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
             logger.error('refreshToken non trouvé dans la BDD Users');
             res.status(config.erreurServer.BAD_IDENTIFICATION).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
           }
-          next(false);
+          //next(false);
         }
 
         //ajout de l'email dans le body de la requête
@@ -535,7 +535,7 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
         logger.error("Pb BDD Users");
         res.status(config.erreurServer.ERREUR_SERVER).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");
       }
-      next(false);
+      //next(false);
     });
 
   }catch(err){
@@ -548,6 +548,6 @@ exports.mailNewPassword = function (req, res, next){//Vérification refreshToken
       logger.error("erreur authentification !", err);
       res.status(config.erreurServer.BAD_IDENTIFICATION).json({error: new Error(process.env.MSG_ERROR_PRODUCTION)});
     }
-    next(false);
+    //next(false);
   }
 }

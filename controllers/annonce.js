@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Annonce = require('../models/Annonce');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+const moment = require('moment');
 
 const config = require('../config/config');
 const { logger } = require('../log/winston');
@@ -23,7 +24,7 @@ exports.addAnnonce = (req, res, next) => {//Role autorisé Free
       logger.error('accessToken manquant');
       res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
-    next(false);
+    //next(false);
   }
   const accessToken = cookies.access_token;
 
@@ -44,7 +45,7 @@ exports.addAnnonce = (req, res, next) => {//Role autorisé Free
             logger.error('User introuvable dans la BDD');
             res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
         }
-        next(false);
+        //next(false);
       } else {//on sauvegarde la nouvelle annonce
             
         const myAnnonce = new Annonce({
@@ -130,7 +131,7 @@ exports.addAnnonce = (req, res, next) => {//Role autorisé Free
               console.log(process.env.MSG_ERROR_PRODUCTION);
               res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
             }
-            next(false);
+            //next(false);
           });
       }
     })
@@ -144,7 +145,7 @@ exports.addAnnonce = (req, res, next) => {//Role autorisé Free
         logger.error("Pb BDD Users");
         res.status(config.erreurServer.ERREUR_SERVER);
       }
-      next(false);
+      //next(false);
     });
 
 };
@@ -164,7 +165,7 @@ exports.addPhotoAnnonce = (req, res, next) => {//Role autorisé Free
       logger.error('accessToken manquant');
       res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
-    next(false);
+    //next(false);
   }
   const accessToken = cookies.access_token;
 
@@ -192,7 +193,7 @@ exports.addPhotoAnnonce = (req, res, next) => {//Role autorisé Free
           logger.error('Annonce introuvable dans la BDD');
           res.status(config.erreurServer.BAD_REQUEST);
       }
-      next(false);
+      //next(false);
     } else {//on met à jour l'annonce
 
       if(chatty) console.log("annonce.photos avant", annonce.photos)
@@ -211,7 +212,7 @@ exports.addPhotoAnnonce = (req, res, next) => {//Role autorisé Free
               logger.error('Annonce introuvable dans la BDD');
               res.status(config.erreurServer.BAD_REQUEST);
           }
-          next(false);
+          //next(false);
         } else {//on met à jour l'annonce
 
           if(process.env.DEVELOP === "true") {
@@ -237,7 +238,7 @@ exports.addPhotoAnnonce = (req, res, next) => {//Role autorisé Free
           logger.error("Pb BDD Annonces update");
           res.status(config.erreurServer.ERREUR_SERVER);
         }
-        next(false);
+        //next(false);
       });
     }
   })
@@ -251,7 +252,7 @@ exports.addPhotoAnnonce = (req, res, next) => {//Role autorisé Free
       logger.error("Pb BDD Annonces find");
       res.status(config.erreurServer.ERREUR_SERVER);
     }
-    next(false);
+    //next(false);
   });
 };
 
@@ -278,7 +279,7 @@ exports.suppAnnonce = (req, res, next) => {
         res.status(config.erreurServer.BAD_REQUEST);
       }
 
-      next(false);
+      //next(false);
     } else {
 
       Annonce.deleteOne({ _id: req.body.ref })
@@ -302,7 +303,7 @@ exports.suppAnnonce = (req, res, next) => {
       
           if(process.env.DEVELOP === "true") console.log('Suppression annonce nok !');
 
-          next(false);
+          //next(false);
         } else {
           if(process.env.DEVELOP === "true") {
             console.log("then annonce");
@@ -327,7 +328,7 @@ exports.suppAnnonce = (req, res, next) => {
           logger.error("Pb BDD Annonces");
           res.status(config.erreurServer.ERREUR_SERVER);
         }
-        next(false);
+        //next(false);
       });
     }
   })
@@ -341,7 +342,7 @@ exports.suppAnnonce = (req, res, next) => {
       logger.error("Pb BDD Annonces suppPhotoBDD");
       res.status(config.erreurServer.ERREUR_SERVER);
     }
-    next(false);
+    //next(false);
   });
 };
 
@@ -360,7 +361,7 @@ exports.updateAnnonce = (req, res, next) => {
       logger.error('accessToken manquant');
       res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
-    next(false);
+    //next(false);
   }
   const accessToken = cookies.access_token;
 
@@ -425,7 +426,7 @@ exports.updateAnnonce = (req, res, next) => {
     console.log('body', req.body)
   }
 
-  Annonce.findOneAndUpdate({ _id: refAnnonce, userId: decodedToken.sub }, { ...req.body, _id: refAnnonce, userId: decodedToken.sub })
+  Annonce.findOneAndUpdate({ _id: refAnnonce, userId: decodedToken.sub }, { ...req.body, _id: refAnnonce, userId: decodedToken.sub, datePoster: moment() })
   .then((annonce) => {//Pas de problème avec la BDD
     
     if(!annonce) {
@@ -437,7 +438,7 @@ exports.updateAnnonce = (req, res, next) => {
           logger.error('Annonce introuvable dans la BDD');
           res.status(config.erreurServer.BAD_REQUEST);
       }
-      next(false);
+      //next(false);
     } else {//on met à jour l'annonce
       if(chatty)
       {
@@ -468,7 +469,7 @@ exports.updateAnnonce = (req, res, next) => {
       logger.error("Pb BDD Annonces");
       res.status(config.erreurServer.ERREUR_SERVER);
     }
-    next(false);
+    //next(false);
   });
 };
 
@@ -503,7 +504,7 @@ exports.suppOnePhotoAnnonce = (req, res, next) => {
         logger.error("Pb suppOnePhotoAnnonce");
         res.status(config.erreurServer.ERREUR_SERVER);
       }
-      next(false);
+      //next(false);
     }
   });
 };
@@ -534,7 +535,7 @@ exports.getAnnonces = (req, res, next) => {
       logger.error("Pb BDD Annonces getAnnonces");
       res.status(config.erreurServer.ERREUR_SERVER);
     }
-    next(false);
+    //next(false);
   });
 }
 
@@ -553,7 +554,7 @@ exports.getMesAnnonces = (req, res, next) => {
       logger.error('accessToken manquant');
       res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
-    next(false);
+    //next(false);
   }
   const accessToken = cookies.access_token;
 
@@ -574,7 +575,7 @@ exports.getMesAnnonces = (req, res, next) => {
             logger.error('User introuvable dans la BDD');
             res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
         }
-        next(false);
+        //next(false);
       } else {//on envoie les informations des annonces de l'utilisateur
 
         Annonce.find({userId: decodedToken.sub }, { _id: 0, photos: 1, titreAnnonce: 2, loyerHC: 3, charges: 4, lieu: 5, datePoster: 6, _id: 7 })
@@ -599,7 +600,7 @@ exports.getMesAnnonces = (req, res, next) => {
             logger.error("Pb BDD Annonces getMesAnnonces");
             res.status(config.erreurServer.ERREUR_SERVER);
           }
-          next(false);
+          //next(false);
         });
       }
     })
@@ -613,7 +614,7 @@ exports.getMesAnnonces = (req, res, next) => {
         logger.error("Pb BDD Users");
         res.status(config.erreurServer.ERREUR_SERVER);
       }
-      next(false);
+      //next(false);
     });
 }
 
@@ -632,7 +633,7 @@ exports.getOneAnnonce = (req, res, next) => {
       logger.error('accessToken manquant');
       res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
-    next(false);
+    //next(false);
   }
   const accessToken = cookies.access_token;
 
@@ -652,7 +653,7 @@ exports.getOneAnnonce = (req, res, next) => {
             logger.error('User introuvable dans la BDD');
             res.status(config.erreurServer.BAD_REQUEST).redirect("https://"+process.env.SITE_HOST+":"+process.env.SITE_PORT+"/login");//page de connexion
         }
-        next(false);
+        //next(false);
       } else {//on sauvegarde la nouvelle annonce
 
         Annonce.findOne({ _id: req.body.ref }, { userId: 0, _id: 0 })//0 supp le champ dans la réponse
@@ -668,7 +669,7 @@ exports.getOneAnnonce = (req, res, next) => {
                 res.status(config.erreurServer.BAD_REQUEST);
               }
 
-              next(false);
+              //next(false);
             } else {
               //console.log('annonce', annonce);
 
@@ -694,7 +695,7 @@ exports.getOneAnnonce = (req, res, next) => {
               logger.error("Pb BDD Annonces suppPhotoBDD");
               res.status(config.erreurServer.ERREUR_SERVER);
             }
-            next(false);
+            //next(false);
           });
       }
     })
@@ -708,7 +709,7 @@ exports.getOneAnnonce = (req, res, next) => {
         logger.error("Pb BDD Users");
         res.status(config.erreurServer.ERREUR_SERVER);
       }
-      next(false);
+      //next(false);
     });
 }
 
@@ -727,7 +728,7 @@ exports.suppPhotosAnnonce = (req, res, next) => {//recherche les photos qui ne s
       logger.error('accessToken manquant');
       res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
-    next(false);
+    //next(false);
   }
   const accessToken = cookies.access_token;
 
@@ -748,7 +749,7 @@ exports.suppPhotosAnnonce = (req, res, next) => {//recherche les photos qui ne s
             logger.error('User introuvable dans la BDD');
             res.status(config.erreurServer.BAD_REQUEST);
         }
-        next(false);
+        //next(false);
       } else {//On recherche les urls des photos initials
 
         Annonce.find({ _id: req.body.ref, userId: decodedToken.sub }, { _id: 0, photos: 1 })
@@ -809,7 +810,7 @@ exports.suppPhotosAnnonce = (req, res, next) => {//recherche les photos qui ne s
               logger.error("Pb BDD urlsInitial suppPhotosAnnonce");
               res.status(config.erreurServer.ERREUR_SERVER);
             }
-            next(false);
+            //next(false);
           });
         })
         .catch(error => {
@@ -822,7 +823,7 @@ exports.suppPhotosAnnonce = (req, res, next) => {//recherche les photos qui ne s
             logger.error("Pb BDD Annonces suppPhotosAnnonce");
             res.status(config.erreurServer.ERREUR_SERVER);
           }
-          next(false);
+          //next(false);
         });
       }
     })
@@ -836,6 +837,6 @@ exports.suppPhotosAnnonce = (req, res, next) => {//recherche les photos qui ne s
         logger.error("Pb BDD Users");
         res.status(config.erreurServer.ERREUR_SERVER);
       }
-      next(false);
+      //next(false);
     });
 };
