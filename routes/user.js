@@ -76,6 +76,7 @@ router.post('/updateAnnonce', checkBody.validParamAuth, checkBody.validParamUpda
 router.post('/addPhotoAnnonce', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, multerPhotosAnnonce, checkBody.validParamRef, xssFilter.filterParamRef, annonce.addPhotoAnnonce);
 router.post('/suppAnnonce', checkBody.validParamAuth, checkBody.validParamSuppAnnonce, xssFilter.filterParamAuth, xssFilter.filterSuppAnnonce, auth.normal, role.levelAuthorizeFree, annonce.suppAnnonce);
 router.post('/suppOnePhotoAnnonce', checkBody.validParamAuth, xssFilter.filterParamAuth, checkBody.validParamSuppOnePhoto, xssFilter.filterParamSuppOnePhoto, auth.normal, role.levelAuthorizeFree, annonce.suppOnePhotoAnnonce);
+router.post('/suppPhotosAnnonce', checkBody.validParamAuth, xssFilter.filterParamAuth, checkBody.validParamSuppPhotos, xssFilter.filterParamSuppPhotos, auth.normal, role.levelAuthorizeFree, annonce.suppPhotosAnnonce);
 router.post('/getOneAnnonce', checkBody.validParamAuth, xssFilter.filterParamAuth, checkBody.validParamRef, xssFilter.filterParamRef, auth.normal, role.levelAuthorizeFree, annonce.getOneAnnonce);
 router.post('/getAnnonces', annonce.getAnnonces);
 router.post('/getMesAnnonces', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, annonce.getMesAnnonces);

@@ -711,3 +711,131 @@ exports.getOneAnnonce = (req, res, next) => {
       next(false);
     });
 }
+
+exports.suppPhotosAnnonce = (req, res, next) => {//recherche les photos qui ne sont pas dans la requête et supp les urls dans la BDD
+  if(process.env.DEVELOP === "true") console.log("fonction suppPhotosAnnonce !");
+  else logger.info("Requête suppPhotosAnnonce lancée !");
+
+  const { cookies } = req;
+  
+  if (!cookies || !cookies.access_token) {//cookie présent ?
+    if(process.env.DEVELOP === "true") {
+      console.log('accessToken manquant');
+      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
+      res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
+    } else {
+      logger.error('accessToken manquant');
+      res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+    }
+    next(false);
+  }
+  const accessToken = cookies.access_token;
+
+  const decodedToken = jwt.verify(accessToken, config.token.accessToken.secret, {
+      algorithms: config.token.accessToken.algorithm
+    });
+  if(process.env.DEVELOP === "true") console.log('decodedToken', decodedToken);
+
+
+  User.findOne({ _id: decodedToken.sub })
+    .then((user) => {//Pas de problème avec la BDD
+      if(!user) {
+        if(process.env.DEVELOP === "true") {
+            console.log('User introuvable dans la BDD');
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
+            res.status(config.erreurServer.BAD_REQUEST);
+        } else {
+            logger.error('User introuvable dans la BDD');
+            res.status(config.erreurServer.BAD_REQUEST);
+        }
+        next(false);
+      } else {//On recherche les urls des photos initials
+
+        Annonce.find({ _id: req.body.ref, userId: decodedToken.sub }, { _id: 0, photos: 1 })
+        .then((urlsInitial) => {
+          if(chatty) {
+            console.log('urlsInitial', urlsInitial);
+            console.log('urlsInitial photos', urlsInitial[0].photos);
+            console.log('photosBackup', req.body.photos);
+          }
+
+          for(const url of urlsInitial[0].photos){
+            if(chatty){
+              console.log('url link', url);
+              console.log('url', req.body.photos);
+              var arrBackUp = [...req.body.photos];
+              console.log('arrBackUp', arrBackUp);
+              console.log(arrBackUp.includes(url));
+            }
+
+            if(!req.body.photos.includes(url)){
+
+              fs.unlink(`Images/Annonces/${url.split('/Images/Annonces/')[1]}`, (resp) => {
+                if(chatty){
+                  console.log('urlPhoto', url)
+                  console.log(`Images/Annonces/${url.split('/Images/Annonces/')[1]}`)
+                }
+
+                if(process.env.DEVELOP === "true") console.log("Suppression une photo de l'annonce ok !");
+                else logger.info("Mise au propre des photos de l'annonce ok !");
+              });
+            }
+          }
+
+          res.status(200).json({ message: process.env.MSG_OK_PRODUCTION });
+          next();
+
+          //On met à jour la liste des photos dans la BDD
+          Annonce.updateOne({ _id: req.body.ref, userId: decodedToken.sub }, { photos: req.body.photos })
+          .then(() => {
+            if(process.env.DEVELOP === "true") {
+              console.log("suppPhotosAnnonce");
+              res.status(200).json({ message: "Mise au propre des photos de l'annonce ok !" });
+            } else {
+              res.status(200).json({ message: process.env.MSG_OK_PRODUCTION });
+              logger.info("Mise au propre des photos de l'annonce ok !");
+            }
+  
+            if(process.env.DEVELOP === "true") console.log("Mise au propre des photos de l'annonce ok !");
+            next();
+          })
+          .catch(error => {
+            if(process.env.DEVELOP === "true") {  
+              console.log('error', error);      
+              console.log("Pb BDD urlsInitial suppPhotosAnnonce");
+              console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+              res.status(config.erreurServer.ERREUR_SERVER);
+            } else {
+              logger.error("Pb BDD urlsInitial suppPhotosAnnonce");
+              res.status(config.erreurServer.ERREUR_SERVER);
+            }
+            next(false);
+          });
+        })
+        .catch(error => {
+          if(process.env.DEVELOP === "true") {  
+            console.log('error', error);      
+            console.log("Pb BDD Annonces suppPhotosAnnonce");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+            res.status(config.erreurServer.ERREUR_SERVER);
+          } else {
+            logger.error("Pb BDD Annonces suppPhotosAnnonce");
+            res.status(config.erreurServer.ERREUR_SERVER);
+          }
+          next(false);
+        });
+      }
+    })
+    .catch(error => {
+      if(process.env.DEVELOP === "true") {  
+        console.log(error, error);      
+        console.log("Pb BDD Users");
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        res.status(config.erreurServer.ERREUR_SERVER);
+      } else {
+        logger.error("Pb BDD Users");
+        res.status(config.erreurServer.ERREUR_SERVER);
+      }
+      next(false);
+    });
+};

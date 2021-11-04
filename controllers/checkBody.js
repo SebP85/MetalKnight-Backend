@@ -393,6 +393,29 @@ function isUrlAnnonces(val){
     return v;
 }
 
+function isUrlPhotos(photos){
+    var verifPhotos = true;
+    for(const urlPhoto of photos){
+        if(!v8n()
+            .string()
+            .not.null()
+            .first("h")
+            .includes("https://")
+            .includes("/Images/Annonces/")
+            .pattern(/[a-z0-9A-Z_.:\/]+$/)//autorisé
+            .test(urlPhoto)){
+                verifPhotos = false;
+                //console.log("urlPhoto nok", urlPhoto)
+                break;
+            }
+    }
+
+    if(chatty) console.log("UrlPhotos", photos);
+    if(!photos && process.env.DEVELOP === "false") logger.error("UrlPhotos =>", photos);
+
+    return verifPhotos;
+}
+
 exports.validParamRegister = function (req, res, next){
     if(process.env.DEVELOP === "true") console.log("checkBody");
     else logger.info("Vérification des données d'entrées");
@@ -948,6 +971,27 @@ exports.validParamSuppOnePhoto = function (req, res, next){
             console.log("Données validParamSuppOnePhoto nok");
             console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
         } else logger.error("Données validParamSuppOnePhoto nok");
+        res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+        next(false);
+    }
+};
+
+exports.validParamSuppPhotos = function (req, res, next){
+
+    if(chatty) {
+        console.log('photos =', req.body.photos)
+        console.log('ref =', req.body.ref)
+    }
+    
+    if(isUrlPhotos(req.body.photos) && isRef(req.body.ref)){
+        if(process.env.DEVELOP === "true") console.log("Données validParamSuppPhotosAnnonce ok");
+        else logger.info("Données validParamSuppPhotosAnnonce ok");
+        next();
+    } else {
+        if(process.env.DEVELOP === "true") {
+            console.log("Données validParamSuppPhotosAnnonce nok");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        } else logger.error("Données validParamSuppPhotosAnnonce nok");
         res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
         next(false);
     }
