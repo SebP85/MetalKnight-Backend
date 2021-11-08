@@ -417,7 +417,6 @@ exports.signup = (req, res, next) => {//Enregistrement du nouvel utilisateur
               civilite: req.body.civilite,
               token: crypto.randomBytes(128).toString('hex'),
               refreshToken: crypto.randomBytes(128).toString('hex'),
-
             });
 
             //Envoie l'email

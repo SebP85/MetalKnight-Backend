@@ -66,7 +66,7 @@ exports.addAnnonce = (req, res, next) => {//Role autorisé Free
           ges: req.body.ges,
           masquerNumero: Boolean(req.body.masquerNumero),  
           refuseDemarcheCommercial: Boolean(req.body.refuseDemarcheCommercial),
-          annonceActive: Boolean(req.body.annonceActive),
+          annonceActive: false,//Boolean(req.body.annonceActive),
           annonceValide: Boolean(req.body.annonceValide),
           meuble: Boolean(req.body.meuble),
           
@@ -378,7 +378,7 @@ exports.updateAnnonce = (req, res, next) => {
   req.body.tel=String(req.body.tel);
   req.body.surface=Number(req.body.surface);
   req.body.nbrePieces=Number(req.body.nbrePieces);
-  req.body.annonceActive=Boolean(req.body.annonceActive);
+  req.body.annonceActive= false;//Boolean(req.body.annonceActive);
   req.body.annonceValide=Boolean(req.body.annonceValide);
   req.body.masquerNumero=Boolean(req.body.masquerNumero);
   req.body.refuseDemarcheCommercial=Boolean(req.body.refuseDemarcheCommercial);
