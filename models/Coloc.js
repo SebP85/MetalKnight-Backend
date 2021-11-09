@@ -17,6 +17,7 @@ const colocSchema = mongoose.Schema({
     situation: { type: String, required: true },
     rechercheActive: { type: Boolean, required: true },
     avatar: { type: String },
+    favoris_annonce: { type: [{ type: String }], },
     
 });
 

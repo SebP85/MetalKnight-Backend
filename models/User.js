@@ -18,6 +18,7 @@ const userSchema = mongoose.Schema({
     token: { type: String, required: true },
     refreshToken: { type: String, required: true },
     note: { type: Array, default: [""] },
+    favoris_colocs: { type: [{ type: String }], },
     
 });
 
