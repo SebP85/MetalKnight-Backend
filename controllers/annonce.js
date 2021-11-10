@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const Annonce = require('../models/Annonce');
+const Coloc = require('../models/Coloc');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const moment = require('moment');
@@ -7,7 +8,7 @@ const moment = require('moment');
 const config = require('../config/config');
 const { logger } = require('../log/winston');
 
-var chatty = false;
+var chatty = true;
 
 exports.addAnnonce = (req, res, next) => {//Role autorisé Free
   if(process.env.DEVELOP === "true") console.log("fonction addAnnonce !");
@@ -840,3 +841,95 @@ exports.suppPhotosAnnonce = (req, res, next) => {//recherche les photos qui ne s
       //next(false);
     });
 };
+
+exports.getFavorisAnnonces = (req, res, next) => {
+  if(process.env.DEVELOP === "true") console.log("fonction getFavorisAnnonces !");
+  else logger.info("Requête getFavorisAnnonces lancée !");
+
+  var listeFavorisAnnonces = new Array();
+
+  const { cookies } = req;
+    
+  if (!cookies || !cookies.access_token) {//cookie présent ?
+    if(process.env.DEVELOP === "true") {
+      console.log('accessToken manquant');
+      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
+      res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
+    } else {
+      logger.error('accessToken manquant');
+      res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+    }
+    //next(false);
+  }
+  const accessToken = cookies.access_token;
+
+  const decodedToken = jwt.verify(accessToken, config.token.accessToken.secret, {
+      algorithms: config.token.accessToken.algorithm
+    });
+  if(process.env.DEVELOP === "true") console.log('decodedToken', decodedToken);
+
+  Coloc.findOne({ userId: decodedToken.sub })
+  .then((c) => {
+    if(!c) {//id non trouvé
+          
+      if(chatty) {//Pas de zone de recherche renseignée
+        console.log('id coloc non trouvé');
+      }
+
+    } else {
+
+      if(chatty) {
+        console.log('id coloc trouvé');
+      }
+
+      favorisAnnonces = c.favoris_annonce;
+
+      for (const favoris in favorisAnnonces) {
+        if(chatty) console.log('annonce', favorisAnnonces[favoris])
+  
+        Annonce.findOne({annonceActive: true, annonceValide: true, userId: favoris }, {_id: 0, photos: 1, titreAnnonce: 2, loyerHC: 3, charges: 4, lieu: 5, datePoster: 6 })
+        .then((annonces) => {
+          if(!annonces) {//ref non trouvé
+            if(chatty) {//Pas de zone de recherche renseignée
+              console.log('ref annonce non trouvé');
+            }
+          } else {
+            if(chatty) {
+              console.log('ref annonce trouvé');
+            }
+            listeFavorisColocs.push({ annonces });
+          }
+        })
+        .catch(error => {
+          if(process.env.DEVELOP === "true") {  
+            console.log(error, error);      
+            console.log("Pb BDD Annonces getFavorisAnnonces");
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+            res.status(config.erreurServer.ERREUR_SERVER);
+          } else {
+            logger.error("Pb BDD Annonces getFavorisAnnonces");
+            res.status(config.erreurServer.ERREUR_SERVER);
+          }
+          //next(false);
+        });
+      }
+  
+      if(chatty) console.log('listeFavorisAnnonces', listeFavorisAnnonces);
+  
+      res.status(200).json({ listeFavorisAnnonces: listeFavorisAnnonces });
+      next();
+
+    }
+  })
+  .catch(error => {//Pb avec la BDD
+    if(process.env.DEVELOP === "true") {
+      console.log('erreur pour accèder à la BDD coloc pour getFavorisAnnonces');
+      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+      res.status(400).json({ error });
+    } else {
+      logger.error("erreur pour accèder à la BDD coloc pour getFavorisAnnonces");
+      console.log(process.env.MSG_ERROR_PRODUCTION);
+      res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
+    }
+  });
+}
