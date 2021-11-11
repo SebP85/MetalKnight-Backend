@@ -245,7 +245,7 @@ exports.addPhotoAnnonce = (req, res, next) => {//Role autorisé Free
   })
   .catch(error => {
     if(process.env.DEVELOP === "true") {  
-      console.log(error, error);      
+      console.log(error);      
       console.log("Pb BDD Annonces find");
       console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
       res.status(config.erreurServer.ERREUR_SERVER);
@@ -514,7 +514,7 @@ exports.getAnnonces = (req, res, next) => {
   if(process.env.DEVELOP === "true") console.log("fonction getAnnonces !");
   else logger.info("Requête getAnnonces lancée !");
 
-  Annonce.find({annonceActive: true, annonceValide: true}, {_id: 0, photos: 1, titreAnnonce: 2, loyerHC: 3, charges: 4, lieu: 5, datePoster: 6 })
+  Annonce.find({annonceActive: true, annonceValide: true}, {_id: 0, photos: 1, titreAnnonce: 2, loyerHC: 3, charges: 4, lieu: 5, datePoster: 6, _id: 7 })
   .then((annonces) => {
     if(process.env.DEVELOP === "true") {
       console.log("then getAnnonces");
@@ -538,7 +538,7 @@ exports.getAnnonces = (req, res, next) => {
     }
     //next(false);
   });
-}
+};
 
 exports.getMesAnnonces = (req, res, next) => {
   if(process.env.DEVELOP === "true") console.log("fonction getMesAnnonces !");
@@ -617,7 +617,7 @@ exports.getMesAnnonces = (req, res, next) => {
       }
       //next(false);
     });
-}
+};
 
 exports.getOneAnnonce = (req, res, next) => {
   if(process.env.DEVELOP === "true") console.log("fonction getOneAnnonce !");
@@ -712,7 +712,7 @@ exports.getOneAnnonce = (req, res, next) => {
       }
       //next(false);
     });
-}
+};
 
 exports.suppPhotosAnnonce = (req, res, next) => {//recherche les photos qui ne sont pas dans la requête et supp les urls dans la BDD
   if(process.env.DEVELOP === "true") console.log("fonction suppPhotosAnnonce !");
@@ -882,12 +882,12 @@ exports.getFavorisAnnonces = (req, res, next) => {
         console.log('id coloc trouvé');
       }
 
-      favorisAnnonces = c.favoris_annonce;
+      favorisAnnonces = c.favoris_annonces;
 
       for (const favoris in favorisAnnonces) {
         if(chatty) console.log('annonce', favorisAnnonces[favoris])
   
-        Annonce.findOne({annonceActive: true, annonceValide: true, userId: favoris }, {_id: 0, photos: 1, titreAnnonce: 2, loyerHC: 3, charges: 4, lieu: 5, datePoster: 6 })
+        Annonce.findOne({annonceActive: true, annonceValide: true, userId: favorisAnnonces[favoris] }, {_id: 0, photos: 1, titreAnnonce: 2, loyerHC: 3, charges: 4, lieu: 5, datePoster: 6 })
         .then((annonces) => {
           if(!annonces) {//ref non trouvé
             if(chatty) {//Pas de zone de recherche renseignée
@@ -932,4 +932,108 @@ exports.getFavorisAnnonces = (req, res, next) => {
       res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
     }
   });
-}
+};
+
+exports.setFavorisAnnonces = (req, res, next) => {
+  if(process.env.DEVELOP === "true") console.log("fonction setFavorisAnnonces !");
+  else logger.info("Requête setFavorisAnnonces lancée !");
+
+  const { cookies } = req;
+
+  if (!cookies || !cookies.access_token) {//cookie présent ?
+    if(process.env.DEVELOP === "true") {
+      console.log('accessToken manquant');
+      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
+      res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
+    } else {
+      logger.error('accessToken manquant');
+      res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+    }
+    //next(false);
+  }
+  const accessToken = cookies.access_token;
+
+  const decodedToken = jwt.verify(accessToken, config.token.accessToken.secret, {
+      algorithms: config.token.accessToken.algorithm
+    });
+  if(process.env.DEVELOP === "true") console.log('decodedToken', decodedToken);
+
+  Coloc.findOne({ userId: decodedToken.sub })
+  .then((coloc) => {//Pas de problème avec la BDD
+    if(!coloc) {
+      if(process.env.DEVELOP === "true") {
+          console.log('coloc introuvable dans la BDD');
+      } else {
+          logger.error('coloc introuvable dans la BDD');
+      }
+
+      const myColoc = new Coloc({
+        userId: decodedToken.sub,
+        distance: 0,
+        budget: 0,
+        age: 18,
+        situation: 'etudiant',
+        rechercheActive: Boolean(false),
+        favoris_annonces: [req.body.ref]
+      });
+      Coloc.save({ userId: decodedToken.sub }, myColoc)
+      .then(() => {
+        res.status(201).json({ message: process.env.MSG_OK_PRODUCTION });
+        next();
+      })
+      .catch(error => {
+        if(process.env.DEVELOP === "true") {  
+          console.log(error);      
+          console.log("Pb BDD Coloc save");
+          console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+          res.status(config.erreurServer.ERREUR_SERVER);
+        } else {
+          logger.error("Pb BDD Coloc save");
+          res.status(config.erreurServer.ERREUR_SERVER);
+        }
+        //next(false);
+      });
+    } else {
+      if(coloc.favoris_annonces.find(elm => elm === req.body.ref)){//On vérifie si déjà dans les favoris
+        //Si oui on le supprime
+        coloc.favoris_annonces.splice(coloc.favoris_annonces.indexOf(req.body.ref), 1);
+      } else {
+        //si non on l'ajoute
+        coloc.favoris_annonces.push(req.body.ref);
+      }
+
+      Coloc.updateOne({ userId: decodedToken.sub }, coloc)
+      .then(() => {
+        res.status(201).json({ message: process.env.MSG_OK_PRODUCTION });
+        next();
+      })
+      .catch(error => {
+        if(process.env.DEVELOP === "true") {  
+          console.log(error);      
+          console.log("Pb BDD Coloc updateOne");
+          console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+          res.status(config.erreurServer.ERREUR_SERVER);
+        } else {
+          logger.error("Pb BDD Coloc updateOne");
+          res.status(config.erreurServer.ERREUR_SERVER);
+        }
+        //next(false);
+      });
+    }
+
+    
+  })
+  .catch(error => {
+    if(process.env.DEVELOP === "true") {  
+      console.log(error);      
+      console.log("Pb BDD Coloc findOne");
+      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+      res.status(config.erreurServer.ERREUR_SERVER);
+    } else {
+      logger.error("Pb BDD Coloc findOne");
+      res.status(config.erreurServer.ERREUR_SERVER);
+    }
+    //next(false);
+  });
+
+};

@@ -82,5 +82,6 @@ router.post('/getOneAnnonce', checkBody.validParamAuth, xssFilter.filterParamAut
 router.post('/getAnnonces', annonce.getAnnonces);
 router.post('/getMesAnnonces', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, annonce.getMesAnnonces);
 router.post('/getFavorisAnnonces', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, annonce.getFavorisAnnonces);
+router.post('/setFavorisAnnonces', checkBody.validParamAuth, xssFilter.filterParamAuth, checkBody.validParamRef, xssFilter.filterParamRef, auth.normal, role.levelAuthorizeFree, annonce.setFavorisAnnonces);
 
 module.exports = router;//test
