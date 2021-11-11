@@ -8,7 +8,7 @@ const moment = require('moment');
 const config = require('../config/config');
 const { logger } = require('../log/winston');
 
-var chatty = true;
+var chatty = false;
 
 exports.addAnnonce = (req, res, next) => {//Role autorisé Free
   if(process.env.DEVELOP === "true") console.log("fonction addAnnonce !");
@@ -911,12 +911,15 @@ exports.getFavorisAnnonces = (req, res, next) => {
   if(process.env.DEVELOP === "true") console.log('decodedToken', decodedToken);
 
   Coloc.findOne({ userId: decodedToken.sub })
-  .then((c) => {
+  .then(async (c) => {
     if(!c) {//id non trouvé
           
       if(chatty) {//Pas de zone de recherche renseignée
         console.log('id coloc non trouvé');
       }
+
+      res.status(200).json({ listeFavorisAnnonces: listeFavorisAnnonces });
+      next();
 
     } else {
 
@@ -929,7 +932,7 @@ exports.getFavorisAnnonces = (req, res, next) => {
       for (const favoris in favorisAnnonces) {
         if(chatty) console.log('annonce', favorisAnnonces[favoris])
   
-        Annonce.findOne({annonceActive: true, annonceValide: true, userId: favorisAnnonces[favoris] }, {_id: 0, photos: 1, titreAnnonce: 2, loyerHC: 3, charges: 4, lieu: 5, datePoster: 6 })
+        await Annonce.findOne({ annonceActive: true, annonceValide: true, _id: favorisAnnonces[favoris] }, { _id: 0, photos: 1, titreAnnonce: 2, loyerHC: 3, charges: 4, lieu: 5, datePoster: 6, _id: 7 })
         .then((annonces) => {
           if(!annonces) {//ref non trouvé
             if(chatty) {//Pas de zone de recherche renseignée
@@ -938,8 +941,18 @@ exports.getFavorisAnnonces = (req, res, next) => {
           } else {
             if(chatty) {
               console.log('ref annonce trouvé');
+              console.log('annonces', annonces);
             }
-            listeFavorisColocs.push({ annonces });
+            
+            listeFavorisAnnonces.push({ 
+              photos: annonces.photos,
+              titreAnnonce: annonces.titreAnnonce,
+              loyerHC: annonces.loyerHC,
+              charges: annonces.charges,
+              lieu: annonces.lieu,
+              datePoster: annonces.datePoster,
+              _id: annonces._id
+            });
           }
         })
         .catch(error => {
@@ -955,12 +968,10 @@ exports.getFavorisAnnonces = (req, res, next) => {
           //next(false);
         });
       }
-  
       if(chatty) console.log('listeFavorisAnnonces', listeFavorisAnnonces);
   
       res.status(200).json({ listeFavorisAnnonces: listeFavorisAnnonces });
       next();
-
     }
   })
   .catch(error => {//Pb avec la BDD
