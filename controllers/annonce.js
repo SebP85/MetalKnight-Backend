@@ -516,15 +516,57 @@ exports.getAnnonces = (req, res, next) => {
 
   Annonce.find({annonceActive: true, annonceValide: true}, {_id: 0, photos: 1, titreAnnonce: 2, loyerHC: 3, charges: 4, lieu: 5, datePoster: 6, _id: 7 })
   .then((annonces) => {
-    if(process.env.DEVELOP === "true") {
-      console.log("then getAnnonces");
-      res.status(200).json({ message: 'Informations annonces transmisent !', annoncesSimple: annonces });
+
+    const { cookies } = req;
+  
+    if (!cookies || !cookies.access_token) {//cookie présent ?
+      if(process.env.DEVELOP === "true") {
+        console.log('accessToken manquant');
+      } else {
+        logger.error('accessToken manquant');
+      }
+      if(process.env.DEVELOP === "true") {
+        console.log("then getAnnonces");
+        res.status(200).json({ message: 'Informations annonces transmisent sans cookie !', annoncesSimple: annonces });
+      } else {
+        res.status(200).json({ message: process.env.MSG_OK_PRODUCTION, annoncesSimple: annonces });
+        logger.info("Informations annonces transmisent sans cookie !");
+      }
+      if(process.env.DEVELOP === "true") console.log('Informations annonces transmisent !');
+      next();
     } else {
-      res.status(200).json({ message: process.env.MSG_OK_PRODUCTION, annoncesSimple: annonces });
-      logger.info("Informations annonces transmisent !");
+      const accessToken = cookies.access_token;
+
+      const decodedToken = jwt.verify(accessToken, config.token.accessToken.secret, {
+          algorithms: config.token.accessToken.algorithm
+        });
+      if(process.env.DEVELOP === "true") console.log('decodedToken', decodedToken);
+
+      Coloc.findOne({ userId: decodedToken.sub }, { _id: 0, favoris_annonces: 1 })
+      .then((favoris) => {
+        if(process.env.DEVELOP === "true") {
+          console.log("then getAnnonces");
+          res.status(200).json({ message: 'Informations annonces transmisent !', annoncesSimple: annonces, favoris: favoris.favoris_annonces });
+        } else {
+          res.status(200).json({ message: process.env.MSG_OK_PRODUCTION, annoncesSimple: annonces, favoris: favoris.favoris_annonces });
+          logger.info("Informations annonces transmisent !");
+        }
+        if(process.env.DEVELOP === "true") console.log('Informations annonces transmisent !');
+        next();
+      })
+      .catch(error => {
+        if(process.env.DEVELOP === "true") {  
+          console.log(error, error);      
+          console.log("Pb BDD Colocs getAnnonces");
+          console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+          res.status(config.erreurServer.ERREUR_SERVER);
+        } else {
+          logger.error("Pb BDD Colocs getAnnonces");
+          res.status(config.erreurServer.ERREUR_SERVER);
+        }
+        //next(false);
+      });
     }
-    if(process.env.DEVELOP === "true") console.log('Informations annonces transmisent !');
-    next();
   })
   .catch(error => {
     if(process.env.DEVELOP === "true") {  
