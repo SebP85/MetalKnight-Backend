@@ -8,7 +8,7 @@ const moment = require('moment');
 const config = require('../config/config');
 const { logger } = require('../log/winston');
 
-var chatty = true;
+var chatty = false;
 
 exports.addAnnonce = (req, res, next) => {//Role autorisé Free
   if(process.env.DEVELOP === "true") console.log("fonction addAnnonce !");
@@ -1052,7 +1052,8 @@ exports.setFavorisAnnonces = (req, res, next) => {
 };
 
 exports.getFavorisRefAnnonce = (req, res, next) => {
-
+  if(process.env.DEVELOP === "true") console.log("fonction getFavorisRefAnnonce !");
+  else logger.info("Requête getFavorisRefAnnonce lancée !");
 
   const { cookies } = req;
   
