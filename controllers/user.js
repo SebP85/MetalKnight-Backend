@@ -626,6 +626,7 @@ exports.login = (req, res, next) => {//connexion
                     user.tentativesConnexion=0;
                     user.token=crypto.randomBytes(128).toString('hex');//nouveau token par sécurité
                     user.refreshToken=crypto.randomBytes(128).toString('hex');//nouveau token par sécurité
+                    user.lastConnexion=moment();
 
                     User.updateOne({ email: user.email }, user)
                       .then(() => {

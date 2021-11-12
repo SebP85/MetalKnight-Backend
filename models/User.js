@@ -19,6 +19,7 @@ const userSchema = mongoose.Schema({
     refreshToken: { type: String, required: true },
     note: { type: Array, default: [""] },
     favoris_colocs: { type: [{ type: String }], },
+    lastConnexion: { type: Date, default: moment() }
     
 });
 

@@ -8,7 +8,7 @@ const moment = require('moment');
 const config = require('../config/config');
 const { logger } = require('../log/winston');
 
-var chatty = false;
+var chatty = true;
 
 exports.addAnnonce = (req, res, next) => {//Role autorisé Free
   if(process.env.DEVELOP === "true") console.log("fonction addAnnonce !");
@@ -517,56 +517,16 @@ exports.getAnnonces = (req, res, next) => {
   Annonce.find({annonceActive: true, annonceValide: true}, {_id: 0, photos: 1, titreAnnonce: 2, loyerHC: 3, charges: 4, lieu: 5, datePoster: 6, _id: 7 })
   .then((annonces) => {
 
-    const { cookies } = req;
-  
-    if (!cookies || !cookies.access_token) {//cookie présent ?
-      if(process.env.DEVELOP === "true") {
-        console.log('accessToken manquant');
-      } else {
-        logger.error('accessToken manquant');
-      }
-      if(process.env.DEVELOP === "true") {
-        console.log("then getAnnonces");
-        res.status(200).json({ message: 'Informations annonces transmisent sans cookie !', annoncesSimple: annonces });
-      } else {
-        res.status(200).json({ message: process.env.MSG_OK_PRODUCTION, annoncesSimple: annonces });
-        logger.info("Informations annonces transmisent sans cookie !");
-      }
-      if(process.env.DEVELOP === "true") console.log('Informations annonces transmisent !');
-      next();
+    if(process.env.DEVELOP === "true") {
+      console.log("then getAnnonces");
+      res.status(200).json({ message: 'Informations annonces transmisent !', annoncesSimple: annonces });
     } else {
-      const accessToken = cookies.access_token;
-
-      const decodedToken = jwt.verify(accessToken, config.token.accessToken.secret, {
-          algorithms: config.token.accessToken.algorithm
-        });
-      if(process.env.DEVELOP === "true") console.log('decodedToken', decodedToken);
-
-      Coloc.findOne({ userId: decodedToken.sub }, { _id: 0, favoris_annonces: 1 })
-      .then((favoris) => {
-        if(process.env.DEVELOP === "true") {
-          console.log("then getAnnonces");
-          res.status(200).json({ message: 'Informations annonces transmisent !', annoncesSimple: annonces, favoris: favoris.favoris_annonces });
-        } else {
-          res.status(200).json({ message: process.env.MSG_OK_PRODUCTION, annoncesSimple: annonces, favoris: favoris.favoris_annonces });
-          logger.info("Informations annonces transmisent !");
-        }
-        if(process.env.DEVELOP === "true") console.log('Informations annonces transmisent !');
-        next();
-      })
-      .catch(error => {
-        if(process.env.DEVELOP === "true") {  
-          console.log(error, error);      
-          console.log("Pb BDD Colocs getAnnonces");
-          console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-          res.status(config.erreurServer.ERREUR_SERVER);
-        } else {
-          logger.error("Pb BDD Colocs getAnnonces");
-          res.status(config.erreurServer.ERREUR_SERVER);
-        }
-        //next(false);
-      });
+      res.status(200).json({ message: process.env.MSG_OK_PRODUCTION, annoncesSimple: annonces });
+      logger.info("Informations annonces transmisent !");
     }
+    if(process.env.DEVELOP === "true") console.log('Informations annonces transmisent !');
+    next();
+    
   })
   .catch(error => {
     if(process.env.DEVELOP === "true") {  
@@ -1089,4 +1049,52 @@ exports.setFavorisAnnonces = (req, res, next) => {
     //next(false);
   });
 
+};
+
+exports.getFavorisRefAnnonce = (req, res, next) => {
+
+
+  const { cookies } = req;
+  
+  if (!cookies || !cookies.access_token) {//cookie présent ?
+    if(process.env.DEVELOP === "true") {
+      console.log('accessToken manquant');
+    } else {
+      logger.error('accessToken manquant');
+    }
+    res.status(config.erreurServer.BAD_IDENTIFICATION);
+
+  } else {
+    const accessToken = cookies.access_token;
+
+    const decodedToken = jwt.verify(accessToken, config.token.accessToken.secret, {
+        algorithms: config.token.accessToken.algorithm
+      });
+    if(process.env.DEVELOP === "true") console.log('decodedToken', decodedToken);
+
+    Coloc.findOne({ userId: decodedToken.sub }, { _id: 0, favoris_annonces: 1 })
+    .then((favoris) => {
+      if(process.env.DEVELOP === "true") {
+        console.log("then getFavorisRefAnnonce");
+        res.status(200).json({ message: "Informations favoris ref transmisent !", favoris: favoris.favoris_annonces });
+      } else {
+        res.status(200).json({ message: process.env.MSG_OK_PRODUCTION, favoris: favoris.favoris_annonces });
+        logger.info("Informations favoris ref transmisent !");
+      }
+      if(process.env.DEVELOP === "true") console.log("Informations favoris ref transmisent !");
+      next();
+    })
+    .catch(error => {
+      if(process.env.DEVELOP === "true") {  
+        console.log(error, error);      
+        console.log("Pb BDD Colocs getFavorisRefAnnonce");
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        res.status(config.erreurServer.ERREUR_SERVER);
+      } else {
+        logger.error("Pb BDD Colocs getFavorisRefAnnonce");
+        res.status(config.erreurServer.ERREUR_SERVER);
+      }
+      //next(false);
+    });
+  }
 };

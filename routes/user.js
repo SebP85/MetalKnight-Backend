@@ -70,6 +70,7 @@ router.post('/getUrlAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth
 router.post('/setAvatar', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, coloc.suppAvatar, multerAvatar, coloc.setAvatar);
 router.post('/getListeColocs', coloc.getListeColocs);
 router.post('/getListeFavorisColocs', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, coloc.getListeFavorisColocs);
+router.post('/setFavorisColocs', checkBody.validParamAuth, xssFilter.filterParamAuth, checkBody.validParamRef, xssFilter.filterParamRef, auth.normal, role.levelAuthorizeFree, coloc.setFavorisColocs);
 
 //Gestion des annonces
 router.post('/addAnnonce', checkBody.validParamAuth, checkBody.validParamAddAnnonce, xssFilter.filterParamAuth, xssFilter.filterAddAnnonce, auth.normal, role.levelAuthorizeFree, annonce.addAnnonce);
@@ -83,5 +84,6 @@ router.post('/getAnnonces', annonce.getAnnonces);
 router.post('/getMesAnnonces', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, annonce.getMesAnnonces);
 router.post('/getFavorisAnnonces', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, annonce.getFavorisAnnonces);
 router.post('/setFavorisAnnonces', checkBody.validParamAuth, xssFilter.filterParamAuth, checkBody.validParamRef, xssFilter.filterParamRef, auth.normal, role.levelAuthorizeFree, annonce.setFavorisAnnonces);
+router.post('/getFavorisRefAnnonce', checkBody.validParamAuth, xssFilter.filterParamAuth, auth.normal, role.levelAuthorizeFree, annonce.getFavorisRefAnnonce);
 
 module.exports = router;//test

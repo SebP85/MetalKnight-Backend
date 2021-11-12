@@ -664,68 +664,107 @@ exports.getListeColocs = async (req, res, next) => {
 
   var listeColocs = new Array();
 
-  //On recherche la liste des colocataires avec les infos:
-  //prénom, age, avatar, commentaire, rechercheActive
-  await User.find({userConfirmed: true})
-  .then(async (colocs) => {
-    if(chatty) console.log('colocs', colocs.length)
-
-    for (const coloc in colocs) {
-      if(chatty) console.log('userId', colocs[coloc]._id)
-
-      await Coloc.findOne({ userId: colocs[coloc]._id })
-      .then((c) => {
-        if(!c) {//id non trouvé
-              
-          if(chatty) {//Pas de zone de recherche renseignée
-            console.log('id coloc non trouvé');
-          }
-  
-        } else {
-  
-          if(chatty) {
-            console.log('id coloc trouvé');
-          }
-
-          listeColocs.push({
-            'commentaire': c.commentaire,
-            'age': c.age,
-            avatar: {'source': c.avatar, 'alt': 'avatar'},
-            'rechercheActive': c.rechercheActive,
-            'note': colocs[coloc].note,
-            'firstName': colocs[coloc].firstName
-          });
-
-        }
-      })
-      .catch(error => {//Pb avec la BDD
-        if(process.env.DEVELOP === "true") {
-          console.log('erreur pour accèder à la BDD coloc pour getListeColocs');
-          console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
-          res.status(400).json({ error });
-        } else {
-          logger.error("erreur pour accèder à la BDD coloc pour getListeColocs");
-          console.log(process.env.MSG_ERROR_PRODUCTION);
-          res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
-        }
-
-        next();
-      });
+  const { cookies } = req;
+    
+  if (!cookies || !cookies.access_token) {//cookie présent ?
+    if(process.env.DEVELOP === "true") {
+      console.log('accessToken manquant');
+      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
+      res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
+    } else {
+      logger.error('accessToken manquant');
+      res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
     }
+    //next(false);
+  }
+  const accessToken = cookies.access_token;
 
-    if(chatty) console.log('listeColocs', listeColocs);
+  const decodedToken = jwt.verify(accessToken, config.token.accessToken.secret, {
+      algorithms: config.token.accessToken.algorithm
+    });
+  if(process.env.DEVELOP === "true") console.log('decodedToken', decodedToken);
 
-    res.status(200).json({ listeColocs: listeColocs });
-    next();
+  User.findOne({_id: decodedToken.sub}, { _id: 0, userId: 1, favoris_colocs: 2 })
+  .then(async (favoris) => {
+    //On recherche la liste des colocataires avec les infos:
+    //prénom, age, avatar, commentaire, rechercheActive
+    await User.find({userConfirmed: true})
+    .then(async (colocs) => {
+      if(chatty) console.log('colocs', colocs.length)
 
+      for (const coloc in colocs) {
+        if(chatty) console.log('userId', colocs[coloc]._id)
+
+        await Coloc.findOne({ userId: colocs[coloc]._id })
+        .then((c) => {
+          if(!c) {//id non trouvé
+                
+            if(chatty) {//Pas de zone de recherche renseignée
+              console.log('id coloc non trouvé');
+            }
+    
+          } else {
+    
+            //if(chatty) {
+              console.log('id coloc trouvé');
+            //}
+
+            listeColocs.push({
+              'commentaire': c.commentaire,
+              'age': c.age,
+              avatar: {'source': c.avatar, 'alt': 'avatar'},
+              'rechercheActive': c.rechercheActive,
+              'note': colocs[coloc].note,
+              'firstName': colocs[coloc].firstName,
+              'ref': c.userId,
+              'lastConnexion': colocs[coloc].lastConnexion,
+              
+            });
+
+          }
+        })
+        .catch(error => {//Pb avec la BDD
+          if(process.env.DEVELOP === "true") {
+            console.log('erreur pour accèder à la BDD coloc pour getListeColocs');
+            console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+            res.status(400).json({ error });
+          } else {
+            logger.error("erreur pour accèder à la BDD coloc pour getListeColocs");
+            console.log(process.env.MSG_ERROR_PRODUCTION);
+            res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
+          }
+
+          next();
+        });
+      }
+
+      //if(chatty)
+      console.log('listeColocs', listeColocs);
+
+      res.status(200).json({ listeColocs: listeColocs, favoris: favoris.favoris_colocs });
+      next();
+
+    })
+    .catch(error => {//Pb avec la BDD
+      if(process.env.DEVELOP === "true") {
+        console.log('erreur pour accèder à la BDD User pour getListeColocs');
+        console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+        res.status(400).json({ error });
+      } else {
+        logger.error("erreur pour accèder à la BDD User pour getListeColocs");
+        console.log(process.env.MSG_ERROR_PRODUCTION);
+        res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
+      }
+      //next(false);
+    });
   })
   .catch(error => {//Pb avec la BDD
     if(process.env.DEVELOP === "true") {
-      console.log('erreur pour accèder à la BDD User pour getListeColocs');
+      console.log('erreur pour accèder à la BDD User pour getListeColocs - pour avoir les favoris');
       console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
       res.status(400).json({ error });
     } else {
-      logger.error("erreur pour accèder à la BDD User pour getListeColocs");
+      logger.error("erreur pour accèder à la BDD User pour getListeColocs - pour avoir les favoris");
       console.log(process.env.MSG_ERROR_PRODUCTION);
       res.status(400).json({ message: process.env.MSG_ERROR_PRODUCTION });
     }
@@ -828,3 +867,82 @@ exports.getListeFavorisColocs = async (req, res, next) => {
     //next(false);
   });
 }
+
+exports.setFavorisColocs = (req, res, next) => {
+  if(process.env.DEVELOP === "true") console.log("fonction setFavorisColocs !");
+  else logger.info("Requête setFavorisColocs lancée !");
+
+  const { cookies } = req;
+
+  if (!cookies || !cookies.access_token) {//cookie présent ?
+    if(process.env.DEVELOP === "true") {
+      console.log('accessToken manquant');
+      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');    
+      res.status(config.erreurServer.BAD_REQUEST).json({ message: 'Missing token in cookie' });
+    } else {
+      logger.error('accessToken manquant');
+      res.status(config.erreurServer.BAD_REQUEST).json({ error: process.env.MSG_ERROR_PRODUCTION });
+    }
+    //next(false);
+  }
+  const accessToken = cookies.access_token;
+
+  const decodedToken = jwt.verify(accessToken, config.token.accessToken.secret, {
+      algorithms: config.token.accessToken.algorithm
+    });
+  if(process.env.DEVELOP === "true") console.log('decodedToken', decodedToken);
+
+  User.findOne({ _id: decodedToken.sub }, {_id: 0, favoris_colocs: 1})
+  .then((user) => {//Pas de problème avec la BDD
+    if(!user) {
+      if(process.env.DEVELOP === "true") {
+          console.log('user introuvable dans la BDD');
+      } else {
+          logger.error('user introuvable dans la BDD');
+      }
+      res.status(config.erreurServer.BAD_REQUEST).json({ message: process.env.MSG_ERROR_PRODUCTION });
+      
+    } else {
+      if(user.favoris_colocs.find(elm => elm === req.body.ref)){//On vérifie si déjà dans les favoris
+        //Si oui on le supprime
+        user.favoris_colocs.splice(user.favoris_colocs.indexOf(req.body.ref), 1);
+      } else {
+        //si non on l'ajoute
+        user.favoris_colocs.push(req.body.ref);
+      }
+
+      User.updateOne({ _id: decodedToken.sub }, user)
+      .then(() => {
+        res.status(201).json({ message: process.env.MSG_OK_PRODUCTION });
+        next();
+      })
+      .catch(error => {
+        if(process.env.DEVELOP === "true") {  
+          console.log(error);      
+          console.log("Pb BDD User updateOne");
+          console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+          res.status(config.erreurServer.ERREUR_SERVER);
+        } else {
+          logger.error("Pb BDD User updateOne");
+          res.status(config.erreurServer.ERREUR_SERVER);
+        }
+        //next(false);
+      });
+    }
+
+    
+  })
+  .catch(error => {
+    if(process.env.DEVELOP === "true") {  
+      console.log(error);      
+      console.log("Pb BDD User findOne");
+      console.log('---------------------------------------------------------    Requête erreur    ------------------------------------------------------------------');
+      res.status(config.erreurServer.ERREUR_SERVER);
+    } else {
+      logger.error("Pb BDD User findOne");
+      res.status(config.erreurServer.ERREUR_SERVER);
+    }
+    //next(false);
+  });
+
+};
